@@ -1,16 +1,43 @@
 #!/usr/bin/env python
 """
-https://github.com/zeeZ/gw2-location/blob/75f446535ed448e569bc458ccdabc71413a5f2ed/client/location_sender.py
+gw2_helper_python/read_mumble_link.py
 
+The latest version of this package is available at:
+<https://github.com/jantman/gw2_helper_python>
 
+################################################################################
+Copyright 2016 Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
-See also:
-https://github.com/hackedd/gw2api/blob/6e785b257180473b9e8ce0653f101c54d59c7144/gw2api/mumble.py
-https://github.com/TheTerrasque/gw2lib/blob/2fd7a5efea1e3036a84cfda172a3571399a1e3de/gw2lib/mumble.py
-https://github.com/teomat/gw2-wurm-blocking-helper/blob/1e4380073ebf98407351d8f066681779a6def4d9/wurm%20overlay.py
-https://github.com/nandokun/gw2_event_map/blob/cb9b2cb94daeb200684407b325b4b09fd9b46b36/server/web_server.py
+    This file is part of gw2_helper_python.
 
-https://wiki.guildwars2.com/wiki/API:MumbleLink
+    gw2_helper_python is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    gw2_helper_python is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with gw2_helper_python.  If not, see <http://www.gnu.org/licenses/>.
+
+The Copyright and Authors attributions contained herein may not be removed or
+otherwise altered, except to add the Author attribution of a contributor to
+this work. (Additional Terms pursuant to Section 7b of the AGPL v3)
+################################################################################
+While not legally required, I sincerely request that anyone who finds
+bugs please submit them at <https://github.com/jantman/gw2_helper_python> or
+to me via email, and that you send any contributions or improvements
+either as a pull request on GitHub, or to me via email.
+################################################################################
+
+AUTHORS:
+Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
+################################################################################
+
+See: https://wiki.guildwars2.com/wiki/API:MumbleLink
 """
 
 import mmap
@@ -19,14 +46,13 @@ import binascii
 import time
 import json
 from socket import inet_ntoa
+import ctypes
+import mmap
 
 fname = "MumbleLink"
 #fmt = 'IL3f3f3f512s3f'
 fmt = 'IL3f256s3f256sL256s2048s'
 mapsize = struct.calcsize(fmt)
-    
-import ctypes
-import mmap
 
 class in_addr(ctypes.Structure):
     """
@@ -37,7 +63,7 @@ class in_addr(ctypes.Structure):
     _fields_ = [
         ('s_addr', ctypes.c_byte * 4),
     ]
-    
+
     def value(self):
         return inet_ntoa(self.s_addr)
 
@@ -55,7 +81,7 @@ class sockaddr_in(ctypes.Structure):
         ('sin_port',   ctypes.c_ushort),
         ('sin_addr',   in_addr),
     ]
-    
+
     def as_dict(self):
         d = {
             'sin_family': int(self.sin_family),
@@ -67,7 +93,7 @@ class sockaddr_in(ctypes.Structure):
 class GW2context(ctypes.Structure):
     """
     see: https://wiki.guildwars2.com/wiki/API:MumbleLink
-    
+
     struct MumbleContext {
         byte serverAddress[28]; // contains sockaddr_in or sockaddr_in6
         unsigned mapId;
@@ -85,7 +111,7 @@ class GW2context(ctypes.Structure):
         ("instance",       ctypes.c_uint),
         ("buildId",        ctypes.c_uint),
     ]
-    
+
     def as_dict(self):
         d = {
             #'serverAddress': self.serverAddress,
@@ -151,13 +177,6 @@ def Unpack(ctype, buf):
     cstring = ctypes.create_string_buffer(buf)
     ctype_instance = ctypes.cast(ctypes.pointer(cstring), ctypes.POINTER(ctype)).contents
     return ctype_instance
-
-
-def continent_coords(continent_rect, map_rect, point):
-    return (
-        ( point[0]-map_rect[0][0])/(map_rect[1][0]-map_rect[0][0])*(continent_rect[1][0]-continent_rect[0][0])+continent_rect[0][0],
-        (-point[1]-map_rect[0][1])/(map_rect[1][1]-map_rect[0][1])*(continent_rect[1][1]-continent_rect[0][1])+continent_rect[0][1]
-    )
 
 
 current_map = 0
