@@ -40,7 +40,6 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 See: https://wiki.guildwars2.com/wiki/API:MumbleLink
 """
 
-import mmap
 import struct
 import binascii
 import time
@@ -50,9 +49,48 @@ import ctypes
 import mmap
 
 fname = "MumbleLink"
-#fmt = 'IL3f3f3f512s3f'
 fmt = 'IL3f256s3f256sL256s2048s'
 mapsize = struct.calcsize(fmt)
+
+def carray_to_array(a, alen):
+    floatPtr = ctypes.cast(a, ctypes.POINTER(ctypes.c_float))
+    return [floatPtr[i] for i in range(alen)]
+
+def Unpack(ctype, buf):
+    cstring = ctypes.create_string_buffer(buf)
+    ctype_instance = ctypes.cast(ctypes.pointer(cstring), ctypes.POINTER(ctype)).contents
+    return ctype_instance
+
+
+current_map = 0
+current_map_data = None
+previous_tick = 0
+first = True
+memfile = mmap.mmap(0, ctypes.sizeof(Link), "MumbleLink")
+while True:
+    memfile.seek(0)
+    data = memfile.read(ctypes.sizeof(Link))
+    result = Unpack(Link, data)
+    if result.uiVersion == 0 and result.uiTick == 0:
+        print("MumbleLink contains no data, setting up and waiting")
+        try:
+            init = Link(2,name="Guild Wars 2")
+            memfile.seek(0)
+            memfile.write(init)
+        except Exception, e:
+            logging.exception("Error writing init data",e)
+    if result.uiTick != previous_tick:
+        if first:
+            print("MumbleLink seems to be active, hope for the best")
+            first = False
+        r = result.as_dict()
+        print(r)
+    previous_tick = result.uiTick
+    time.sleep(2)
+
+###################################
+# BEGIN Struct definition classes #
+###################################
 
 class in_addr(ctypes.Structure):
     """
@@ -168,39 +206,3 @@ class Link(ctypes.Structure):
             #ctx = Unpack(GW2context, result.context).as_json()
             pass
         return d
-
-def carray_to_array(a, alen):
-    floatPtr = ctypes.cast(a, ctypes.POINTER(ctypes.c_float))
-    return [floatPtr[i] for i in range(alen)]
-
-def Unpack(ctype, buf):
-    cstring = ctypes.create_string_buffer(buf)
-    ctype_instance = ctypes.cast(ctypes.pointer(cstring), ctypes.POINTER(ctype)).contents
-    return ctype_instance
-
-
-current_map = 0
-current_map_data = None
-previous_tick = 0
-first = True
-memfile = mmap.mmap(0, ctypes.sizeof(Link), "MumbleLink")
-while True:
-    memfile.seek(0)
-    data = memfile.read(ctypes.sizeof(Link))
-    result = Unpack(Link, data)
-    if result.uiVersion == 0 and result.uiTick == 0:
-        print("MumbleLink contains no data, setting up and waiting")
-        try:
-            init = Link(2,name="Guild Wars 2")
-            memfile.seek(0)
-            memfile.write(init)
-        except Exception, e:
-            logging.exception("Error writing init data",e)
-    if result.uiTick != previous_tick:
-        if first:
-            print("MumbleLink seems to be active, hope for the best")
-            first = False
-        r = result.as_dict()
-        print(r)
-    previous_tick = result.uiTick
-    time.sleep(2)
