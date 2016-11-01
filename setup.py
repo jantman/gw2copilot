@@ -43,11 +43,10 @@ from gw2_helper_python.version import VERSION, PROJECT_URL
 with open('README.rst') as file:
     long_description = file.read()
 
-"""
 requires = [
-    'something'
+    'requests',
+    'twisted>=16.0.0'
 ]
-"""
 
 classifiers = [
     'Development Status :: 2 - Pre-Alpha',
@@ -86,7 +85,11 @@ setup(
                 '2, to automate manual tasks that players currently perform '
                 'out of the game.',
     long_description=long_description,
-    # install_requires=requires,
     keywords="gw2 guildwars arenanet mumble mumblelink",
-    classifiers=classifiers
+    classifiers=classifiers,
+    install_requires=requires,
+    entry_points="""
+    [console_scripts]
+    gw2helper = gw2_helper_python.runner:console_entry_point
+    """,
 )
