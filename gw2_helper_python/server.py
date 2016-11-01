@@ -73,20 +73,31 @@ class TwistedServer(object):
         :param bind_port: port number to bind to / listen on
         :type bind_port: int
         """
-        self.poll_interval = poll_interval
-        self.bind_port = bind_port
+        self._poll_interval = poll_interval
+        self._bind_port = bind_port
         self.reactor = reactor
         # @TODO perform the initial cache gets
         # saved state:
-        self._mumble_link_data = {'foo': 'bar'}
+        self._mumble_link_data = None
         self._wine_protocol = None
         self._wine_process = None
 
-    def run_reactor(self):
+    def update_mumble_data(self, mumble_data):
+        """
+        Process an update to the MumbleLink data. This should be called by
+        MumbleLink readers to pass back data; they should NOT write directly
+        to instance variables.
+
+        :param mumble_data: Raw data received from GW2 via MumbleLink
+        :type mumble_data: dict
+        """
+        self._mumble_link_data = mumble_data
+
+    def _run_reactor(self):
         """Method to run the Twisted reactor; mock point for testing"""
         self.reactor.run()
 
-    def listentcp(self, site):
+    def _listentcp(self, site):
         """
         Setup TCP listener for the Site; helper method for testing
 
@@ -94,8 +105,8 @@ class TwistedServer(object):
         :type site: :py:class:`~.GW2HelperSite`
         """
         logger.warning('Setting TCP listener on port %d for HTTP requests',
-                       self.bind_port)
-        self.reactor.listenTCP(self.bind_port, site)
+                       self._bind_port)
+        self.reactor.listenTCP(self._bind_port, site)
 
     def add_update_loop(self):
         """
@@ -105,10 +116,10 @@ class TwistedServer(object):
         l = LoopingCall(self.wine_protocol.ask_for_output)
         l.clock = self.reactor
         logger.warning('Setting poll interval to %s seconds',
-                       self.poll_interval)
-        l.start(self.poll_interval)
+                       self._poll_interval)
+        l.start(self._poll_interval)
 
-    def add_mumble_reader(self):
+    def _add_mumble_reader(self):
         # @TODO fix this; 2 classes one for Native and one for Wine;
         # have them do everything in here.
         if platform.system() != 'Linux':
@@ -116,7 +127,6 @@ class TwistedServer(object):
                                       "impmemented.")
         logger.debug("Creating WineProcessProtocol")
         self._wine_protocol = WineProcessProtocol(self)
-        logger.debug(dir(self.wine_protocol))
         logger.debug("Creating spawned process")
         self._wine_process = self.reactor.spawnProcess(
             self._wine_protocol,
@@ -135,9 +145,9 @@ class TwistedServer(object):
         reader, and start the Twisted reactor"""
         # setup the web Site and HTTP listener
         site = Site(GW2HelperSite(self))
-        self.listentcp(site)
+        self._listentcp(site)
         # setup the MumbleLink reader
-        self.add_mumble_reader()
+        self._add_mumble_reader()
         # run the main reactor event loop
         logger.warning('Starting Twisted reactor (event loop)')
-        self.run_reactor()
+        self._run_reactor()

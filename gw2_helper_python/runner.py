@@ -55,6 +55,7 @@ requests_log.propagate = True
 
 
 class Runner(object):
+    """command-line entry point for the main TwistedServer"""
 
     def parse_args(self, argv):
         """
@@ -86,7 +87,7 @@ class Runner(object):
         return args
 
     def console_entry_point(self):
-        """parse arguments, handle them, run the VaultRedirector"""
+        """parse arguments, handle them, run the TwistedServer"""
         args = self.parse_args(sys.argv[1:])
         if args.verbose == 1:
             set_log_info()
