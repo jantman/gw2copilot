@@ -33,11 +33,11 @@ Overview
 gw2_helper_python is a browser-based "helper" for Guild Wars 2, to automate manual
 tasks that players currently perform out of the game.
 
-It is developed for either native Windows or Wine/PlayOnLinux and interfaces with both the official ArenaNet GuildWars ReST API (for both general information and account-specific data) and also makes use of the [MumbleLink](https://wiki.guildwars2.com/wiki/API:MumbleLink) memory-mapped file to retrieve realtime character location from the game.
+It is developed for either native Windows or Wine/PlayOnLinux and interfaces with both the official ArenaNet GuildWars ReST API (for both general information and account-specific data) and also makes use of the `MumbleLink <https://wiki.guildwars2.com/wiki/API:MumbleLink>`_ memory-mapped file to retrieve realtime character location from the game.
 
 This aims to automate manual tasks that players currently perform, including looking up zone maps online, tracking ToDo's, etc.
 
-This project is _not_ a game overlay; its runs as a standalone webserver, intended to display data in a browser on a second monitor. It also does not, and will not, incorporate anything that violates the User Agreement or Rules of Conduct; aside from the documented [ReST APIs](https://wiki.guildwars2.com/wiki/API:Main) which it uses to communicate with ArenaNet servers, the only way this software interacts with the game is by reading information from the documented [MumbleLink](https://wiki.guildwars2.com/wiki/API:MumbleLink) memory-mapped file to determine current character and location.
+This project is *not* a game overlay; its runs as a standalone webserver, intended to display data in a browser on a second monitor. It also does not, and will not, incorporate anything that violates the User Agreement or Rules of Conduct; aside from the documented `ReST APIs <https://wiki.guildwars2.com/wiki/API:Main>`_ which it uses to communicate with ArenaNet servers, the only way this software interacts with the game is by reading information from the documented `MumbleLink <https://wiki.guildwars2.com/wiki/API:MumbleLink>`_ memory-mapped file to determine current character and location.
 
 Planned features include:
 
@@ -48,14 +48,17 @@ Planned features include:
 Status
 ------
 
-This is _very alpha_ software. I wrote it for myself and a small number of friends. If it's useful to you, great, but I don't intend on doing a whole lot of development on it. The codebase is pretty rough, and I'm probably not even going to write tests for it, let alone the rest of what goes along with real released software; sorry, but I have too many personal projects, and I just want the end result of this.
+This is *very alpha* software. I wrote it for myself and a small number of friends. If it's useful to you, great, but I don't intend on doing a whole lot of development on it. The codebase is pretty rough, and I'm probably not even going to write tests for it, let alone the rest of what goes along with real released software; sorry, but I have too many personal projects, and I just want the end result of this.
+
+Note that running natively under Windows is *not currently functional*, as I can't get GW2 to
+login under VirtualBox.
 
 Requirements
 ------------
 
-* Python 2.7 (for Windows users, get it [here](https://www.python.org/downloads/windows/)) with [pip](https://pip.pypa.io/en/stable/)
-* [Guild Wars 2](https://www.guildwars2.com/en/)
-* Windows, or Linux and GW2 running via [wine](https://www.winehq.org/) or [PlayOnLinux](https://www.playonlinux.com/en/)
+* Python 2.7 (for Windows users, get it `here <https://www.python.org/downloads/windows/>`_) with `pip <https://pip.pypa.io/en/stable/>`_
+* `Guild Wars 2 <https://www.guildwars2.com/en/>`_
+* Windows, or Linux and GW2 running via `wine <https://www.winehq.org/>`_ or `PlayOnLinux <https://www.playonlinux.com/en/>`_
 
 Installation
 ------------
@@ -177,6 +180,6 @@ Release Checklist
 License and Disclaimer
 ----------------------
 
-This software is licensed under version 3 of the [GNU Affero GPL](https://www.gnu.org/licenses/agpl-3.0.en.html). The gist is this means you can't build a publicly-accessible service using this code unless you release your complete source code to all of your users under the same license.
+This software is licensed under version 3 of the `GNU Affero GPL <https://www.gnu.org/licenses/agpl-3.0.en.html>`_. The gist is this means you can't build a publicly-accessible service using this code unless you release your complete source code to all of your users under the same license.
 
-This software does not, and will not, violate the Guild Wars 2 [User Agreement](https://www.guildwars2.com/en/legal/guild-wars-2-user-agreement/), [Rules of Conduct](https://www.guildwars2.com/en/legal/guild-wars-2-rules-of-conduct/) or [Terms of Use](https://www.guildwars2.com/en-gb/legal/guild-wars-2-content-terms-of-use/).
+This software does not, and will not, violate the Guild Wars 2 `User Agreement <https://www.guildwars2.com/en/legal/guild-wars-2-user-agreement/>`_, `Rules of Conduct <https://www.guildwars2.com/en/legal/guild-wars-2-rules-of-conduct/>`_ or `Terms of Use <https://www.guildwars2.com/en-gb/legal/guild-wars-2-content-terms-of-use/>`_.
