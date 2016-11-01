@@ -1,34 +1,34 @@
 #!/usr/bin/env python
 """
-gw2_helper_python/runner.py
+gw2copilot/runner.py
 
 The latest version of this package is available at:
-<https://github.com/jantman/gw2_helper_python>
+<https://github.com/jantman/gw2copilot>
 
 ################################################################################
 Copyright 2016 Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
-    This file is part of gw2_helper_python.
+    This file is part of gw2copilot.
 
-    gw2_helper_python is free software: you can redistribute it and/or modify
+    gw2copilot is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    gw2_helper_python is distributed in the hope that it will be useful,
+    gw2copilot is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Affero General Public License for more details.
 
     You should have received a copy of the GNU Affero General Public License
-    along with gw2_helper_python.  If not, see <http://www.gnu.org/licenses/>.
+    along with gw2copilot.  If not, see <http://www.gnu.org/licenses/>.
 
 The Copyright and Authors attributions contained herein may not be removed or
 otherwise altered, except to add the Author attribution of a contributor to
 this work. (Additional Terms pursuant to Section 7b of the AGPL v3)
 ################################################################################
 While not legally required, I sincerely request that anyone who finds
-bugs please submit them at <https://github.com/jantman/gw2_helper_python> or
+bugs please submit them at <https://github.com/jantman/gw2copilot> or
 to me via email, and that you send any contributions or improvements
 either as a pull request on GitHub, or to me via email.
 ################################################################################
@@ -72,7 +72,7 @@ class Runner(object):
                        default=0,
                        help='verbose output. specify twice for debug-level '
                        'output.')
-        ver_str = 'gw2_helper_python {v} (see <{s}> for source code)'.format(
+        ver_str = 'gw2copilot {v} (see <{s}> for source code)'.format(
             s=PROJECT_URL,
             v=VERSION
         )

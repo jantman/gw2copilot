@@ -1,7 +1,7 @@
-gw2_helper_python
+gw2copilot
 ===============
 
 .. toctree::
    :maxdepth: 4
 
-   gw2_helper_python
+   gw2copilot

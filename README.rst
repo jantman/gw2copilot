@@ -1,24 +1,24 @@
-gw2_helper_python
+gw2copilot
 =================
 
-.. image:: https://img.shields.io/github/forks/jantman/gw2_helper_python.svg
+.. image:: https://img.shields.io/github/forks/jantman/gw2copilot.svg
    :alt: GitHub Forks
-   :target: https://github.com/jantman/gw2_helper_python/network
+   :target: https://github.com/jantman/gw2copilot/network
 
-.. image:: https://img.shields.io/github/issues/jantman/gw2_helper_python.svg
+.. image:: https://img.shields.io/github/issues/jantman/gw2copilot.svg
    :alt: GitHub Open Issues
-   :target: https://github.com/jantman/gw2_helper_python/issues
+   :target: https://github.com/jantman/gw2copilot/issues
 
-.. image:: https://secure.travis-ci.org/jantman/gw2_helper_python.png?branch=master
-   :target: http://travis-ci.org/jantman/gw2_helper_python
+.. image:: https://secure.travis-ci.org/jantman/gw2copilot.png?branch=master
+   :target: http://travis-ci.org/jantman/gw2copilot
    :alt: travis-ci for master branch
 
-.. image:: https://codecov.io/github/jantman/gw2_helper_python/coverage.svg?branch=master
-   :target: https://codecov.io/github/jantman/gw2_helper_python?branch=master
+.. image:: https://codecov.io/github/jantman/gw2copilot/coverage.svg?branch=master
+   :target: https://codecov.io/github/jantman/gw2copilot?branch=master
    :alt: coverage report for master branch
 
-.. image:: https://readthedocs.org/projects/gw2_helper_python/badge/?version=latest
-   :target: https://readthedocs.org/projects/gw2_helper_python/?badge=latest
+.. image:: https://readthedocs.org/projects/gw2copilot/badge/?version=latest
+   :target: https://readthedocs.org/projects/gw2copilot/?badge=latest
    :alt: sphinx documentation for latest release
 
 .. image:: http://www.repostatus.org/badges/latest/wip.svg
@@ -30,7 +30,7 @@ A Python-based GuildWars2 helper tool.
 Overview
 --------
 
-gw2_helper_python is a browser-based "helper" for Guild Wars 2, to automate manual
+gw2copilot is a browser-based "helper" for Guild Wars 2, to automate manual
 tasks that players currently perform out of the game.
 
 It is developed for either native Windows or Wine/PlayOnLinux and interfaces with both the official ArenaNet GuildWars ReST API (for both general information and account-specific data) and also makes use of the `MumbleLink <https://wiki.guildwars2.com/wiki/API:MumbleLink>`_ memory-mapped file to retrieve realtime character location from the game.
@@ -69,7 +69,7 @@ for information on how to create a venv.
 
 .. code-block:: bash
 
-    pip install git+https://github.com/jantman/gw2_helper_python.git@master#egg=gw2_helper_python
+    pip install git+https://github.com/jantman/gw2copilot.git@master#egg=gw2copilot
 
 If you're running under Linux (wine/PlayOnLinux), you'll also need to install Python2.7 in the same WINEPREFIX as GW2.
 
@@ -107,7 +107,7 @@ Notes/References/Links
 Bugs and Feature Requests
 -------------------------
 
-Bug reports and feature requests are happily accepted via the `GitHub Issue Tracker <https://github.com/jantman/gw2_helper_python/issues>`_. Pull requests are
+Bug reports and feature requests are happily accepted via the `GitHub Issue Tracker <https://github.com/jantman/gw2copilot/issues>`_. Pull requests are
 welcome. Issues that don't have an accompanying pull request will be worked on
 as my time and priority allows.
 
@@ -116,15 +116,15 @@ Development
 
 To install for development:
 
-1. Fork the `gw2_helper_python <https://github.com/jantman/gw2_helper_python>`_ repository on GitHub
+1. Fork the `gw2copilot <https://github.com/jantman/gw2copilot>`_ repository on GitHub
 2. Create a new branch off of master in your fork.
 
 .. code-block:: bash
 
-    $ virtualenv gw2_helper_python
-    $ cd gw2_helper_python && source bin/activate
-    $ pip install -e git+git@github.com:YOURNAME/gw2_helper_python.git@BRANCHNAME#egg=gw2_helper_python
-    $ cd src/gw2_helper_python
+    $ virtualenv gw2copilot
+    $ cd gw2copilot && source bin/activate
+    $ pip install -e git+git@github.com:YOURNAME/gw2copilot.git@BRANCHNAME#egg=gw2copilot
+    $ cd src/gw2copilot
 
 The git clone you're now in will probably be checked out to a specific commit,
 so you may want to ``git checkout BRANCHNAME``.
@@ -154,7 +154,7 @@ Release Checklist
 2. Confirm that there are CHANGES.rst entries for all major changes.
 3. Ensure that Travis tests passing in all environments.
 4. Ensure that test coverage is no less than the last release (ideally, 100%).
-5. Increment the version number in gw2_helper_python/version.py and add version and release date to CHANGES.rst, then push to GitHub.
+5. Increment the version number in gw2copilot/version.py and add version and release date to CHANGES.rst, then push to GitHub.
 6. Confirm that README.rst renders correctly on GitHub.
 7. Upload package to testpypi:
 
@@ -163,7 +163,7 @@ Release Checklist
    * ``python setup.py register -r https://testpypi.python.org/pypi``
    * ``python setup.py sdist bdist_wheel``
    * ``twine upload -r test dist/*``
-   * Check that the README renders at https://testpypi.python.org/pypi/gw2_helper_python
+   * Check that the README renders at https://testpypi.python.org/pypi/gw2copilot
 
 8. Create a pull request for the release to be merged into master. Upon successful Travis build, merge it.
 9. Tag the release in Git, push tag to GitHub:

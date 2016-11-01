@@ -1,34 +1,34 @@
 #!/usr/bin/env python
 """
-gw2_helper_python/server.py
+gw2copilot/server.py
 
 The latest version of this package is available at:
-<https://github.com/jantman/gw2_helper_python>
+<https://github.com/jantman/gw2copilot>
 
 ################################################################################
 Copyright 2016 Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
-    This file is part of gw2_helper_python.
+    This file is part of gw2copilot.
 
-    gw2_helper_python is free software: you can redistribute it and/or modify
+    gw2copilot is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    gw2_helper_python is distributed in the hope that it will be useful,
+    gw2copilot is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Affero General Public License for more details.
 
     You should have received a copy of the GNU Affero General Public License
-    along with gw2_helper_python.  If not, see <http://www.gnu.org/licenses/>.
+    along with gw2copilot.  If not, see <http://www.gnu.org/licenses/>.
 
 The Copyright and Authors attributions contained herein may not be removed or
 otherwise altered, except to add the Author attribution of a contributor to
 this work. (Additional Terms pursuant to Section 7b of the AGPL v3)
 ################################################################################
 While not legally required, I sincerely request that anyone who finds
-bugs please submit them at <https://github.com/jantman/gw2_helper_python> or
+bugs please submit them at <https://github.com/jantman/gw2copilot> or
 to me via email, and that you send any contributions or improvements
 either as a pull request on GitHub, or to me via email.
 ################################################################################
@@ -51,7 +51,7 @@ from twisted.internet import reactor
 from twisted.web._responses import NOT_FOUND, SERVICE_UNAVAILABLE, OK
 
 from .version import VERSION, PROJECT_URL
-from .site import GW2HelperSite
+from .site import GW2CopilotSite
 from .wine_mumble_reader import WineMumbleLinkReader
 from .native_mumble_reader import NativeMumbleLinkReader
 
@@ -102,7 +102,7 @@ class TwistedServer(object):
         Setup TCP listener for the Site; helper method for testing
 
         :param site: Site to serve
-        :type site: :py:class:`~.GW2HelperSite`
+        :type site: :py:class:`~.GW2CopilotSite`
         """
         logger.warning('Setting TCP listener on port %d for HTTP requests',
                        self._bind_port)
@@ -128,7 +128,7 @@ class TwistedServer(object):
         """setup the web Site, start listening on port, setup the MumbleLink
         reader, and start the Twisted reactor"""
         # setup the web Site and HTTP listener
-        site = Site(GW2HelperSite(self))
+        site = Site(GW2CopilotSite(self))
         self._listentcp(site)
         # setup the MumbleLink reader
         self._add_mumble_reader()

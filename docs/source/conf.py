@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# gw2_helper_python documentation build configuration file, created by
+# gw2copilot documentation build configuration file, created by
 # sphinx-quickstart on Sat Jun  6 16:12:56 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -17,7 +17,7 @@ import os
 import re
 # to let sphinx find the actual source...
 sys.path.insert(0, os.path.abspath("../.."))
-from gw2_helper_python.version import VERSION
+from gw2copilot.version import VERSION
 import sphinx.environment
 from docutils.utils import get_source_line
 
@@ -67,7 +67,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'gw2_helper_python'
+project = u'gw2copilot'
 copyright = u'2016 Jason Antman'
 author = u'Jason Antman'
 
@@ -134,7 +134,7 @@ if is_rtd:
         sphinx_rtd_theme.get_html_theme_path(),
     ]
     html_static_path = ['_static']
-    htmlhelp_basename = 'gw2_helper_pythondoc'
+    htmlhelp_basename = 'gw2copilotdoc'
 
 #html_theme_options = {
 #    'analytics_id': 'Your-ID-Here',
@@ -205,7 +205,7 @@ html_last_updated_fmt = '%b %d, %Y'
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-#htmlhelp_basename = 'gw2_helper_pythondoc'
+#htmlhelp_basename = 'gw2copilotdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -227,7 +227,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'gw2_helper_python.tex', u'gw2_helper_python Documentation',
+  (master_doc, 'gw2copilot.tex', u'gw2copilot Documentation',
    u'Jason Antman', 'manual'),
 ]
 
@@ -257,7 +257,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'gw2_helper_python', u'gw2_helper_python Documentation',
+    (master_doc, 'gw2copilot', u'gw2copilot Documentation',
      [author], 1)
 ]
 
@@ -271,8 +271,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'gw2_helper_python', u'gw2_helper_python Documentation',
-   author, 'gw2_helper_python', 'One line description of project.',
+  (master_doc, 'gw2copilot', u'gw2copilot Documentation',
+   author, 'gw2copilot', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -303,7 +303,7 @@ linkcheck_ignore = [
     r'https?://.*\.readthedocs\.org.*',
     r'https?://codecov\.io.*',
     r'https?://.*readthedocs\.org.*',
-    r'https?://pypi\.python\.org/pypi/gw2_helper_python'
+    r'https?://pypi\.python\.org/pypi/gw2copilot'
 ]
 
 # exclude module docstrings - see http://stackoverflow.com/a/18031024/211734

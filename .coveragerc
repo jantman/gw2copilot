@@ -1,7 +1,7 @@
 [run]
 branch = True
 omit = lib/*
-       gw2_helper_python/tests/*
+       gw2copilot/tests/*
        setup.py
 
 [report]
