@@ -71,7 +71,7 @@ class GW2MumbleLinkReader(object):
     """
 
     def __init__(self):
-        """open the memory-mapped file"""
+        """open the memory-mapped file and prepare for reading"""
         self.fname = "MumbleLink"
         self.map_size = ctypes.sizeof(Link)
         logger.debug("Initializing mmap(0, %d, %s)", self.map_size, self.fname)
@@ -82,7 +82,8 @@ class GW2MumbleLinkReader(object):
 
     def read(self):
         """
-        Read memfile once.
+        Read memfile once. Return a dict of its contents if the game has written
+        to it (uiTick has changed) since the last read; otherwise return None.
 
         This should return something like (note the units are not yet converted
         to GW2's coordinate system):
@@ -274,11 +275,31 @@ def set_log_level_format(level, format):
 
 
 def carray_to_array(a, alen):
+    """
+    Convert a ``ctypes.array`` to a native Python list.
+
+    :param a: ctypes array
+    :param alen: length of ctypes array
+    :type alen: int
+    :return: native Python list
+    :rtype: list
+    """
     floatPtr = ctypes.cast(a, ctypes.POINTER(ctypes.c_float))
     return [floatPtr[i] for i in range(alen)]
 
 
 def Unpack(ctype, buf):
+    """
+    Given binary string from :py:meth:`mmap.mmap.read`, unpack it as the given
+    ctype Structure, and return an instance of the Structure.
+
+    :param ctype: ctype Structure to unpack as
+    :type ctype: ctypes.Structure
+    :param buf: binary data read from :py:meth:`mmap.mmap.read`
+    :type buf: str
+    :return: unpacked Structure object (instance of ``ctype``)
+    :rtype: ctypes.Structure
+    """
     cstring = ctypes.create_string_buffer(buf)
     ctype_instance = ctypes.cast(ctypes.pointer(cstring), ctypes.POINTER(ctype)).contents
     return ctype_instance
@@ -286,6 +307,8 @@ def Unpack(ctype, buf):
 
 class in_addr(ctypes.Structure):
     """
+    ctypes Structure for in_addr
+
     struct in_addr {
         unsigned long s_addr;  // load with inet_aton()
     };
@@ -300,12 +323,14 @@ class in_addr(ctypes.Structure):
 
 class sockaddr_in(ctypes.Structure):
     """
+    ctypes Structure for sockaddr_in
+
     struct sockaddr_in {
         short            sin_family;   // e.g. AF_INET
         unsigned short   sin_port;     // e.g. htons(3490)
         struct in_addr   sin_addr;     // see struct in_addr, below
         char             sin_zero[8];  // zero this if you want to
-    };
+    }
     """
     _fields_ = [
         ('sin_family', ctypes.c_short),
@@ -324,6 +349,8 @@ class sockaddr_in(ctypes.Structure):
 
 class GW2context(ctypes.Structure):
     """
+    ctypes Structure for GW2-specific context element in Link.
+
     see: https://wiki.guildwars2.com/wiki/API:MumbleLink
 
     struct MumbleContext {
@@ -358,6 +385,7 @@ class GW2context(ctypes.Structure):
 
 
 class Link(ctypes.Structure):
+    """ctypes Structure for MumbleLink memory map"""
     # see: https://wiki.guildwars2.com/wiki/API:MumbleLink
 
     _fields_ = [

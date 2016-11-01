@@ -59,10 +59,14 @@ logger = logging.getLogger()
 
 
 class TwistedServer(object):
+    """
+    TwistedServer is the heart of the application, which handles all IO and
+    bridges the MumbleLink to the web frontend and other logic.
+    """
 
     def __init__(self, poll_interval=5.0, bind_port=8080):
         """
-        Initialize the server.
+        Initialize the Twisted Server, the heart of the application...
 
         :param poll_interval: interval in seconds to poll MumbleLink
         :type poll_interval: float
@@ -72,67 +76,11 @@ class TwistedServer(object):
         self.poll_interval = poll_interval
         self.bind_port = bind_port
         self.reactor = reactor
+        # @TODO perform the initial cache gets
         # saved state:
-        self.mumble_link_data = {'foo': 'bar'}
-        self.wine_protocol = None
-        self.wine_process = None
-
-    def get_active_node(self):
-        """
-        GET the Consul URL for the 'vault' service health check, parse the JSON
-        reply, and return either the active node in (name|ip):port form, or
-        None if no active node can be found.
-
-        :return: active node in ``(name|ip):port`` form (str) or None
-        """
-
-        """
-        url = 'http://%s/v1/health/service/vault' % self.consul_host_port
-        # parse the health check results and find the one that's passing
-        if self.log_enabled:
-            logger.debug('Polling active node from: %s', url)
-        r = requests.get(url)
-        # return the current leader address
-        for node in r.json():
-            if 'active' not in node['Service']['Tags']:
-                continue
-            port = node['Service']['Port']
-            n = "%s:%d" % (node['Node']['Node'], port)
-            if self.redir_ip:
-                n = "%s:%d" % (node['Node']['Address'], port)
-            if self.log_enabled:
-                logger.info("Got active node as: %s", n)
-            return n
-        if self.log_enabled:
-            logger.critical('NO vault services found with health check passing')
-        return None
-        """
-        pass
-
-    def update_active_node(self):
-        """
-        Run :py:meth:`~.get_active_node` and update ``self.active_node_ip_port``
-        to its value. If it raised an Exception, log the exception and set
-        ``self.active_node_ip_port`` to None.
-        """
-
-        """
-        try:
-            newnode = self.get_active_node()
-            self.last_poll_time = datetime.now().isoformat()
-        except Exception:
-            logger.exception('Exception encountered when polling active node')
-            # we have a choice here whether to keep serving the old active
-            # node, or start serving 503s. Might as well serve the old one, in
-            # case the error is with Consul or intermittent. If the node is
-            # really down, the client will end up with an error anyway...
-            newnode = None
-        if self.log_enabled and newnode != self.active_node_ip_port:
-            logger.warning("Active vault node changed from %s to %s",
-                           self.active_node_ip_port, newnode)
-        self.active_node_ip_port = newnode
-        """
-        pass
+        self._mumble_link_data = {'foo': 'bar'}
+        self._wine_protocol = None
+        self._wine_process = None
 
     def run_reactor(self):
         """Method to run the Twisted reactor; mock point for testing"""
@@ -143,7 +91,7 @@ class TwistedServer(object):
         Setup TCP listener for the Site; helper method for testing
 
         :param site: Site to serve
-        :type site: :py:class:`~.VaultRedirectorSite`
+        :type site: :py:class:`~.GW2HelperSite`
         """
         logger.warning('Setting TCP listener on port %d for HTTP requests',
                        self.bind_port)
@@ -151,7 +99,7 @@ class TwistedServer(object):
 
     def add_update_loop(self):
         """
-        Setup the LoopingCall to poll Consul every ``self.poll_interval``;
+        Setup the LoopingCall to poll MumbleLink every ``self.poll_interval``;
         helper for testing.
         """
         l = LoopingCall(self.wine_protocol.ask_for_output)
@@ -161,33 +109,35 @@ class TwistedServer(object):
         l.start(self.poll_interval)
 
     def add_mumble_reader(self):
+        # @TODO fix this; 2 classes one for Native and one for Wine;
+        # have them do everything in here.
         if platform.system() != 'Linux':
             raise NotImplementedError("ERROR: non-Linux support not "
                                       "impmemented.")
         logger.debug("Creating WineProcessProtocol")
-        self.wine_protocol = WineProcessProtocol(self)
+        self._wine_protocol = WineProcessProtocol(self)
         logger.debug(dir(self.wine_protocol))
         logger.debug("Creating spawned process")
-        self.wine_process = self.reactor.spawnProcess(
-            self.wine_protocol,
+        self._wine_process = self.reactor.spawnProcess(
+            self._wine_protocol,
             '/home/jantman/GIT/gw2_helper_python/bin/python',
             [
                 '/home/jantman/GIT/gw2_helper_python/bin/python',
                 '/home/jantman/GIT/gw2_helper_python/gw2_helper_python/output_test.py'
             ],
-            {}
+            {}  # @TODO need to use the wine process' environment
         )
+        # update on a regular basis
+        self.add_update_loop()
 
     def run(self):
-        """setup the site, start listening on port, setup the looping call to
-        :py:meth:`~.update_active_node` every ``self.poll_interval`` seconds,
-        and start the Twisted reactor"""
-        logger.error("TODO: implement initial checks")
+        """setup the web Site, start listening on port, setup the MumbleLink
+        reader, and start the Twisted reactor"""
+        # setup the web Site and HTTP listener
         site = Site(GW2HelperSite(self))
-        # setup our HTTP(S) listener
         self.listentcp(site)
-        # setup the update_active_node poll every POLL_INTERVAL seconds
+        # setup the MumbleLink reader
         self.add_mumble_reader()
-        self.add_update_loop()
+        # run the main reactor event loop
         logger.warning('Starting Twisted reactor (event loop)')
         self.run_reactor()
