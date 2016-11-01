@@ -40,8 +40,60 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 import logging
 import json
 from twisted.internet import protocol
+from twisted.internet.task import LoopingCall
 
 logger = logging.getLogger()
+
+
+class WineMumbleLinkReader(object):
+    """
+    Class to handle reading MumbleLink via wine.
+    """
+
+    def __init__(self, parent_server, poll_interval):
+        """
+        Initialize the class.
+        :param parent_server: the TwistedServer instance that started this
+        :type parent_server: :py:class:`~.TwistedServer`
+        :param poll_interval: interval in seconds to poll MumbleLink
+        :type poll_interval: float
+        """
+        logger.debug("Instantiating WineMumbleLinkReader")
+        self.server = parent_server
+        self._poll_interval = poll_interval
+        self._wine_protocol = None
+        self._wine_process = None
+        self._setup_process()
+        self.add_update_loop()
+
+    def _add_update_loop(self):
+        """
+        Setup the LoopingCall to poll MumbleLink every ``self.poll_interval``;
+        helper for testing.
+        """
+        logger.debug("Creating LoopingCall")
+        l = LoopingCall(self._wine_protocol.ask_for_output)
+        l.clock = self.server.reactor
+        logger.info('Setting poll interval to %s seconds',
+                    self._poll_interval)
+        l.start(self._poll_interval)
+
+    def _setup_process(self):
+        """
+        Setup and spawn the process to read MumbleLink.
+        """
+        logger.debug("Creating WineProcessProtocol")
+        self._wine_protocol = WineProcessProtocol(self.server)
+        logger.debug("Creating spawned process")
+        self._wine_process = self.server.reactor.spawnProcess(
+            self._wine_protocol,
+            '/home/jantman/GIT/gw2_helper_python/bin/python',
+            [
+                '/home/jantman/GIT/gw2_helper_python/bin/python',
+                '/home/jantman/GIT/gw2_helper_python/gw2_helper_python/output_test.py'
+            ],
+            {}  # @TODO need to use the wine process' environment
+        )
 
 
 class WineProcessProtocol(protocol.ProcessProtocol):
@@ -79,9 +131,8 @@ class WineProcessProtocol(protocol.ProcessProtocol):
     def outReceived(self, data):
         """
         Called when output is received from the process; attempts to deserialize
-        JSON and on success passes it back to
-        ``self.parent_server.update_mumble_data``
-        (:py:meth:`~.TwistedServer.update_mumble_data`).
+        JSON and on success passes it back to ``self.parent_server`` via
+        :py:meth:`~.TwistedServer.update_mumble_data`.
 
         :param data: JSON data read from MumbleLink
         :type data: str

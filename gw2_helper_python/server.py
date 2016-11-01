@@ -48,12 +48,12 @@ from datetime import datetime
 from twisted.web import resource
 from twisted.web.server import Site
 from twisted.internet import reactor
-from twisted.internet.task import LoopingCall
 from twisted.web._responses import NOT_FOUND, SERVICE_UNAVAILABLE, OK
 
 from .version import VERSION, PROJECT_URL
 from .site import GW2HelperSite
-from .wine_reader import WineProcessProtocol
+from .wine_mumble_reader import WineMumbleLinkReader
+from .native_mumble_reader import NativeMumbleLinkReader
 
 logger = logging.getLogger()
 
@@ -79,8 +79,7 @@ class TwistedServer(object):
         # @TODO perform the initial cache gets
         # saved state:
         self._mumble_link_data = None
-        self._wine_protocol = None
-        self._wine_process = None
+        self._mumble_reader = None
 
     def update_mumble_data(self, mumble_data):
         """
@@ -92,6 +91,7 @@ class TwistedServer(object):
         :type mumble_data: dict
         """
         self._mumble_link_data = mumble_data
+        # @TODO do useful stuff with the data; figure out where we are
 
     def _run_reactor(self):
         """Method to run the Twisted reactor; mock point for testing"""
@@ -108,37 +108,21 @@ class TwistedServer(object):
                        self._bind_port)
         self.reactor.listenTCP(self._bind_port, site)
 
-    def add_update_loop(self):
-        """
-        Setup the LoopingCall to poll MumbleLink every ``self.poll_interval``;
-        helper for testing.
-        """
-        l = LoopingCall(self.wine_protocol.ask_for_output)
-        l.clock = self.reactor
-        logger.warning('Setting poll interval to %s seconds',
-                       self._poll_interval)
-        l.start(self._poll_interval)
-
     def _add_mumble_reader(self):
-        # @TODO fix this; 2 classes one for Native and one for Wine;
-        # have them do everything in here.
-        if platform.system() != 'Linux':
-            raise NotImplementedError("ERROR: non-Linux support not "
-                                      "impmemented.")
-        logger.debug("Creating WineProcessProtocol")
-        self._wine_protocol = WineProcessProtocol(self)
-        logger.debug("Creating spawned process")
-        self._wine_process = self.reactor.spawnProcess(
-            self._wine_protocol,
-            '/home/jantman/GIT/gw2_helper_python/bin/python',
-            [
-                '/home/jantman/GIT/gw2_helper_python/bin/python',
-                '/home/jantman/GIT/gw2_helper_python/gw2_helper_python/output_test.py'
-            ],
-            {}  # @TODO need to use the wine process' environment
-        )
-        # update on a regular basis
-        self.add_update_loop()
+        """
+        Figure out what platform we're on, and instantiate the right
+        MumbleReader class for it.
+        """
+        if platform.system() == 'Linux':
+            logger.debug("Using WineMumbleLinkReader on Linux platform")
+            self._mumble_reader = WineMumbleLinkReader(self)
+        elif platform.system() == 'Windows':
+            logger.debug("Using NativeMumbleLinkReader on Windows platform")
+            self._mumble_reader = NativeMumbleLinkReader(self)
+        else:
+            raise NotImplementedError("ERROR: don't know how to read"
+                                      "MumbleLink on unsupported platform "
+                                      "%s" % platform.system())
 
     def run(self):
         """setup the web Site, start listening on port, setup the MumbleLink
