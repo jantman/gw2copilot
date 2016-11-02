@@ -55,6 +55,7 @@ from .site import GW2CopilotSite
 from .wine_mumble_reader import WineMumbleLinkReader
 from .native_mumble_reader import NativeMumbleLinkReader
 from .test_mumble_reader import TestMumbleLinkReader
+from .playerinfo import PlayerInfo
 
 logger = logging.getLogger()
 
@@ -85,6 +86,7 @@ class TwistedServer(object):
         self._mumble_link_data = None
         self._mumble_reader = None
         self._test = test
+        self.playerinfo = PlayerInfo()
 
     def update_mumble_data(self, mumble_data):
         """
@@ -97,7 +99,10 @@ class TwistedServer(object):
         """
         logger.debug("Updating mumble data: %s", mumble_data)
         self._mumble_link_data = mumble_data
-        # @TODO do useful stuff with the data; figure out where we are
+        self.playerinfo.update_mumble_link(mumble_data)
+        # DEBUG
+        print(self.playerinfo.as_dict)
+        # END DEBUG
 
     @property
     def raw_mumble_link_data(self):
