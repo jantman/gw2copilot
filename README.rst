@@ -39,7 +39,8 @@ This aims to automate manual tasks that players currently perform, including loo
 
 This project is *not* a game overlay; its runs as a standalone webserver, intended to display data in a browser on a second monitor. It also does not, and will not, incorporate anything that violates the User Agreement or Rules of Conduct; aside from the documented `ReST APIs <https://wiki.guildwars2.com/wiki/API:Main>`_ which it uses to communicate with ArenaNet servers, the only way this software interacts with the game is by reading information from the documented `MumbleLink <https://wiki.guildwars2.com/wiki/API:MumbleLink>`_ memory-mapped file to determine current character and location.
 
-Planned features include:
+Planned features
+++++++++++++++++
 
 - Store a list of ToDo items/reminders per-zone, and display them when you're in that zone
 - Track zone completion percentages.
