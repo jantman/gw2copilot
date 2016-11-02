@@ -41,8 +41,11 @@ This project is *not* a game overlay; its runs as a standalone webserver, intend
 
 Planned features include:
 
-- Allowing you to store a list of ToDo items/reminders per-zone, and displaying them when you're in that zone.
-- Displaying an interactive map of the current zone, including your location.
+- Store a list of ToDo items/reminders per-zone, and display them when you're in that zone
+- Track zone completion percentages.
+- Displaying an interactive map of the current zone, including your location as well as waypoints, POIs, etc (with links to the relevant wiki articles).
+- Using manual input (i.e. clicking on hearts/waypoints/etc. that you've already gotten), track what you haven't completed in each zone.
+- Possibly showing gathering node locations on the interactive map.
 - Tracking a list of crafting recipes that you want to make, and what materials you have vs still need.
 
 Status
