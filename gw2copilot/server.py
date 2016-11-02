@@ -56,6 +56,7 @@ from .wine_mumble_reader import WineMumbleLinkReader
 from .native_mumble_reader import NativeMumbleLinkReader
 from .test_mumble_reader import TestMumbleLinkReader
 from .playerinfo import PlayerInfo
+from .caching_api_client import CachingAPIClient
 
 logger = logging.getLogger()
 
@@ -66,7 +67,8 @@ class TwistedServer(object):
     bridges the MumbleLink to the web frontend and other logic.
     """
 
-    def __init__(self, poll_interval=5.0, bind_port=8080, test=False):
+    def __init__(self, poll_interval=5.0, bind_port=8080, test=False,
+                 cache_dir=None):
         """
         Initialize the Twisted Server, the heart of the application...
 
@@ -77,16 +79,24 @@ class TwistedServer(object):
         :param test: if True, don't actually connect to the game, just use
           example MumbleLink data
         :type test: bool
+        :param cache_dir: absolute path to gw2copilot cache directory
+        :type cache_dir: str
         """
         self._poll_interval = poll_interval
         self._bind_port = bind_port
         self.reactor = reactor
+        if cache_dir is None:
+            cd = os.path.abspath(os.path.expanduser('~/.gw2copilot/cache'))
+            logger.debug('Defaulting cache directory to: %s', cd)
+            cache_dir = cd
+        self._cache_dir = cache_dir
+        self.cache = CachingAPIClient(self, cache_dir)
         # @TODO perform the initial cache gets
         # saved state:
         self._mumble_link_data = None
         self._mumble_reader = None
         self._test = test
-        self.playerinfo = PlayerInfo()
+        self.playerinfo = PlayerInfo(self.cache)
 
     def update_mumble_data(self, mumble_data):
         """

@@ -113,6 +113,7 @@ class TestMumbleLinkReader(object):
         self.server = parent_server
         self._poll_interval = poll_interval
         self.uiTick = 2
+        self._looping_deferred = None
         self._add_update_loop()
 
     def _add_update_loop(self):
@@ -125,7 +126,8 @@ class TestMumbleLinkReader(object):
         l.clock = self.server.reactor
         logger.info('Setting poll interval to %s seconds',
                     self._poll_interval)
-        l.start(self._poll_interval)
+        self._looping_deferred = l.start(self._poll_interval)
+        self._looping_deferred.addErrback(logger.error)
 
     def _read(self):
         """

@@ -62,6 +62,7 @@ class NativeMumbleLinkReader(object):
         logger.debug("Instantiating NativeMumbleLinkReader")
         self.server = parent_server
         self._poll_interval = poll_interval
+        self._looping_deferred = None
         self._reader = GW2MumbleLinkReader()
         self._add_update_loop()
 
@@ -75,7 +76,8 @@ class NativeMumbleLinkReader(object):
         l.clock = self.server.reactor
         logger.info('Setting poll interval to %s seconds',
                     self._poll_interval)
-        l.start(self._poll_interval)
+        self._looping_deferred = l.start(self._poll_interval)
+        self._looping_deferred.addErrback(logger.error)
 
     def _read(self):
         """

@@ -66,6 +66,7 @@ class WineMumbleLinkReader(object):
         self._poll_interval = poll_interval
         self._wine_protocol = None
         self._wine_process = None
+        self._looping_deferred = None
         self._setup_process()
         self._add_update_loop()
 
@@ -79,7 +80,8 @@ class WineMumbleLinkReader(object):
         l.clock = self.server.reactor
         logger.info('Setting poll interval to %s seconds',
                     self._poll_interval)
-        l.start(self._poll_interval)
+        self._looping_deferred = l.start(self._poll_interval)
+        self._looping_deferred.addErrback(logger.error)
 
     def _setup_process(self):
         """
