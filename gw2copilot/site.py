@@ -110,7 +110,7 @@ class GW2CopilotSite(object):
                     statuscode, queued, str(request.method),
                     request.client.host, request.client.port)
         return self.make_response(
-            json.dumps(self.parent_server.raw_mumble_link_data)
+            json.dumps(self.parent_server.playerinfo.as_dict)
         )
 
     def render(self, request):

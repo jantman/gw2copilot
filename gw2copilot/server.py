@@ -100,9 +100,6 @@ class TwistedServer(object):
         logger.debug("Updating mumble data: %s", mumble_data)
         self._mumble_link_data = mumble_data
         self.playerinfo.update_mumble_link(mumble_data)
-        # DEBUG
-        print(self.playerinfo.as_dict)
-        # END DEBUG
 
     @property
     def raw_mumble_link_data(self):
