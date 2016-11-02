@@ -83,6 +83,10 @@ class Runner(object):
         p.add_argument('-P', '--port', dest='bind_port', action='store',
                        type=int, default=8080,
                        help='Port number to listen on (default 8080)')
+        p.add_argument('--test-mumble', dest='test_mumble', action='store_true',
+                       default=False,
+                       help='do not actually connect to game via MumbleLink; '
+                            'use static example/test data')
         args = p.parse_args(argv)
         return args
 
@@ -96,7 +100,8 @@ class Runner(object):
 
         s = TwistedServer(
             poll_interval=args.poll_interval,
-            bind_port=args.bind_port
+            bind_port=args.bind_port,
+            test=args.test_mumble
         )
         s.run()
 

@@ -45,7 +45,8 @@ with open('README.rst') as file:
 
 requires = [
     'requests',
-    'twisted>=16.0.0'
+    'twisted>=16.0.0,<17.0.0',
+    'psutil>=4.4.0,<5.0'
 ]
 
 classifiers = [

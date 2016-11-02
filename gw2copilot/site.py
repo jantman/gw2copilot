@@ -72,18 +72,6 @@ class GW2CopilotSite(object):
         """
         self.parent_server = parent_server
 
-    def status_response(self):
-        s = json.dumps({
-            'healthy': True,
-            'application': 'vault-redirector',
-            'source': _PROJECT_URL,
-            'version': _VERSION,
-            'consul_host_port': self.redirector.consul_host_port,
-            'active_vault': self.redirector.active_node_ip_port,
-            'last_consul_poll': self.redirector.last_poll_time
-        })
-        return s
-
     def getChildWithDefault(self, name, request):
         """
         This should never be called; it's simply required to implement the
@@ -122,7 +110,7 @@ class GW2CopilotSite(object):
                     statuscode, queued, str(request.method),
                     request.client.host, request.client.port)
         return self.make_response(
-            json.dumps(self.parent_server.mumble_link_data)
+            json.dumps(self.parent_server.raw_mumble_link_data)
         )
 
     def render(self, request):
@@ -160,7 +148,9 @@ class GW2CopilotSite(object):
         request.setHeader('server',
                           'gw2copilot/%s/%s' % (VERSION, twisted_server))
         # handle health check request
-        if path == '/mumble_status':
+        if path == '/':
+            return self.mumble_status(request)
+        elif path == '/mumble_status':
             return self.mumble_status(request)
         queued = ''
         if request.queued:

@@ -196,13 +196,15 @@ def console_entry_point(argv):
         try:
             res = m.read()
             if res is not None:
-                print(json.dumps(res))
+                sys.stdout.write(json.dumps(res) + "\n")
+                sys.stdout.flush()
         except Exception as ex:
-            print(json.dumps({
+            sys.stdout.write(json.dumps({
                 'error': True,
                 'exception': str(ex),
                 'traceback': str(format_exc())
-            }))
+            }) + "\n")
+            sys.stdout.flush()
         if args.pause_in:
             logger.debug("Pausing until newline on STDIN...")
             sys.stdin.readline()

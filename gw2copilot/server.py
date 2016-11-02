@@ -54,6 +54,7 @@ from .version import VERSION, PROJECT_URL
 from .site import GW2CopilotSite
 from .wine_mumble_reader import WineMumbleLinkReader
 from .native_mumble_reader import NativeMumbleLinkReader
+from .test_mumble_reader import TestMumbleLinkReader
 
 logger = logging.getLogger()
 
@@ -64,7 +65,7 @@ class TwistedServer(object):
     bridges the MumbleLink to the web frontend and other logic.
     """
 
-    def __init__(self, poll_interval=5.0, bind_port=8080):
+    def __init__(self, poll_interval=5.0, bind_port=8080, test=False):
         """
         Initialize the Twisted Server, the heart of the application...
 
@@ -72,6 +73,9 @@ class TwistedServer(object):
         :type poll_interval: float
         :param bind_port: port number to bind to / listen on
         :type bind_port: int
+        :param test: if True, don't actually connect to the game, just use
+          example MumbleLink data
+        :type test: bool
         """
         self._poll_interval = poll_interval
         self._bind_port = bind_port
@@ -80,6 +84,7 @@ class TwistedServer(object):
         # saved state:
         self._mumble_link_data = None
         self._mumble_reader = None
+        self._test = test
 
     def update_mumble_data(self, mumble_data):
         """
@@ -90,8 +95,19 @@ class TwistedServer(object):
         :param mumble_data: Raw data received from GW2 via MumbleLink
         :type mumble_data: dict
         """
+        logger.debug("Updating mumble data: %s", mumble_data)
         self._mumble_link_data = mumble_data
         # @TODO do useful stuff with the data; figure out where we are
+
+    @property
+    def raw_mumble_link_data(self):
+        """
+        Return the current raw mumble link data.
+
+        :return: current raw MumbleLink data
+        :rtype: dict
+        """
+        return self._mumble_link_data
 
     def _run_reactor(self):
         """Method to run the Twisted reactor; mock point for testing"""
@@ -113,12 +129,18 @@ class TwistedServer(object):
         Figure out what platform we're on, and instantiate the right
         MumbleReader class for it.
         """
-        if platform.system() == 'Linux':
+        if self._test:
+            logger.warning('Using TestMumbleLinkReader - TEST DATA ONLY')
+            self._mumble_reader = TestMumbleLinkReader(
+                self, self._poll_interval)
+        elif platform.system() == 'Linux':
             logger.debug("Using WineMumbleLinkReader on Linux platform")
-            self._mumble_reader = WineMumbleLinkReader(self)
+            self._mumble_reader = WineMumbleLinkReader(
+                self, self._poll_interval)
         elif platform.system() == 'Windows':
             logger.debug("Using NativeMumbleLinkReader on Windows platform")
-            self._mumble_reader = NativeMumbleLinkReader(self)
+            self._mumble_reader = NativeMumbleLinkReader(
+                self, self._poll_interval)
         else:
             raise NotImplementedError("ERROR: don't know how to read"
                                       "MumbleLink on unsupported platform "

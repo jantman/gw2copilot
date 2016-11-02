@@ -1,5 +1,5 @@
 """
-gw2copilot/native_mumble_reader.py
+gw2copilot/test_mumble_reader.py
 
 The latest version of this package is available at:
 <https://github.com/jantman/gw2copilot>
@@ -39,35 +39,85 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
 import logging
 from twisted.internet.task import LoopingCall
-from .read_mumble_link import GW2MumbleLinkReader
 
 logger = logging.getLogger()
 
 
-class NativeMumbleLinkReader(object):
+class TestMumbleLinkReader(object):
     """
-    Class to handle reading MumbleLink natively (direct mmap).
+    Test class to spit back a static dict that looks like Mumble Link data.
     """
+
+    mumble_data = {
+        'uiVersion': 2,
+        'fAvatarTop': [0.0, 0.0, 0.0],
+        'description': '',
+        'fCameraTop': [0.0, 0.0, 0.0],
+        'uiTick': 2,
+        'fAvatarPosition': [
+            -174.71437072753906,
+            20.880884170532227,
+            192.11866760253906
+        ],
+        'context_len': 48,
+        'context': {
+            'buildId': 68778,
+            'mapId': 50,
+            'shardId': 268435480,
+            'instance': 0,
+            'mapType': 5,
+            'serverAddress': {
+                'sin_port': 27999,
+                'sin_addr': '97.105.110.95',
+                'sin_family': 24380
+            }
+        },
+        'fAvatarFront': [
+            0.1378183364868164,
+            0.0,
+            -0.9904575347900391
+        ],
+        'fCameraFront': [
+            0.13758768141269684,
+            -0.22495095431804657,
+            -0.9646070003509521
+        ],
+        'fCameraPosition': [
+            -176.2913818359375,
+            26.569297790527344,
+            203.17486572265625
+        ],
+        'identity': {
+            'fov': 0.873,
+            'map_id': 50,
+            'name': 'Jantman',
+            'profession': 4,
+            'team_color_id': 0,
+            'commander': False,
+            'race': 3,
+            'world_id': 268435480
+        },
+        'name': u'Guild Wars 2'
+    }
 
     def __init__(self, parent_server, poll_interval):
         """
-        Initialize the class. Create the :py:class:`~.GW2MumbleLinkReader`
-        instance.
+        Initialize the class.
 
         :param parent_server: the TwistedServer instance that started this
         :type parent_server: :py:class:`~.TwistedServer`
         :param poll_interval: interval in seconds to poll MumbleLink
         :type poll_interval: float
         """
-        logger.debug("Instantiating NativeMumbleLinkReader")
+        logger.warning("Instantiating TestMumbleLinkReader")
         self.server = parent_server
         self._poll_interval = poll_interval
-        self._reader = GW2MumbleLinkReader()
+        self.uiTick = 2
         self._add_update_loop()
 
     def _add_update_loop(self):
         """
-        Setup the LoopingCall to poll MumbleLink every ``self.poll_interval``;
+        Setup the LoopingCall to return data every ``self.poll_interval``;
         helper for testing. The LoopingCall will simply call :py:meth:`~._read`.
         """
         logger.debug("Creating LoopingCall")
@@ -79,10 +129,10 @@ class NativeMumbleLinkReader(object):
 
     def _read(self):
         """
-        Read from the mmap via ``self._reader`` (
-        :py:meth:`~.GW2MumbleLinkReader.read`) and pass data back to
-        ``self.parent_server`` via :py:meth:`~.TwistedServer.update_mumble_data`
+        Update the server with a static dict of data that looks like what
+        :py:meth:`~.GW2MumbleLinkReader.read` would return.
         """
-        logger.debug("Reading MumbleLink mmap")
-        d = self._reader.read()
-        self.server.update_mumble_data(d)
+        logger.warning("STATIC TEST DATA ONLY - not actually from game!")
+        self.uiTick += 1
+        self.mumble_data['uiTick'] = self.uiTick
+        self.server.update_mumble_data(self.mumble_data)

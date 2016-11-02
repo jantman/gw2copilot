@@ -1,5 +1,5 @@
 """
-gw2copilot/wine_reader.py
+gw2copilot/wine_mumble_reader.py
 
 The latest version of this package is available at:
 <https://github.com/jantman/gw2copilot>
@@ -38,7 +38,10 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 """
 
 import logging
+import os
 import json
+import psutil
+import pkg_resources
 from twisted.internet import protocol
 from twisted.internet.task import LoopingCall
 
@@ -64,7 +67,7 @@ class WineMumbleLinkReader(object):
         self._wine_protocol = None
         self._wine_process = None
         self._setup_process()
-        self.add_update_loop()
+        self._add_update_loop()
 
     def _add_update_loop(self):
         """
@@ -84,16 +87,87 @@ class WineMumbleLinkReader(object):
         """
         logger.debug("Creating WineProcessProtocol")
         self._wine_protocol = WineProcessProtocol(self.server)
-        logger.debug("Creating spawned process")
-        self._wine_process = self.server.reactor.spawnProcess(
-            self._wine_protocol,
-            '/home/jantman/GIT/gw2copilot/bin/python',
-            [
-                '/home/jantman/GIT/gw2copilot/bin/python',
-                '/home/jantman/GIT/gw2copilot/gw2copilot/output_test.py'
-            ],
-            {}  # @TODO need to use the wine process' environment
+        logger.debug("Finding process executable, args and environ")
+        executable, args, env = self._gw2_wine_spawn_info
+        logger.debug(
+            "Creating spawned process; executable=%s args=%s len(env)=%d",
+            executable, args, len(env)
         )
+        self._wine_process = self.server.reactor.spawnProcess(
+            self._wine_protocol, executable, args, env)
+
+    @property
+    def _gw2_wine_spawn_info(self):
+        """
+        Return the information required to spawn :py:mod:`~.read_mumble_link`
+        as a Python script running under GW2's wine install.
+
+        :return: return a 3-tuple of wine executable path (str), args to pass
+          to wine (list, wine python binary path and ``read_mumble_link.py``
+          module path), wine process environment (dict)
+        :rtype: tuple
+        """
+        gw2_ps = self._gw2_process
+        env = gw2_ps.environ()
+        wine_path = os.path.join(os.path.dirname(gw2_ps.exe()), 'wine')
+        logger.debug("Gw2.exe executable: %s; inferred wine binary as: %s",
+                     gw2_ps.exe(), wine_path)
+        wine_args = [
+            wine_path,
+            self._wine_python_path(env['WINEPREFIX']),
+            self._read_mumble_path,
+            '-i'
+        ]
+        return wine_path, wine_args, env
+
+    @property
+    def _read_mumble_path(self):
+        """
+        Return the absolute path to :py:mod:`~.read_mumble_link` on disk.
+
+        :return: absolute path to :py:mod:`~.read_mumble_link`
+        :rtype: str
+        """
+        p = pkg_resources.resource_filename('gw2copilot', 'read_mumble_link.py')
+        p = os.path.abspath(os.path.realpath(p))
+        logger.debug('Found path to read_mumble_link as: %s', p)
+        return p
+
+    def _wine_python_path(self, wineprefix):
+        """
+        Given a specified ``WINEPREFIX``, return the path to the Python binary
+        in it.
+
+        :param wineprefix: ``WINEPREFIX`` env var
+        :type wineprefix: str
+        :return: absolute path to wine's Python binary
+        :rtype: str
+        """
+        p = os.path.join(wineprefix, 'drive_c', 'Python27', 'python.exe')
+        if not os.path.exists(p):
+            raise Exception("Unable to find wine Python at: %s", p)
+        logger.debug('Found wine Python binary at: %s', p)
+        return p
+
+    @property
+    def _gw2_process(self):
+        """
+        Find the Gw2.exe process; return the Process object.
+
+        :return: Gw2.exe process
+        :rtype: :py:class:`psutil.Process`
+        """
+        gw2_p = None
+        for p in psutil.process_iter():
+            if p.name() != 'Gw2.exe':
+                continue
+            if gw2_p is not None:
+                raise Exception("Error: more than one Gw2.exe process found")
+            gw2_p = p
+        if gw2_p is None:
+            raise Exception("Error: could not find a running Gw2.exe process")
+        logger.debug("Found Gw2.exe process, PID %d", gw2_p.pid)
+        return gw2_p
 
 
 class WineProcessProtocol(protocol.ProcessProtocol):
@@ -112,8 +186,9 @@ class WineProcessProtocol(protocol.ProcessProtocol):
         :param parent_server: the TwistedServer instance that started this
         :type parent_server: :py:class:`~.TwistedServer`
         """
-        logger.debug("Initializing")
+        logger.debug("Initializing WineProcessProtocol")
         self.parent_server = parent_server
+        self.have_data = False
 
     def connectionMade(self):
         """Triggered when the process starts; just logs a debug message"""
@@ -140,9 +215,22 @@ class WineProcessProtocol(protocol.ProcessProtocol):
         logger.debug("Data received: %s", data)
         try:
             d = json.loads(data.strip())
+            self.have_data = True
             self.parent_server.update_mumble_data(d)
         except Exception:
             logger.exception("Could not deserialize data")
+
+    def errReceived(self, data):
+        """
+        Called when STDERR from the process has output; if we have not yet
+        successfully deserialized a JSON message, logs STDERR at debug-level;
+        otherwise discards it.
+
+        :param data: STDERR from the process
+        :type data: str
+        """
+        if not self.have_data:
+            logger.debug('Process STDERR: %s', data)
 
     def processExited(self, status):
         """called when the process exits; just logs a debug message"""
@@ -151,7 +239,7 @@ class WineProcessProtocol(protocol.ProcessProtocol):
     def processEnded(self, status):
         """called when the process ends and is cleaned up;
         just logs a debug message"""
-        logger.debug("Process exited %s", status)
+        logger.debug("Process ended %s", status)
 
     def inConnectionLost(self):
         """called when STDIN connection is lost; just logs a debug message"""
@@ -160,6 +248,8 @@ class WineProcessProtocol(protocol.ProcessProtocol):
     def outConnectionLost(self):
         """called when STDOUT connection is lost; just logs a debug message"""
         logger.debug("STDOUT connection lost")
+        raise Exception('read_mumble_link.py (wine process) '
+                        'STDOUT connection lost')
 
     def errConnectionLost(self):
         """called when STDERR connection is lost; just logs a debug message"""
