@@ -39,6 +39,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 """
 
 import sys
+import os
 import argparse
 import logging
 
@@ -79,10 +80,15 @@ class Runner(object):
         p.add_argument('-V', '--version', action='version', version=ver_str)
         p.add_argument('-p', '--poll-interval', dest='poll_interval',
                        default=2.0, action='store', type=float,
-                       help='MumbleLink polling interval in seconds')
+                       help='MumbleLink polling interval in seconds '
+                       '(default: 2.0)')
         p.add_argument('-P', '--port', dest='bind_port', action='store',
                        type=int, default=8080,
                        help='Port number to listen on (default 8080)')
+        cd = os.path.abspath(os.path.expanduser('~/.gw2copilot/cache'))
+        p.add_argument('-c', '--cache-dir', dest='cache_dir', action='store',
+                       default=cd, type=str,
+                       help='cache directory path (default: %s)' % cd)
         p.add_argument('--test-mumble', dest='test_mumble', action='store_true',
                        default=False,
                        help='do not actually connect to game via MumbleLink; '
@@ -101,7 +107,8 @@ class Runner(object):
         s = TwistedServer(
             poll_interval=args.poll_interval,
             bind_port=args.bind_port,
-            test=args.test_mumble
+            test=args.test_mumble,
+            cache_dir=args.cache_dir
         )
         s.run()
 

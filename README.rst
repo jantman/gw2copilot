@@ -39,10 +39,14 @@ This aims to automate manual tasks that players currently perform, including loo
 
 This project is *not* a game overlay; its runs as a standalone webserver, intended to display data in a browser on a second monitor. It also does not, and will not, incorporate anything that violates the User Agreement or Rules of Conduct; aside from the documented `ReST APIs <https://wiki.guildwars2.com/wiki/API:Main>`_ which it uses to communicate with ArenaNet servers, the only way this software interacts with the game is by reading information from the documented `MumbleLink <https://wiki.guildwars2.com/wiki/API:MumbleLink>`_ memory-mapped file to determine current character and location.
 
-Planned features include:
+Planned features
+++++++++++++++++
 
-- Allowing you to store a list of ToDo items/reminders per-zone, and displaying them when you're in that zone.
-- Displaying an interactive map of the current zone, including your location.
+- Store a list of ToDo items/reminders per-zone, and display them when you're in that zone
+- Track zone completion percentages.
+- Displaying an interactive map of the current zone, including your location as well as waypoints, POIs, etc (with links to the relevant wiki articles).
+- Using manual input (i.e. clicking on hearts/waypoints/etc. that you've already gotten), track what you haven't completed in each zone.
+- Possibly showing gathering node locations on the interactive map.
 - Tracking a list of crafting recipes that you want to make, and what materials you have vs still need.
 
 Status

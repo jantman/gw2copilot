@@ -49,12 +49,17 @@ class PlayerInfo(object):
     Class to store MumbleLink- and API-derived data about the current player.
     """
 
-    def __init__(self):
+    def __init__(self, cache):
         """
         Initialize the object.
+
+        :param cache: the CachingAPIClient instance to use to get/set cache
+        :type cache: :py:class:`~.CachingAPIClient`
         """
+        self._cache = cache
         self._mumble_link_data = {}
         self._current_map = -1
+        self._current_map_data = {}
         # calculated values
         self._facing_direction = 0
         self._elevation = 0
@@ -64,8 +69,6 @@ class PlayerInfo(object):
         self._region_name = ''
         self._map_name = ''
         self._position = [0, 0]
-        # cache
-        self._map_data = {}
 
     @property
     def as_dict(self):
@@ -89,8 +92,8 @@ class PlayerInfo(object):
             'region_name': self._region_name,
             'map_name': self._map_name,
             'map_level_range': '%d-%d' % (
-                self._get_map_data(self._current_map)['min_level'],
-                self._get_map_data(self._current_map)['max_level']
+                self._current_map_data['min_level'],
+                self._current_map_data['max_level']
             ),
             'position': self._position
         }
@@ -120,9 +123,8 @@ class PlayerInfo(object):
         """
         Update player position with current mumble and map data.
         """
-        mapdata = self._get_map_data(self._current_map)
-        map_rect = mapdata['map_rect']
-        con_rect = mapdata['continent_rect']
+        map_rect = self._current_map_data['map_rect']
+        con_rect = self._current_map_data['continent_rect']
         x = m2i(self._mumble_link_data['fAvatarPosition'][0])
         y = m2i(self._mumble_link_data['fAvatarPosition'][2])
         self._position = self._continent_coords(con_rect, map_rect, x, y)
@@ -159,33 +161,13 @@ class PlayerInfo(object):
         :type new_map_id: int
         """
         self._current_map = new_map_id
-        mapdata = self._get_map_data(new_map_id)
+        mapdata = self._cache.map_data(new_map_id)
         self._continent_id = mapdata['continent_id']
         self._continent_name = mapdata['continent_name']
         self._region_id = mapdata['region_id']
         self._region_name = mapdata['region_name']
         self._map_name = mapdata['map_name']
-
-    def _get_map_data(self, map_id):
-        """
-        Return dict of map data, from cache (``self._map_data``) if present,
-        otherwise GET, cache and return.
-
-        :param map_id: requested map ID
-        :type map_id: int
-        :return: map data from API
-        :rtype: dict
-        """
-        if map_id in self._map_data:
-            logger.debug('Using data for map %d from cache', map_id)
-            return self._map_data[map_id]
-        url = 'https://api.guildwars2.com/v1/maps.json?map_id=%d' % map_id
-        logger.debug('GETting map data from: %s', url)
-        r = requests.get(url)
-        logger.debug('Got map data (HTTP status %d) response length %d',
-                     r.status_code, len(r.text))
-        self._map_data[map_id] = r.json()['maps'][str(map_id)]
-        return self._map_data[map_id]
+        self._current_map_data = mapdata
 
 
 def m2i(m):
