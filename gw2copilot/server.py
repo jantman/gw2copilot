@@ -43,7 +43,7 @@ import logging
 import signal
 import json
 import platform
-from os import getpid, access, R_OK
+import os
 from datetime import datetime
 from twisted.web import resource
 from twisted.web.server import Site
