@@ -49,6 +49,25 @@ class PlayerInfo(object):
     Class to store MumbleLink- and API-derived data about the current player.
     """
 
+    professions = [
+        'Guardian',
+        'Warrior',
+        'Engineer',
+        'Ranger',
+        'Thief',
+        'Elementalist',
+        'Mesmer',
+        'Necromancer',
+        'Revenant'
+    ]
+    races = [
+        'Asura',
+        'Charr',
+        'Human',
+        'Norn',
+        'Sylvari'
+    ]
+
     def __init__(self, cache):
         """
         Initialize the object.
@@ -85,7 +104,13 @@ class PlayerInfo(object):
             'map_id': self._current_map,
             'name': self._mumble_link_data['identity']['name'],
             'profession_id': self._mumble_link_data['identity']['profession'],
+            'profession_name': self.professions[
+                self._mumble_link_data['identity']['profession']
+            ],
             'race_id': self._mumble_link_data['identity']['race'],
+            'race_name': self.races[
+                self._mumble_link_data['identity']['race']
+            ],
             'continent_id': self._continent_id,
             'continent_name': self._continent_name,
             'region_id': self._region_id,
