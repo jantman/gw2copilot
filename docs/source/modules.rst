@@ -1,5 +1,5 @@
 gw2copilot
-===============
+==========
 
 .. toctree::
    :maxdepth: 4

@@ -157,7 +157,7 @@ class WineMumbleLinkReader(object):
         Find the Gw2.exe process; return the Process object.
 
         :return: Gw2.exe process
-        :rtype: :py:class:`psutil.Process`
+        :rtype: psutil.Process
         """
         gw2_p = None
         for p in psutil.process_iter():

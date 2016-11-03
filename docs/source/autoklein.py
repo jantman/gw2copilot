@@ -26,8 +26,45 @@ from sphinx.util.docstrings import prepare_docstring
 from sphinx.pycode import ModuleAnalyzer
 
 from sphinxcontrib import httpdomain
-from sphinxcontrib.autohttp.common import http_directive, import_object
+from sphinxcontrib.autohttp.common import http_directive
 
+import six
+from six.moves import builtins
+from six.moves import reduce
+
+msg_re = re.compile(
+    r'__init__\(\) takes exactly (\d+) arguments \(\d+ given\)'
+)
+
+
+def import_object(import_name):
+    """
+    This is slightly modified from the original version in
+    sphinxcontrib.autohttp.common to handle importing classes that take
+    arguments, specifically our GW2CopilotSite class.
+    """
+    module_name, expr = import_name.split(':', 1)
+    mod = __import__(module_name)
+    mod = reduce(getattr, module_name.split('.')[1:], mod)
+    globals = builtins
+    if not isinstance(globals, dict):
+        globals = globals.__dict__
+    try:
+        res = eval(expr, globals, mod.__dict__)
+    except TypeError as ex:
+        m = msg_re.match(ex.message)
+        if not m:
+            raise ex
+        # class takes argument(s); just pass None for them
+        num_args = int(m.group(1))
+        expr_prefix = expr[:expr.index('(')+1]
+        expr_suffix = expr[expr.index(')'):]
+        expr_args = ', '.join(['None' * (num_args - 1)])
+        new_expr = expr_prefix + expr_args + expr_suffix
+        print('%s.__init__ - added %d args: %s' %(
+              expr_prefix[:-1], (num_args - 1), new_expr))
+        res = eval(new_expr, globals, mod.__dict__)
+    return res
 
 def translate_werkzeug_rule(rule):
     from werkzeug.routing import parse_rule

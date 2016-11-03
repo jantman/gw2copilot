@@ -294,7 +294,9 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'python': ('http://docs.python.org/2.7', None),
-    'twisted': ('http://twistedmatrix.com/documents/current/api/', None)
+    'twisted': ('http://twistedmatrix.com/documents/current/api/', None),
+    'klein': ('https://klein.readthedocs.io/en/latest/', None),
+    'psutil': ('https://pythonhosted.org/psutil/', None)
 }
 
 autoclass_content = 'class'
@@ -306,7 +308,13 @@ linkcheck_ignore = [
     r'https?://.*\.readthedocs\.org.*',
     r'https?://codecov\.io.*',
     r'https?://.*readthedocs\.org.*',
-    r'https?://pypi\.python\.org/pypi/gw2copilot'
+    r'https?://pypi\.python\.org/pypi/gw2copilot',
+    r'https?://testpypi\.python\.org/pypi/gw2copilot',
+    r'https?://www\.guildwars2\.com*'
+]
+
+nitpick_ignore = [
+    ('py:class', '_ctypes.Structure')
 ]
 
 # exclude module docstrings - see http://stackoverflow.com/a/18031024/211734

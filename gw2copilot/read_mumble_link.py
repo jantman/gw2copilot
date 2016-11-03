@@ -88,6 +88,8 @@ class GW2MumbleLinkReader(object):
         This should return something like (note the units are not yet converted
         to GW2's coordinate system):
 
+        .. code-block:: json
+
             {
                 "description": "",
                 "fAvatarPosition": [
@@ -311,9 +313,11 @@ class in_addr(ctypes.Structure):
     """
     ctypes Structure for in_addr
 
-    struct in_addr {
-        unsigned long s_addr;  // load with inet_aton()
-    };
+    .. code-block:: c
+
+        struct in_addr {
+            unsigned long s_addr;  // load with inet_aton()
+        };
     """
     _fields_ = [
         ('s_addr', ctypes.c_byte * 4),
@@ -327,12 +331,14 @@ class sockaddr_in(ctypes.Structure):
     """
     ctypes Structure for sockaddr_in
 
-    struct sockaddr_in {
-        short            sin_family;   // e.g. AF_INET
-        unsigned short   sin_port;     // e.g. htons(3490)
-        struct in_addr   sin_addr;     // see struct in_addr, below
-        char             sin_zero[8];  // zero this if you want to
-    }
+    .. code-block:: c
+
+        struct sockaddr_in {
+            short            sin_family;   // e.g. AF_INET
+            unsigned short   sin_port;     // e.g. htons(3490)
+            struct in_addr   sin_addr;     // see struct in_addr, below
+            char             sin_zero[8];  // zero this if you want to
+        };
     """
     _fields_ = [
         ('sin_family', ctypes.c_short),
@@ -355,14 +361,16 @@ class GW2context(ctypes.Structure):
 
     see: https://wiki.guildwars2.com/wiki/API:MumbleLink
 
-    struct MumbleContext {
-        byte serverAddress[28]; // contains sockaddr_in or sockaddr_in6
-        unsigned mapId;
-        unsigned mapType;
-        unsigned shardId;
-        unsigned instance;
-        unsigned buildId;
-    };
+    .. code-block:: c
+
+        struct MumbleContext {
+            byte serverAddress[28]; // contains sockaddr_in or sockaddr_in6
+            unsigned mapId;
+            unsigned mapType;
+            unsigned shardId;
+            unsigned instance;
+            unsigned buildId;
+        };
     """
     _fields_ = [
         ("serverAddress",  ctypes.c_byte * 28),

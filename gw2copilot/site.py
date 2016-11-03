@@ -52,12 +52,12 @@ app = Klein()
 
 class GW2CopilotSite(object):
     """
-    Wrapper around :py:class:`Klein` to handle the site.
+    Wrapper around ``klein.app.Klein`` to handle the site.
     """
 
     def __init__(self, parent_server):
         """
-
+        Initialize the Site.
         :param parent_server: parent TwisterServer instance
         :type parent_server: :py:class:`~.TwistedServer` instance
         """
@@ -109,7 +109,7 @@ class GW2CopilotSite(object):
         """
         Return the full MumbleLink data.
 
-        This serves :http:put:`/mumble_status` endpoint.
+        This serves :http:get:`/mumble_status` endpoint.
 
         :param request: incoming HTTP request
         :type request: :py:class:`twisted.web.server.Request`
@@ -160,12 +160,9 @@ class GW2CopilotSite(object):
         msg = self.make_response('OK')
         request.setResponseCode(statuscode, message=msg)
         request.setHeader("Content-Type", 'application/json')
-        queued = ''
-        if request.queued:
-            queued = 'QUEUED '
-        logger.info('RESPOND %d for %s%s request for '
-                    '/vault-redirector-health from %s:%s',
-                    statuscode, queued, str(request.method),
+        logger.info('RESPOND %d for %s%s request for %s from %s:%s',
+                    statuscode, ('QUEUED ' if request.queued else ''),
+                    str(request.method), request.uri,
                     request.client.host, request.client.port)
         return self.make_response(
             json.dumps(self.parent_server.playerinfo.as_dict)

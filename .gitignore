@@ -1,3 +1,6 @@
+# for now, ignore generated docs
+docs/source/gw2copilot.*rst
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
