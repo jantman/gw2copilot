@@ -20,6 +20,8 @@ sys.path.insert(0, os.path.abspath("../.."))
 from gw2copilot.version import VERSION
 import sphinx.environment
 from docutils.utils import get_source_line
+sys.path.append(os.path.dirname(__file__))
+from autoklein import setup as autoklein_setup
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -291,7 +293,8 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'https://docs.python.org/2/': None,
+    'python': ('http://docs.python.org/2.7', None),
+    'twisted': ('http://twistedmatrix.com/documents/current/api/', None)
 }
 
 autoclass_content = 'class'
@@ -308,8 +311,21 @@ linkcheck_ignore = [
 
 # exclude module docstrings - see http://stackoverflow.com/a/18031024/211734
 def remove_module_docstring(app, what, name, obj, options, lines):
+    if what == 'attribute' and \
+                    str(name) == 'rpymostat.engine.apiserver.APIServer.app':
+        # this comes from Klein, which uses Epydoc, which shows as an error
+        del lines[:]
+        lines.append('Global class attribute pointing to a Klein instance.')
     if what == "module":
         del lines[:]
+    # strip <HTTPAPI> docs; this strips anything from 'HTTPAPI' on for
+    # regular autodoc; it'll only be shown for httpdomain docs (autoklein)
+    idx = None
+    for i, line in enumerate(lines):
+       if '<HTTPAPI>' in line:
+           idx = i
+    if idx is not None:
+        del lines[idx:]
 
 # ignore non-local image warnings
 def _warn_node(self, msg, node, **kwargs):
@@ -320,3 +336,4 @@ sphinx.environment.BuildEnvironment.warn_node = _warn_node
 
 def setup(app):
     app.connect("autodoc-process-docstring", remove_module_docstring)
+    autoklein_setup(app)

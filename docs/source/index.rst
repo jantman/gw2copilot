@@ -9,7 +9,8 @@ Contents
 .. toctree::
    :maxdepth: 4
 
-   API <modules>
+   Python API <modules>
+   HTTP API and Endpoints <httpapi>
    Changelog <changes>
 
 Indices and tables

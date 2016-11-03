@@ -93,10 +93,51 @@ class GW2CopilotSite(object):
         """
         Return the full MumbleLink data.
 
+        This serves :http:put:`/mumble_status` endpoint.
+
         :param request: incoming HTTP request
         :type request: :py:class:`twisted.web.server.Request`
         :return: JSON response data string
         :rtype: str
+
+
+        <HTTPAPI>
+        Return the current MumbleLink data as JSON.
+
+        Served by :py:meth:`.mumble_status`.
+
+        **Example request**:
+
+        .. sourcecode:: http
+
+          GET /mumble_status HTTP/1.1
+          Host: example.com
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+          HTTP/1.1 200 OK
+          Content-Type: application/json
+
+          {"something": "goes here"}
+
+        :>json facing_direction: *(float)* direction the character is facing
+        :>json elevation: *(float)* character's elevation in inches
+        :>json map_id: *(int)* current map ID
+        :>json name: *(string)* character name
+        :>json profession_id: *(int)* character profession ID
+        :>json profession_name: *(string)* character profession name
+        :>json race_id: *(int)* character race ID
+        :>json race_name: *(string)* character race name
+        :>json continent_id: *(int)* current continent ID
+        :>json continent_name: *(string)* current continent name
+        :>json region_id: *(int)* current region ID
+        :>json region_name: *(string)* current region name
+        :>json map_name: *(string)* current map name
+        :>json map_level_range: *(string)* current map level range
+        :>json position: *(2-tuple of floats)* current position in inches
+        :statuscode 200: successfully returned result
         """
         statuscode = OK
         msg = self.make_response('OK')
