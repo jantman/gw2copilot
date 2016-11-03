@@ -94,6 +94,7 @@ class TwistedServer(object):
         # @TODO perform the initial cache gets
         # saved state:
         self._mumble_link_data = None
+        self._mumble_update_datetime = None
         self._mumble_reader = None
         self._test = test
         self.playerinfo = PlayerInfo(self.cache)
@@ -109,7 +110,18 @@ class TwistedServer(object):
         """
         logger.debug("Updating mumble data: %s", mumble_data)
         self._mumble_link_data = mumble_data
+        self._mumble_update_datetime = datetime.now()
         self.playerinfo.update_mumble_link(mumble_data)
+
+    @property
+    def mumble_update_datetime(self):
+        """
+        Return the datetime when mumble link data was last updated.
+
+        :return: datetime when mumble link data was last updated
+        :rtype: datetime.datetime
+        """
+        return self._mumble_update_datetime
 
     @property
     def raw_mumble_link_data(self):
