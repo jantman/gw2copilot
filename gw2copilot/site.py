@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 gw2copilot/site.py
 
@@ -38,13 +37,15 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 ################################################################################
 """
 
-import sys
 import logging
 import json
-from .version import VERSION
+from datetime import datetime, timedelta
 from klein import Klein
 from twisted.web._responses import OK
 from jinja2 import Environment, PackageLoader
+
+from .api import GW2CopilotAPI
+from .utils import _make_response, _set_headers
 
 logger = logging.getLogger()
 
@@ -58,7 +59,9 @@ class GW2CopilotSite(object):
 
     def __init__(self, parent_server):
         """
-        Initialize the Site.
+        Initialize the Site, and the API components via an instance of
+        :py:class:`~.GW2CopilotAPI`.
+
         :param parent_server: parent TwisterServer instance
         :type parent_server: :py:class:`~.TwistedServer` instance
         """
@@ -69,8 +72,10 @@ class GW2CopilotSite(object):
             extensions=['jinja2.ext.loopcontrols']
         )
         # setup routes, since this is ugly with a class
-        self.app.route('/mumble_status')(self.mumble_status)
+        self.app.route('/status')(self.status)
         self.app.route('/')(self.homepage)
+        self.api = GW2CopilotAPI(self, parent_server)
+
 
     def site_resource(self):
         """
@@ -82,33 +87,6 @@ class GW2CopilotSite(object):
         :rtype: twisted.web.resource
         """
         return self.app.resource()
-
-    def _make_response(self, s):
-        """
-        If running under python 3+, utf-8 encode the response.
-
-        :param s: response string
-        :type s: str
-        :return: response string, possibly encoded
-        :rtype: str
-        """
-        if sys.version_info[0] < 3:
-            return s
-        return s.encode('utf-8')  # nocoverage - unreachable under py2
-
-    def _set_headers(self, request):
-        """
-        Set headers that all responses should have.
-
-        :param request: incoming HTTP request
-        :type request: :py:class:`twisted.web.server.Request`
-        """
-        # find the original Twisted server header
-        twisted_server = request.responseHeaders.getRawHeaders(
-            'server', 'Twisted'
-        )[0]
-        request.setHeader('server',
-                          'gw2copilot/%s/%s' % (VERSION, twisted_server))
 
     def _render_template(self, tmpl_name, **kwargs):
         """
@@ -127,29 +105,29 @@ class GW2CopilotSite(object):
         rendered = tmpl.render(**kwargs)
         return rendered
 
-    # app.route('/mumble_status')
-    def mumble_status(self, request):
+    # app.route('/status')
+    def status(self, request):
         """
-        Return the full MumbleLink data.
+        Generate the end-user Status page.
 
-        This serves :http:get:`/mumble_status` endpoint.
+        This serves :http:get:`/status` endpoint.
 
         :param request: incoming HTTP request
         :type request: :py:class:`twisted.web.server.Request`
-        :return: JSON response data string
+        :return: HTML output
         :rtype: str
 
 
         <HTTPAPI>
-        Return the current MumbleLink data as JSON.
+        Return the HTML for the /status end-user status page.
 
-        Served by :py:meth:`.mumble_status`.
+        Served by :py:meth:`.status`.
 
         **Example request**:
 
         .. sourcecode:: http
 
-          GET /mumble_status HTTP/1.1
+          GET /status HTTP/1.1
           Host: example.com
 
         **Example Response**:
@@ -157,38 +135,36 @@ class GW2CopilotSite(object):
         .. sourcecode:: http
 
           HTTP/1.1 200 OK
-          Content-Type: application/json
+          Content-Type: text/html
 
-          {"something": "goes here"}
-
-        :>json facing_direction: *(float)* direction the character is facing
-        :>json elevation: *(float)* character's elevation in inches
-        :>json map_id: *(int)* current map ID
-        :>json name: *(string)* character name
-        :>json profession_id: *(int)* character profession ID
-        :>json profession_name: *(string)* character profession name
-        :>json race_id: *(int)* character race ID
-        :>json race_name: *(string)* character race name
-        :>json continent_id: *(int)* current continent ID
-        :>json continent_name: *(string)* current continent name
-        :>json region_id: *(int)* current region ID
-        :>json region_name: *(string)* current region name
-        :>json map_name: *(string)* current map name
-        :>json map_level_range: *(string)* current map level range
-        :>json position: *(2-tuple of floats)* current position in inches
-        :statuscode 200: successfully returned result
+          HTML OUTPUT HERE.
         """
-        self._set_headers(request)
+        _set_headers(request)
         statuscode = OK
-        msg = self._make_response('OK')
+        msg = _make_response('OK')
         request.setResponseCode(statuscode, message=msg)
-        request.setHeader("Content-Type", 'application/json')
         logger.info('RESPOND %d for %s%s request for %s from %s:%s',
                     statuscode, ('QUEUED ' if request.queued else ''),
                     str(request.method), request.uri,
                     request.client.host, request.client.port)
-        return self._make_response(
-            json.dumps(self.parent_server.playerinfo.as_dict)
+        mumble_dt = self.parent_server.mumble_update_datetime
+        mumble_td = (datetime.now() - mumble_dt)
+        if mumble_td < timedelta(seconds=4):
+            mumble_td = 'less than 4 seconds'
+        return _make_response(
+            self._render_template(
+                'status.html',
+                playerinfo=json.dumps(
+                    self.parent_server.playerinfo.as_dict,
+                    sort_keys=True, indent=4, separators=(',', ': ')
+                ),
+                mumble_data=json.dumps(
+                    self.parent_server.raw_mumble_link_data,
+                    sort_keys=True, indent=4, separators=(',', ': ')
+                ),
+                mumble_time=mumble_dt,
+                mumble_td=mumble_td
+            )
         )
 
     # app.route('/')
@@ -226,15 +202,15 @@ class GW2CopilotSite(object):
           HTML OUTPUT HERE.
 
         """
-        self._set_headers(request)
+        _set_headers(request)
         statuscode = OK
-        msg = self._make_response('OK')
+        msg = _make_response('OK')
         request.setResponseCode(statuscode, message=msg)
         logger.info('RESPOND %d for %s%s request for %s from %s:%s',
                     statuscode, ('QUEUED ' if request.queued else ''),
                     str(request.method), request.uri,
                     request.client.host, request.client.port)
-        return self._make_response(
+        return _make_response(
             self._render_template(
                 'index.html'
             )

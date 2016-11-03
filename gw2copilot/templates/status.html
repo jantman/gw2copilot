@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}gw2copilot - application status{% endblock %}
+{% block body %}
+<p>MumbleLink Last Update: {{ mumble_td }} ago ({{ mumble_time }})</p>
+<p>MumbleLink Raw Data:</p>
+<pre>
+{{ mumble_data }}
+</pre>
+<p>PlayerInfo Calculated Data:</p>
+<pre>
+{{ playerinfo }}
+</pre>
+{% endblock %}
