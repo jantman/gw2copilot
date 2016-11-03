@@ -38,19 +38,13 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 ################################################################################
 """
 
-import sys
 import logging
-import signal
-import json
 import platform
 import os
 from datetime import datetime
-from twisted.web import resource
 from twisted.web.server import Site
 from twisted.internet import reactor
-from twisted.web._responses import NOT_FOUND, SERVICE_UNAVAILABLE, OK
 
-from .version import VERSION, PROJECT_URL
 from .site import GW2CopilotSite
 from .wine_mumble_reader import WineMumbleLinkReader
 from .native_mumble_reader import NativeMumbleLinkReader

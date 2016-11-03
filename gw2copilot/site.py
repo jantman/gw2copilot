@@ -41,7 +41,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 import sys
 import logging
 import json
-from .version import VERSION, PROJECT_URL
+from .version import VERSION
 from klein import Klein
 from twisted.web._responses import OK
 

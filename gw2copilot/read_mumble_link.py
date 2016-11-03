@@ -163,7 +163,7 @@ class GW2MumbleLinkReader(object):
         if result.uiTick != self.previous_tick:
             if self.first:
                 logger.info("MumbleLink seems to be active, hope for the best")
-                first = False
+                self.first = False
             self.previous_tick = result.uiTick
             logger.debug("Returning dict; new tick=%s", self.previous_tick)
             return result.as_dict()
@@ -305,7 +305,9 @@ def Unpack(ctype, buf):
     :rtype: ctypes.Structure
     """
     cstring = ctypes.create_string_buffer(buf)
-    ctype_instance = ctypes.cast(ctypes.pointer(cstring), ctypes.POINTER(ctype)).contents
+    ctype_instance = ctypes.cast(
+        ctypes.pointer(cstring), ctypes.POINTER(ctype)
+    ).contents
     return ctype_instance
 
 
