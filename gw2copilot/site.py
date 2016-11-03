@@ -40,29 +40,20 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
 import sys
 import logging
-import signal
 import json
-from os import getpid, access, R_OK
-from datetime import datetime
-from twisted.web import resource
-from twisted.web.server import Site
-from twisted.internet import reactor
-from twisted.internet.task import LoopingCall
-from twisted.web._responses import NOT_FOUND, SERVICE_UNAVAILABLE, OK
 from .version import VERSION, PROJECT_URL
+from klein import Klein
+from twisted.web._responses import OK
 
 logger = logging.getLogger()
+
+app = Klein()
 
 
 class GW2CopilotSite(object):
     """
-    Unfortunately :py:class:`twisted.web.resource.Resource` is an old-style
-    class, so we can't easily subclass it and override its ``__init__``. So,
-    we implement the :py:class:`twisted.web.resource.IResource` interface
-    ourselves.
+    Wrapper around :py:class:`Klein` to handle the site.
     """
-
-    isLeaf = True
 
     def __init__(self, parent_server):
         """
@@ -71,24 +62,49 @@ class GW2CopilotSite(object):
         :type parent_server: :py:class:`~.TwistedServer` instance
         """
         self.parent_server = parent_server
+        self.app = app
+        # setup routes, since this is ugly with a class
+        self.app.route('/mumble_status')(self.mumble_status)
 
-    def getChildWithDefault(self, name, request):
+    def site_resource(self):
         """
-        This should never be called; it's simply required to implement the
-        :py:class:`twisted.web.resource.IResource` interface. Just returns
-        a 404.
+        Return the Klein app's ``resource``, for Twisted to use as its endpoint.
 
-        See: :py:meth:`twisted.web.resource.IResource.getChildWithDefault`
+        This replaces Klein's ``app.run()``.
+
+        :return: Klein app root resource
+        :rtype: twisted.web.resource
         """
-        return resource.ErrorPage(NOT_FOUND, "No Such Resource",
-                                  "No Such Resource")
+        return self.app.resource()
 
     def make_response(self, s):
-        """python 3+ needs a binary response; create one"""
+        """
+        If running under python 3+, utf-8 encode the response.
+
+        :param s: response string
+        :type s: str
+        :return: response string, possibly encoded
+        :rtype: str
+        """
         if sys.version_info[0] < 3:
             return s
         return s.encode('utf-8')  # nocoverage - unreachable under py2
 
+    def _set_headers(self, request):
+        """
+        Set headers that all responses should have.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        """
+        # find the original Twisted server header
+        twisted_server = request.responseHeaders.getRawHeaders(
+            'server', 'Twisted'
+        )[0]
+        request.setHeader('server',
+                          'gw2copilot/%s/%s' % (VERSION, twisted_server))
+
+    # app.route('/mumble_status')
     def mumble_status(self, request):
         """
         Return the full MumbleLink data.
@@ -139,6 +155,7 @@ class GW2CopilotSite(object):
         :>json position: *(2-tuple of floats)* current position in inches
         :statuscode 200: successfully returned result
         """
+        self._set_headers(request)
         statuscode = OK
         msg = self.make_response('OK')
         request.setResponseCode(statuscode, message=msg)
@@ -153,51 +170,3 @@ class GW2CopilotSite(object):
         return self.make_response(
             json.dumps(self.parent_server.playerinfo.as_dict)
         )
-
-    def render(self, request):
-        """
-        Render the response to the given request. This simply gets the current
-        active vault node from ``self.redirector`` (our instance of
-        :py:class:`~.VaultRedirector`) and returns a 307 Temporary Redirect
-        to the same path as the request, on that active node.
-
-        The ``request`` param is an instance of
-        :py:class:`twisted.web.server.Request`, which implements
-        :py:class:`twisted.web.iweb.IRequest` and inherits from
-        :py:class:`twisted.web.http.Request`
-
-        The return value is meaningless. We simply set a response code and
-        headers on the ``request`` parameter.
-
-        If we were unable to retrieve the current active Vault node from the
-        Consul API, return a 503 error response. This is the same code that
-        Vault uses when it is down for maintenance or sealed.
-
-        :param request: incoming HTTP request
-        :type request: :py:class:`twisted.web.server.Request`
-        :return: empty string (None)
-        :rtype: str
-        """
-        path = request.uri
-        # python3 will get a byte string here
-        if not isinstance(path, str):  # nocoverage - py3 only
-            path = path.decode('utf-8')
-        # find the original Twisted server header
-        twisted_server = request.responseHeaders.getRawHeaders(
-            'server', 'Twisted'
-        )[0]
-        request.setHeader('server',
-                          'gw2copilot/%s/%s' % (VERSION, twisted_server))
-        # handle health check request
-        if path == '/':
-            return self.mumble_status(request)
-        elif path == '/mumble_status':
-            return self.mumble_status(request)
-        queued = ''
-        if request.queued:
-            queued = 'QUEUED '
-        logger.info('RESPOND 404 for %s%s request for %s from %s:%s',
-                    queued, str(request.method), path,
-                    request.client.host, request.client.port)
-        return resource.ErrorPage(NOT_FOUND, "No Such Resource",
-                                  "No Such Resource")

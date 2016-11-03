@@ -85,6 +85,7 @@ class TwistedServer(object):
         self._poll_interval = poll_interval
         self._bind_port = bind_port
         self.reactor = reactor
+        self._site = None
         if cache_dir is None:
             cd = os.path.abspath(os.path.expanduser('~/.gw2copilot/cache'))
             logger.debug('Defaulting cache directory to: %s', cd)
@@ -174,8 +175,8 @@ class TwistedServer(object):
         """setup the web Site, start listening on port, setup the MumbleLink
         reader, and start the Twisted reactor"""
         # setup the web Site and HTTP listener
-        site = Site(GW2CopilotSite(self))
-        self._listentcp(site)
+        self._site = GW2CopilotSite(self)
+        self._listentcp(Site(self._site.site_resource()))
         # setup the MumbleLink reader
         self._add_mumble_reader()
         # run the main reactor event loop
