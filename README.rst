@@ -106,7 +106,7 @@ If you're running under Linux (wine/PoL), it's a bit more complicated and involv
 Notes/References/Links
 ----------------------
 
-* Searching for [MumbleLink in Python code on GitHub](https://github.com/search?l=Python&q=MumbleLink&type=Code&utf8=%E2%9C%93) yields a number of other projects that read the memory-mapped MumbleLink file, including quite a few for GW2.
+* Searching for `MumbleLink in Python code on GitHub <https://github.com/search?l=Python&q=MumbleLink&type=Code&utf8=%E2%9C%93>`_ yields a number of other projects that read the memory-mapped MumbleLink file, including quite a few for GW2.
 
 Bugs and Feature Requests
 -------------------------
