@@ -48,6 +48,7 @@ requires = [
     'twisted>=16.0.0,<17.0.0',
     'psutil>=4.4.0,<5.0',
     'klein>=15.0.0,<16.0.0',
+    'Jinja2>=2.8.0, <=2.9.0',
 ]
 
 classifiers = [
@@ -82,6 +83,12 @@ setup(
     author='Jason Antman',
     author_email='jason@jasonantman.com',
     packages=find_packages(),
+    package_data={
+        'gw2copilot': [
+            'templates/*.html',
+            'static/*.*'
+        ]
+    },
     url=PROJECT_URL,
     description='gw2copilot is a browser-based "helper" for Guild Wars '
                 '2, to automate manual tasks that players currently perform '

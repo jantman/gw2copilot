@@ -44,6 +44,7 @@ import json
 from .version import VERSION
 from klein import Klein
 from twisted.web._responses import OK
+from jinja2 import Environment, PackageLoader
 
 logger = logging.getLogger()
 
@@ -63,8 +64,13 @@ class GW2CopilotSite(object):
         """
         self.parent_server = parent_server
         self.app = app
+        self._tmpl_env = Environment(
+            loader=PackageLoader('gw2copilot', 'templates'),
+            extensions=['jinja2.ext.loopcontrols']
+        )
         # setup routes, since this is ugly with a class
         self.app.route('/mumble_status')(self.mumble_status)
+        self.app.route('/')(self.homepage)
 
     def site_resource(self):
         """
@@ -77,7 +83,7 @@ class GW2CopilotSite(object):
         """
         return self.app.resource()
 
-    def make_response(self, s):
+    def _make_response(self, s):
         """
         If running under python 3+, utf-8 encode the response.
 
@@ -103,6 +109,23 @@ class GW2CopilotSite(object):
         )[0]
         request.setHeader('server',
                           'gw2copilot/%s/%s' % (VERSION, twisted_server))
+
+    def _render_template(self, tmpl_name, **kwargs):
+        """
+        Render a Jinja2 template of the given name (passed as argument to
+        :py:meth:`Jinja2.Environment.get_template`) with the specified kwargs
+        (passed as kwargs to :py:method:`jinja2.Template.render`).
+
+        :param tmpl_name: name of the template to render
+        :type tmpl_name: str
+        :param kwargs: kwargs to pass to Jinja2 template render method
+        :type kwargs: dict
+        :return: rendered template string
+        :rtype: str
+        """
+        tmpl = self._tmpl_env.get_template(tmpl_name)
+        rendered = tmpl.render(**kwargs)
+        return rendered
 
     # app.route('/mumble_status')
     def mumble_status(self, request):
@@ -157,13 +180,62 @@ class GW2CopilotSite(object):
         """
         self._set_headers(request)
         statuscode = OK
-        msg = self.make_response('OK')
+        msg = self._make_response('OK')
         request.setResponseCode(statuscode, message=msg)
         request.setHeader("Content-Type", 'application/json')
         logger.info('RESPOND %d for %s%s request for %s from %s:%s',
                     statuscode, ('QUEUED ' if request.queued else ''),
                     str(request.method), request.uri,
                     request.client.host, request.client.port)
-        return self.make_response(
+        return self._make_response(
             json.dumps(self.parent_server.playerinfo.as_dict)
+        )
+
+    # app.route('/')
+    def homepage(self, request):
+        """
+        Generate the end-user landing ("Home") page.
+
+        This serves :http:get:`/` endpoint.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: HTML output
+        :rtype: str
+
+
+        <HTTPAPI>
+        Return the HTML for the / end-user "home" page.
+
+        Served by :py:meth:`.homepage`.
+
+        **Example request**:
+
+        .. sourcecode:: http
+
+          GET / HTTP/1.1
+          Host: example.com
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+          HTTP/1.1 200 OK
+          Content-Type: text/html
+
+          HTML OUTPUT HERE.
+
+        """
+        self._set_headers(request)
+        statuscode = OK
+        msg = self._make_response('OK')
+        request.setResponseCode(statuscode, message=msg)
+        logger.info('RESPOND %d for %s%s request for %s from %s:%s',
+                    statuscode, ('QUEUED ' if request.queued else ''),
+                    str(request.method), request.uri,
+                    request.client.host, request.client.port)
+        return self._make_response(
+            self._render_template(
+                'index.html'
+            )
         )
