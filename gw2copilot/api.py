@@ -86,7 +86,7 @@ class GW2CopilotAPI(object):
         """
         Return the full MumbleLink data.
 
-        This serves :http:get:`/mumble_status` endpoint.
+        This serves :http:get:`/api/mumble_status` endpoint.
 
         :param request: incoming HTTP request
         :type request: :py:class:`twisted.web.server.Request`

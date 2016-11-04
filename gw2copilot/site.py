@@ -91,8 +91,8 @@ class GW2CopilotSite(object):
     def _render_template(self, tmpl_name, **kwargs):
         """
         Render a Jinja2 template of the given name (passed as argument to
-        :py:meth:`Jinja2.Environment.get_template`) with the specified kwargs
-        (passed as kwargs to :py:method:`jinja2.Template.render`).
+        :py:meth:`jinja2.Environment.get_template`) with the
+        specified kwargs (passed as kwargs to :py:meth:`jinja2.Template.render`)
 
         :param tmpl_name: name of the template to render
         :type tmpl_name: str
