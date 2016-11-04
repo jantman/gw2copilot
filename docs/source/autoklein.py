@@ -32,6 +32,8 @@ import six
 from six.moves import builtins
 from six.moves import reduce
 
+from gw2copilot.server import TwistedServer
+
 msg_re = re.compile(
     r'__init__\(\) takes exactly (\d+) arguments \(\d+ given\)'
 )
@@ -47,6 +49,7 @@ def import_object(import_name):
     mod = __import__(module_name)
     mod = reduce(getattr, module_name.split('.')[1:], mod)
     globals = builtins
+    #print('module_name=%s expr=%s mod=%s' % (module_name, expr, mod))
     if not isinstance(globals, dict):
         globals = globals.__dict__
     try:
@@ -113,6 +116,17 @@ class AutokleinDirective(Directive):
                    'undoc-static': directives.unchanged,
                    'include-empty-docstring': directives.unchanged}
 
+    def __init__(self, name, arguments, options, content, lineno,
+                 content_offset, block_text, state, state_machine):
+        super(AutokleinDirective, self).__init__(
+            name, arguments, options, content, lineno, content_offset,
+            block_text, state, state_machine)
+        print("init AutokleinDirective name=%s arguments=%s options=%s "
+              "content=%s lineno=%s content_offset=%s block_text=%s "
+              "state=%s state_machine=%s" % (name, arguments, options, content,
+                                             lineno, content_offset, block_text,
+                                             state, state_machine))
+
     @property
     def endpoints(self):
         endpoints = self.options.get('endpoints', None)
@@ -142,18 +156,23 @@ class AutokleinDirective(Directive):
         return res
 
     def make_rst(self):
-        app = import_object(self.arguments[0])
+        print('make_rst() called; importing %s' % self.arguments[0])
+        server = TwistedServer()
+        server._setup_klein()
+        app = server._app
         if self.endpoints:
             routes = itertools.chain(*[get_routes(app, endpoint)
                     for endpoint in self.endpoints])
         else:
             routes = get_routes(app)
+        print('routes: %s' % routes)
         # sort by path then method
         for method, paths, endpoint in sorted(
                 routes, key=operator.itemgetter(1, 0)
         ):
             if endpoint in self.undoc_endpoints:
                 continue
+            print('ROUTE: method=%s type=%s' % (method, type(method)))
             view = app._endpoints[endpoint]
             docstring = view.__doc__ or ''
             if hasattr(view, 'view_class'):
@@ -163,7 +182,6 @@ class AutokleinDirective(Directive):
             if not isinstance(docstring, six.text_type):
                 analyzer = ModuleAnalyzer.for_module(view.__module__)
                 docstring = force_decode(docstring, analyzer.encoding)
-    
             if not docstring and 'include-empty-docstring' not in self.options:
                 continue
             if '<HTTPAPI>' not in docstring:
@@ -174,9 +192,11 @@ class AutokleinDirective(Directive):
                 yield line
 
     def run(self):
+        print('AutokleinDirective run()')
         node = nodes.section()
         node.document = self.state.document
         result = ViewList()
+        print('calling make_rst()')
         for line in self.make_rst():
             result.append(line, '<autoflask>')
         nested_parse_with_titles(self.state, result, node)
@@ -184,7 +204,7 @@ class AutokleinDirective(Directive):
 
 
 def setup(app):
+    print("run app setup()")
     if 'http' not in app.domains:
         httpdomain.setup(app)
     app.add_directive('autoklein', AutokleinDirective)
-

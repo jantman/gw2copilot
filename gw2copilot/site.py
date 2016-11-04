@@ -55,6 +55,7 @@ class GW2CopilotSite(ClassRouteMixin):
     Class to add the UI routes to our Klein app.
     """
 
+    #: ``klein.app.Klein()`` instance for all web serving
     app = Klein()
 
     #: route prefix to prepend to all @classroutes
