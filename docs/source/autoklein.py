@@ -88,17 +88,6 @@ class AutokleinDirective(Directive):
                    'undoc-static': directives.unchanged,
                    'include-empty-docstring': directives.unchanged}
 
-    def __init__(self, name, arguments, options, content, lineno,
-                 content_offset, block_text, state, state_machine):
-        super(AutokleinDirective, self).__init__(
-            name, arguments, options, content, lineno, content_offset,
-            block_text, state, state_machine)
-        print("init AutokleinDirective name=%s arguments=%s options=%s "
-              "content=%s lineno=%s content_offset=%s block_text=%s "
-              "state=%s state_machine=%s" % (name, arguments, options, content,
-                                             lineno, content_offset, block_text,
-                                             state, state_machine))
-
     @property
     def endpoints(self):
         endpoints = self.options.get('endpoints', None)
@@ -136,14 +125,12 @@ class AutokleinDirective(Directive):
                     for endpoint in self.endpoints])
         else:
             routes = get_routes(app)
-        print('routes: %s' % routes)
         # sort by path then method
         for method, paths, endpoint in sorted(
                 routes, key=operator.itemgetter(1, 0)
         ):
             if endpoint in self.undoc_endpoints:
                 continue
-            print('ROUTE: method=%s type=%s' % (method, type(method)))
             view = app._endpoints[endpoint]
             docstring = view.__doc__ or ''
             if hasattr(view, 'view_class'):
@@ -163,11 +150,9 @@ class AutokleinDirective(Directive):
                 yield line
 
     def run(self):
-        print('AutokleinDirective run()')
         node = nodes.section()
         node.document = self.state.document
         result = ViewList()
-        print('calling make_rst()')
         for line in self.make_rst():
             result.append(line, '<autoflask>')
         nested_parse_with_titles(self.state, result, node)
@@ -175,7 +160,6 @@ class AutokleinDirective(Directive):
 
 
 def setup(app):
-    print("run app setup()")
     if 'http' not in app.domains:
         httpdomain.setup(app)
     app.add_directive('autoklein', AutokleinDirective)
