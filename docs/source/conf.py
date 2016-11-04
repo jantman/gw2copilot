@@ -295,7 +295,6 @@ texinfo_documents = [
 intersphinx_mapping = {
     'python': ('http://docs.python.org/2.7', None),
     'twisted': ('http://twistedmatrix.com/documents/current/api/', None),
-    'klein': ('https://klein.readthedocs.io/en/latest/', None),
     'psutil': ('https://pythonhosted.org/psutil/', None),
     'Jinja2': ('http://jinja.pocoo.org/docs/dev/', None)
 }
