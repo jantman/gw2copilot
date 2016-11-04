@@ -38,7 +38,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 """
 
 import logging
-import inspect
+from functools import update_wrapper
 
 logger = logging.getLogger()
 
@@ -69,13 +69,14 @@ def classroute(url, *args, **kwargs):
     def real_decorator(meth):
         meth._route_params = (url, args, kwargs)
 
-        def wrapper(klass, request):
-            return meth(klass, request)
+        def wrapper(self, request):
+            return meth(self, request)
 
         # since we're wrapping a wrapped method, we need to let
         # ``routable_class`` see the innermost method...
         wrapper._wrapped_method = meth
-        return wrapper
+        # we beed this for sphinx autodoc to work
+        return update_wrapper(wrapper, meth)
     return real_decorator
 
 
