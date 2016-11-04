@@ -166,6 +166,8 @@ class AutokleinDirective(Directive):
     
             if not docstring and 'include-empty-docstring' not in self.options:
                 continue
+            if '<HTTPAPI>' not in docstring:
+                continue
             docstring = self.fix_docstring(docstring)
             docstring = prepare_docstring(docstring)
             for line in http_directive(method, paths, docstring):
