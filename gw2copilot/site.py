@@ -41,8 +41,10 @@ import logging
 import json
 from datetime import datetime, timedelta
 from twisted.web._responses import OK
+from twisted.web.static import File
 from jinja2 import Environment, PackageLoader
 from klein import Klein
+import os
 
 from .utils import _make_response, _set_headers
 from .route_helpers import classroute, ClassRouteMixin
@@ -95,6 +97,25 @@ class GW2CopilotSite(ClassRouteMixin):
         tmpl = self._tmpl_env.get_template(tmpl_name)
         rendered = tmpl.render(**kwargs)
         return rendered
+
+    @classroute('static/', branch=True)
+    def static_files(self, request):
+        """
+        Meta-endpoint for serving static files from the ``static/`` directory.
+
+        This serves the ``/static/`` endpoint via
+        :py:class:twisted.web.static.File`
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: Twisted File resource
+        :rtype: twisted.web.static.File
+        """
+        path = os.path.join(
+            os.path.abspath(os.path.dirname(__file__)),
+            'static'
+        )
+        return File(path)
 
     @classroute('status')
     def status(self, request):
