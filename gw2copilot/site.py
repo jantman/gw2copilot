@@ -40,9 +40,9 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 import logging
 import json
 from datetime import datetime, timedelta
-from klein import Klein
 from twisted.web._responses import OK
 from jinja2 import Environment, PackageLoader
+from klein import Klein
 
 from .utils import _make_response, _set_headers
 from .route_helpers import classroute, ClassRouteMixin
@@ -52,10 +52,9 @@ logger = logging.getLogger()
 
 class GW2CopilotSite(ClassRouteMixin):
     """
-    Wrapper around ``klein.app.Klein`` to handle the site.
+    Class to add the UI routes to our Klein app.
     """
 
-    #: Klein() application instance
     app = Klein()
 
     #: route prefix to prepend to all @classroutes
@@ -63,31 +62,21 @@ class GW2CopilotSite(ClassRouteMixin):
 
     def __init__(self, parent_server):
         """
-        Initialize the Site, and the API components via an instance of
-        :py:class:`~.GW2CopilotAPI`.
+        Initialize the UI site. This must only be called from
+        :py:meth:`~.TwistedSite._setup_klein`.
 
+        :param app: the parent Site class
+        :type app: :py:class:`~.GW2CopilotSite`
         :param parent_server: parent TwisterServer instance
         :type parent_server: :py:class:`~.TwistedServer` instance
         """
-        logger.debug('Initializing Site')
+        logger.debug('Initializing API')
         self.parent_server = parent_server
         self._tmpl_env = Environment(
             loader=PackageLoader('gw2copilot', 'templates'),
             extensions=['jinja2.ext.loopcontrols']
         )
         self._add_routes()
-
-    @property
-    def site_resource(self):
-        """
-        Return the Klein app's ``resource``, for Twisted to use as its endpoint.
-
-        This replaces Klein's ``app.run()``.
-
-        :return: Klein app root resource
-        :rtype: twisted.web.resource
-        """
-        return self.app.resource()
 
     def _render_template(self, tmpl_name, **kwargs):
         """

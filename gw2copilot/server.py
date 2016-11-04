@@ -44,6 +44,7 @@ import os
 from datetime import datetime
 from twisted.web.server import Site
 from twisted.internet import reactor
+from klein import Klein
 
 import gw2copilot.site
 import gw2copilot.api
@@ -82,6 +83,7 @@ class TwistedServer(object):
         self.reactor = reactor
         self._site = None
         self._api = None
+        self._app = None
         if cache_dir is None:
             cd = os.path.abspath(os.path.expanduser('~/.gw2copilot/cache'))
             logger.debug('Defaulting cache directory to: %s', cd)
@@ -167,13 +169,24 @@ class TwistedServer(object):
                                       "MumbleLink on unsupported platform "
                                       "%s" % platform.system())
 
+    def _setup_klein(self):
+        """
+        Setup Klein site classes
+
+        This is broken out into a separate method so that doc generation
+        (``docs/source/autoklein.py``) can setup the Klein site without
+        running a reactor.
+        """
+        self._site = gw2copilot.site.GW2CopilotSite(self)
+        self._app = self._site.app
+        self._api = gw2copilot.api.GW2CopilotAPI(self._site.app, self)
+
     def run(self):
         """setup the web Site, start listening on port, setup the MumbleLink
         reader, and start the Twisted reactor"""
         # setup the web Site and HTTP listener
-        self._site = gw2copilot.site.GW2CopilotSite(self)
-        self._api = gw2copilot.api.GW2CopilotAPI(self._site, self)
-        self._listentcp(Site(self._site.site_resource))
+        self._setup_klein()
+        self._listentcp(Site(self._app.resource()))
         # setup the MumbleLink reader
         self._add_mumble_reader()
         # run the main reactor event loop

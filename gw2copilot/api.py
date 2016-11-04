@@ -55,21 +55,19 @@ class GW2CopilotAPI(ClassRouteMixin):
     #: route prefix to prepend to all @classroutes
     _route_prefix = '/api'
 
-    def __init__(self, site, parent_server):
+    def __init__(self, app, parent_server):
         """
         Initialize the API. This must only be called from
-        :py:meth:`~.TwistedSite.run` after :py:class:`~.GW2CopilotSite` is
-        initialized.
+        :py:meth:`~.TwistedSite._setup_klein`.
 
-        :param site: the parent Site class
-        :type site: :py:class:`~.GW2CopilotSite`
+        :param app: the parent Site class
+        :type app: :py:class:`~.GW2CopilotSite`
         :param parent_server: parent TwisterServer instance
         :type parent_server: :py:class:`~.TwistedServer` instance
         """
         logger.debug('Initializing API')
         self.parent_server = parent_server
-        self.site = site
-        self.app = site.app
+        self.app = app
         self._add_routes()
 
     def _render_template(self, tmpl_name, **kwargs):
