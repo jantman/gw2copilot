@@ -44,18 +44,22 @@ from klein import Klein
 from twisted.web._responses import OK
 from jinja2 import Environment, PackageLoader
 
-from .api import GW2CopilotAPI
 from .utils import _make_response, _set_headers
+from .route_helpers import classroute, ClassRouteMixin
 
 logger = logging.getLogger()
 
-app = Klein()
 
-
-class GW2CopilotSite(object):
+class GW2CopilotSite(ClassRouteMixin):
     """
     Wrapper around ``klein.app.Klein`` to handle the site.
     """
+
+    #: Klein() application instance
+    app = Klein()
+
+    #: route prefix to prepend to all @classroutes
+    _route_prefix = '/'
 
     def __init__(self, parent_server):
         """
@@ -65,18 +69,15 @@ class GW2CopilotSite(object):
         :param parent_server: parent TwisterServer instance
         :type parent_server: :py:class:`~.TwistedServer` instance
         """
+        logger.debug('Initializing Site')
         self.parent_server = parent_server
-        self.app = app
         self._tmpl_env = Environment(
             loader=PackageLoader('gw2copilot', 'templates'),
             extensions=['jinja2.ext.loopcontrols']
         )
-        # setup routes, since this is ugly with a class
-        self.app.route('/status')(self.status)
-        self.app.route('/')(self.homepage)
-        self.api = GW2CopilotAPI(self, parent_server)
+        self._add_routes()
 
-
+    @property
     def site_resource(self):
         """
         Return the Klein app's ``resource``, for Twisted to use as its endpoint.
@@ -105,39 +106,17 @@ class GW2CopilotSite(object):
         rendered = tmpl.render(**kwargs)
         return rendered
 
-    # app.route('/status')
+    @classroute('status')
     def status(self, request):
         """
         Generate the end-user Status page.
 
-        This serves :http:get:`/status` endpoint.
+        This serves the ``/status`` UI page.
 
         :param request: incoming HTTP request
         :type request: :py:class:`twisted.web.server.Request`
         :return: HTML output
         :rtype: str
-
-
-        <HTTPAPI>
-        Return the HTML for the /status end-user status page.
-
-        Served by :py:meth:`.status`.
-
-        **Example request**:
-
-        .. sourcecode:: http
-
-          GET /status HTTP/1.1
-          Host: example.com
-
-        **Example Response**:
-
-        .. sourcecode:: http
-
-          HTTP/1.1 200 OK
-          Content-Type: text/html
-
-          HTML OUTPUT HERE.
         """
         _set_headers(request)
         statuscode = OK
@@ -167,40 +146,17 @@ class GW2CopilotSite(object):
             )
         )
 
-    # app.route('/')
+    @classroute('/')
     def homepage(self, request):
         """
         Generate the end-user landing ("Home") page.
 
-        This serves :http:get:`/` endpoint.
+        This serves the ``/`` UI page.
 
         :param request: incoming HTTP request
         :type request: :py:class:`twisted.web.server.Request`
         :return: HTML output
         :rtype: str
-
-
-        <HTTPAPI>
-        Return the HTML for the / end-user "home" page.
-
-        Served by :py:meth:`.homepage`.
-
-        **Example request**:
-
-        .. sourcecode:: http
-
-          GET / HTTP/1.1
-          Host: example.com
-
-        **Example Response**:
-
-        .. sourcecode:: http
-
-          HTTP/1.1 200 OK
-          Content-Type: text/html
-
-          HTML OUTPUT HERE.
-
         """
         _set_headers(request)
         statuscode = OK

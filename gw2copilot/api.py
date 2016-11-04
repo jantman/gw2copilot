@@ -40,32 +40,37 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 import logging
 import json
 from twisted.web._responses import OK
-from jinja2 import Environment, PackageLoader
 
 from .utils import _make_response, _set_headers
+from .route_helpers import classroute, ClassRouteMixin
 
 logger = logging.getLogger()
 
 
-class GW2CopilotAPI(object):
+class GW2CopilotAPI(ClassRouteMixin):
     """
     Class to add the API routes to our Klein site.
     """
 
+    #: route prefix to prepend to all @classroutes
+    _route_prefix = '/api'
+
     def __init__(self, site, parent_server):
         """
         Initialize the API. This must only be called from
-        :py:meth:`~.GW2CopilotSite.__init__`
+        :py:meth:`~.TwistedSite.run` after :py:class:`~.GW2CopilotSite` is
+        initialized.
 
         :param site: the parent Site class
         :type site: :py:class:`~.GW2CopilotSite`
         :param parent_server: parent TwisterServer instance
         :type parent_server: :py:class:`~.TwistedServer` instance
         """
+        logger.debug('Initializing API')
         self.parent_server = parent_server
         self.site = site
-        # setup routes, since this is ugly with a class
-        self.site.app.route('/api/mumble_status')(self.mumble_status)
+        self.app = site.app
+        self._add_routes()
 
     def _render_template(self, tmpl_name, **kwargs):
         """
@@ -81,7 +86,7 @@ class GW2CopilotAPI(object):
         """
         return self.site._render_template(tmpl_name, **kwargs)
 
-    # app.route('/api/mumble_status')
+    @classroute('mumble_status')
     def mumble_status(self, request):
         """
         Return the full MumbleLink data.
