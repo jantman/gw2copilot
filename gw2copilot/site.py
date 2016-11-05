@@ -206,7 +206,8 @@ class GW2CopilotSite(ClassRouteMixin):
         return make_response(
             self._render_template(
                 'live.html',
-                request
+                request,
+                playerinfo=self.parent_server.playerinfo.as_dict
             )
         )
 
