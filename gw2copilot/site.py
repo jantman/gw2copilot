@@ -81,7 +81,7 @@ class GW2CopilotSite(ClassRouteMixin):
         )
         self._add_routes()
 
-    def _render_template(self, tmpl_name, **kwargs):
+    def _render_template(self, tmpl_name, request, **kwargs):
         """
         Render a Jinja2 template of the given name (passed as argument to
         :py:meth:`jinja2.Environment.get_template`) with the
@@ -89,6 +89,8 @@ class GW2CopilotSite(ClassRouteMixin):
 
         :param tmpl_name: name of the template to render
         :type tmpl_name: str
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
         :param kwargs: kwargs to pass to Jinja2 template render method
         :type kwargs: dict
         :return: rendered template string
@@ -144,6 +146,7 @@ class GW2CopilotSite(ClassRouteMixin):
         return _make_response(
             self._render_template(
                 'status.html',
+                request,
                 playerinfo=json.dumps(
                     self.parent_server.playerinfo.as_dict,
                     sort_keys=True, indent=4, separators=(',', ': ')
@@ -179,6 +182,7 @@ class GW2CopilotSite(ClassRouteMixin):
                     request.client.host, request.client.port)
         return _make_response(
             self._render_template(
-                'index.html'
+                'index.html',
+                request
             )
         )
