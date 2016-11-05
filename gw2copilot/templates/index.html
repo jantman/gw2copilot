@@ -6,30 +6,34 @@
       <div class="container">
         <h1>gw2copilot</h1>
         <p>The only thing you need open on your other monitor when playing GW2.</p>
-      </div>
-    </div>
+      </div> <!-- END container div -->
+    </div> <!-- END jumbotron div -->
 
 
 
     <div class="container">
       <!-- Example row of columns -->
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
           <h2>Live Data</h2>
           <p>Provides realtime information on player location, updated every 2 seconds from the game (via the documented MumbleLink protocol). Find yourself on a map, manually track zone completion, etc.</p>
           <p><a class="btn btn-default" href="/live" role="button">View live data &raquo;</a></p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <h2>Crafting</h2>
           <p>Track recipes you want to make; automatically determines necessary ingredients and (via the GW2 account API) figures how what you already have vs what you still need. </p>
           <p><a class="btn btn-default" href="/crafting" role="button">View crafting &raquo;</a></p>
        </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <h2>Status</h2>
           <p>View internal status </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+          <p><a class="btn btn-default" href="/status" role="button">View status &raquo;</a></p>
         </div>
-      </div>
-
-<img src="/static/kitten.jpg" />
+        <div class="col-md-3">
+          <h2>Help</h2>
+          <p>View help information </p>
+          <p><a class="btn btn-default" href="/help" role="button">View help &raquo;</a></p>
+        </div>
+      </div> <!-- END "row" div -->
+    </div> <!-- /container -->
 {% endblock %}
