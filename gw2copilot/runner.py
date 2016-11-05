@@ -89,10 +89,18 @@ class Runner(object):
         p.add_argument('-c', '--cache-dir', dest='cache_dir', action='store',
                        default=cd, type=str,
                        help='cache directory path (default: %s)' % cd)
-        p.add_argument('--test-mumble', dest='test_mumble', action='store_true',
-                       default=False,
+        test_types = {
+            'staticdata': 'always send the same fake data, except timestamp',
+            'once': 'send fake data, but only once'
+        }
+        p.add_argument('-t', '--test', dest='test_mumble', action='store',
+                       type=str, default=None, choices=test_types.keys(),
                        help='do not actually connect to game via MumbleLink; '
-                            'use static example/test data')
+                            'use static example/test data; possible values: ' +
+                            ', '.join(
+                           ['"%s" - %s' % (
+                               k, test_types[k]) for k in test_types.keys()]
+                       ))
         args = p.parse_args(argv)
         return args
 

@@ -63,7 +63,7 @@ class TwistedServer(object):
     bridges the MumbleLink to the web frontend and other logic.
     """
 
-    def __init__(self, poll_interval=5.0, bind_port=8080, test=False,
+    def __init__(self, poll_interval=5.0, bind_port=8080, test=None,
                  cache_dir=None):
         """
         Initialize the Twisted Server, the heart of the application...
@@ -72,9 +72,10 @@ class TwistedServer(object):
         :type poll_interval: float
         :param bind_port: port number to bind to / listen on
         :type bind_port: int
-        :param test: if True, don't actually connect to the game, just use
-          example MumbleLink data
-        :type test: bool
+        :param test: if not None, use :py:class:`~.TestMumbleLinkReader` as
+           our MumbleLink reader class, and pass this argument to its
+           constructor.
+        :type test: str
         :param cache_dir: absolute path to gw2copilot cache directory
         :type cache_dir: str
         """
@@ -155,7 +156,7 @@ class TwistedServer(object):
         if self._test:
             logger.warning('Using TestMumbleLinkReader - TEST DATA ONLY')
             self._mumble_reader = TestMumbleLinkReader(
-                self, self._poll_interval)
+                self, self._poll_interval, self._test)
         elif platform.system() == 'Linux':
             logger.debug("Using WineMumbleLinkReader on Linux platform")
             self._mumble_reader = WineMumbleLinkReader(

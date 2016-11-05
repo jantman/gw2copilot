@@ -100,7 +100,7 @@ class TestMumbleLinkReader(object):
         'name': u'Guild Wars 2'
     }
 
-    def __init__(self, parent_server, poll_interval):
+    def __init__(self, parent_server, poll_interval, test_type):
         """
         Initialize the class.
 
@@ -108,13 +108,21 @@ class TestMumbleLinkReader(object):
         :type parent_server: :py:class:`~.TwistedServer`
         :param poll_interval: interval in seconds to poll MumbleLink
         :type poll_interval: float
+        :param test_type: the type of test to run
+        :type test_type: str
         """
         logger.warning("Instantiating TestMumbleLinkReader")
         self.server = parent_server
         self._poll_interval = poll_interval
         self.uiTick = 2
         self._looping_deferred = None
-        self._add_update_loop()
+        if test_type == 'staticdata':
+            self._add_update_loop()
+        elif test_type == 'once':
+            logger.debug('Test type "once" - not adding update loop')
+            self._read()
+        else:
+            raise Exception("Invalid test type: %s" % test_type)
 
     def _add_update_loop(self):
         """
