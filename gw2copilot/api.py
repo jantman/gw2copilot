@@ -291,9 +291,13 @@ class GW2CopilotAPI(ClassRouteMixin):
               "region_id": 4
           }
 
-        :>json name: *(string)* character name
-        :>json profession: *(string)* character's profession
-        :>json race: *(string)* character's race
+        :>json map_name: *(string)* current map name
+        :>json map_id: *(int)* current map ID
+        :>json map_level_range: *(string)* current map level range
+        :>json continent_name: *(string)* current continent name
+        :>json continent_id: *(int)* current continent ID
+        :>json region_name: *(string)* current region name
+        :>json region_id: *(int)* current region ID
         :statuscode 200: successfully returned result
         """
         log_request(request)

@@ -107,6 +107,9 @@ class TwistedServer(object):
         self._mumble_reader = None
         self._test = test
         self.playerinfo = PlayerInfo(self.cache)
+        self._pi_position = None
+        self._pi_map_info = None
+        self._pi_player_dict = None
 
     def update_mumble_data(self, mumble_data):
         """
@@ -121,13 +124,25 @@ class TwistedServer(object):
         self._mumble_link_data = mumble_data
         self._mumble_update_datetime = datetime.now()
         self.playerinfo.update_mumble_link(mumble_data)
-        self._ws_send('playerinfo', self.playerinfo.as_dict)
+        if self.playerinfo.player_dict != self._pi_player_dict:
+            logger.debug('player_dict changed')
+            self._pi_player_dict = self.playerinfo.player_dict
+            self._ws_send('player_dict', self._pi_player_dict)
+        if self.playerinfo.map_info != self._pi_map_info:
+            logger.debug('map_info changed')
+            self._pi_map_info = self.playerinfo.map_info
+            self._ws_send('map_info', self._pi_map_info)
+        if self.playerinfo.position != self._pi_position:
+            logger.debug('position changed')
+            self._pi_position = self.playerinfo.position
+            self._ws_send('position', self._pi_position)
 
     def _ws_send(self, msg_type, data):
         """
         Send the given data to all clients via websocket broadcast.
 
-        :param msg_type: type of message; "tick" or "position" or "playerinfo"
+        :param msg_type: type of message; "tick", "position", "player_dict",
+           or "map_info"
         :type msg_type: str
         :param data: JSON-serializable data dict
         :type data: dict
