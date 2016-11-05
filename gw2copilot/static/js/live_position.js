@@ -127,6 +127,13 @@ function getInitialData() {
  */
 function handleUpdatePlayerDict(data) {
     console.log("handleUpdatePlayerData(" + JSON.stringify(data) + ")");
+    if ( playerinfo_dict != data ) {
+        $("#player_info_header").text(
+            data["name"] + " (LEVEL " + data["race"] + " " +
+            data["profession"] + ") - "
+        );
+        playerinfo_dict = data;
+    }
 }
 
 /**
@@ -136,6 +143,13 @@ function handleUpdatePlayerDict(data) {
  */
 function handleUpdateMapInfo(data) {
     console.log("handleUpdateMapInfo(" + JSON.stringify(data) + ")");
+    if ( playerinfo_map_info != data ) {
+        $("#map_info_header").text(
+            data["map_name"] + " (" + data["map_level_range"] + "), " +
+            data["region_name"] + ", " + data["continent_name"]
+        );
+        playerinfo_map_info = data;
+    }
 }
 
 /**
