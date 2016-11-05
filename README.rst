@@ -89,8 +89,20 @@ Usage
 Internals
 ---------
 
+Dependencies and Thanks
++++++++++++++++++++++++
+
+gw2copilot is built on the shoulders of giants; it makes use of the following Free or Open Source tools:
+
+* `bootstrap <http://getbootstrap.com/>`_ and `html5boilerplate <https://html5boilerplate.com/>`_ for the UI, downloaded via `initizlizr <http://www.initializr.com/>`_, which themselves include `jquery <https://jquery.com/>`_ and `modernizr <https://modernizr.com/>`_.
+* The `twisted <https://twistedmatrix.com/>`_ event-based asynchronous framework at the heart of the app (reading the MumbleLink file, serving HTTP and websockets, and timer-based actions).
+* The `Klein <https://klein.readthedocs.io/en/latest/>`_ microframework for serving HTTP, with user-oriented pages templated using `Jinja2 <http://jinja.pocoo.org/>`_.
+* The python `psutil <https://pythonhosted.org/psutil/>`_ package, which greatly simplifies finding the running GW2 wine environment.
+* Crossbar's `autobahn Python <http://crossbar.io/autobahn/>`_ websocket server.
+* `leaflet <http://leafletjs.com/>`_ for rendering the interactive maps, greatly helped by the `example on the GW wiki <https://wiki.guildwars2.com/wiki/API:Maps>`_ and `an example from Cliff Spradlin <http://jsfiddle.net/cliff/CRRGC/>`_.
+
 Reading the MumbleLink File
----------------------------
++++++++++++++++++++++++++++
 
 If you're running natively under Windows, it simply reads the memory-mapped MumbleLink file.
 
@@ -102,11 +114,6 @@ If you're running under Linux (wine/PoL), it's a bit more complicated and involv
 4. Find the correct ``wine`` binary by searching for it using the ``PATH`` of the ``Gw2.exe`` process.
 5. Execute a small helper "shim" script, with GW2's ``wine`` binary and environment, that reads the memory-mapped file and writes all changes to it as JSON to STDOUT.
 6. The main script reads that process' STDOUT to retrieve the information.
-
-Notes/References/Links
-----------------------
-
-* Searching for `MumbleLink in Python code on GitHub <https://github.com/search?l=Python&q=MumbleLink&type=Code&utf8=%E2%9C%93>`_ yields a number of other projects that read the memory-mapped MumbleLink file, including quite a few for GW2.
 
 Bugs and Feature Requests
 -------------------------
