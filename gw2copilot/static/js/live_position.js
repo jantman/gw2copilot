@@ -39,6 +39,9 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
 var sock = null;
 
+/**
+ * Setup websocket server and hook in message handler.
+ */
 window.onload = function() {
     var wsuri;
 
@@ -67,7 +70,37 @@ window.onload = function() {
        }
 
        sock.onmessage = function(e) {
-          console.log("Got echo: " + e.data);
+          console.log("Got websocket message: " + e.data);
+          j = JSON.parse(e.data);
+          if ( j["type"] == "tick" ) {
+              console.log("ignoring websocket tick");
+          }
+          handleWebSocketMessage(j);
        }
     }
+
+    getInitialData();
 };
+
+/**
+ * Handle an incoming websocket message; dispatch it to the correct
+ * handle_* function.
+ *
+ * @param {object} data - the JSON-decoded message content
+ */
+function handleWebSocketMessage(data) {
+    console.log("handleWebSocketMessage(" + JSON.stringify(data) + ")");
+}
+
+/**
+ * Perform the initial data request to initialize the UI.
+ */
+function getInitialData() {
+    console.log("Getting initial data.");
+    // request dicts from API identical to what websockets get, to update
+    // player info and initial location.
+    //
+    // we'll want PlayerInfo() to have methods for these, which will be called
+    // by the /api/ request methods, and will also be sent by websockets on
+    // playerinfo update IFF their response values have changed.
+}
