@@ -84,12 +84,13 @@ class GW2CopilotAPI(ClassRouteMixin):
         """
         return self.site._render_template(tmpl_name, **kwargs)
 
-    @classroute('mumble_status')
-    def mumble_status(self, request):
+    @classroute('player_info')
+    def player_info(self, request):
         """
-        Return the full MumbleLink data.
+        Return the full PlayerInfo data. This returns the exact return value
+        of :py:attr:`~.PlayerInfo.as_dict`.
 
-        This serves :http:get:`/api/mumble_status` endpoint.
+        This serves :http:get:`/api/player_info` endpoint.
 
         :param request: incoming HTTP request
         :type request: :py:class:`twisted.web.server.Request`
@@ -98,15 +99,16 @@ class GW2CopilotAPI(ClassRouteMixin):
 
 
         <HTTPAPI>
-        Return the current MumbleLink data as JSON.
+        Return the current MumbleLink data as JSON. This returns the exact
+        return value of :py:attr:`~.PlayerInfo.as_dict`.
 
-        Served by :py:meth:`.mumble_status`.
+        Served by :py:meth:`.player_info`.
 
         **Example request**:
 
         .. sourcecode:: http
 
-          GET /mumble_status HTTP/1.1
+          GET /player_info HTTP/1.1
           Host: example.com
 
         **Example Response**:
@@ -143,4 +145,163 @@ class GW2CopilotAPI(ClassRouteMixin):
         request.setHeader("Content-Type", 'application/json')
         return make_response(
             json.dumps(self.parent_server.playerinfo.as_dict)
+        )
+
+    @classroute('position')
+    def position(self, request):
+        """
+        Return the player's current position. This returns the exact return
+        value of :py:attr:`~.PlayerInfo.position`.
+
+        This serves :http:get:`/api/position` endpoint.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: JSON response data string
+        :rtype: str
+
+        <HTTPAPI>
+        Return the player's current position as JSON.
+
+        Served by :py:meth:`.position`.
+
+        **Example request**:
+
+        .. sourcecode:: http
+
+          GET /position HTTP/1.1
+          Host: example.com
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+          HTTP/1.1 200 OK
+          Content-Type: application/json
+
+          [1.234, 5.678]
+
+        :>jsonarr x: *(float)* player's X coordinate
+        :>jsonarr y: *(float)* player's Y coordinate
+        :statuscode 200: successfully returned result
+        """
+        log_request(request)
+        set_headers(request)
+        statuscode = OK
+        msg = make_response('OK')
+        request.setResponseCode(statuscode, message=msg)
+        request.setHeader("Content-Type", 'application/json')
+        return make_response(
+            json.dumps(self.parent_server.playerinfo.position)
+        )
+
+    @classroute('player_dict')
+    def player_dict(self, request):
+        """
+        Return a dict of information about the player/character; This returns
+        the exact return value of :py:attr:`~.PlayerInfo.player_dict`.
+
+        This serves :http:get:`/api/player_dict` endpoint.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: JSON response data string
+        :rtype: str
+
+        <HTTPAPI>
+        Return a dict of information about the player/character as JSON.
+
+        Served by :py:meth:`.player_dict`.
+
+        **Example request**:
+
+        .. sourcecode:: http
+
+          GET /player_dict HTTP/1.1
+          Host: example.com
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+          HTTP/1.1 200 OK
+          Content-Type: application/json
+
+          {
+              "name": "Character Name",
+              "profession": "Profession",
+              "race": "Race"
+          }
+
+        :>json name: *(string)* character name
+        :>json profession: *(string)* character's profession
+        :>json race: *(string)* character's race
+        :statuscode 200: successfully returned result
+        """
+        log_request(request)
+        set_headers(request)
+        statuscode = OK
+        msg = make_response('OK')
+        request.setResponseCode(statuscode, message=msg)
+        request.setHeader("Content-Type", 'application/json')
+        return make_response(
+            json.dumps(self.parent_server.playerinfo.player_dict)
+        )
+
+    @classroute('map_info')
+    def map_info(self, request):
+        """
+        Return a dict of information about the player's current map and
+        location; This returns the exact return value of
+        :py:attr:`~.PlayerInfo.map_info`.
+
+        This serves :http:get:`/api/map_info` endpoint.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: JSON response data string
+        :rtype: str
+
+        <HTTPAPI>
+        Return a dict of information about the player's current map as JSON.
+
+        Served by :py:meth:`.map_info`.
+
+        **Example request**:
+
+        .. sourcecode:: http
+
+          GET /map_info HTTP/1.1
+          Host: example.com
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+          HTTP/1.1 200 OK
+          Content-Type: application/json
+
+          {
+              "map_name": "Lion's Arch",
+              "map_id": 50,
+              "map_level_range": "0-80",
+              "continent_name": "Tyria",
+              "continent_id": 1,
+              "region_name": "Kryta",
+              "region_id": 4
+          }
+
+        :>json name: *(string)* character name
+        :>json profession: *(string)* character's profession
+        :>json race: *(string)* character's race
+        :statuscode 200: successfully returned result
+        """
+        log_request(request)
+        set_headers(request)
+        statuscode = OK
+        msg = make_response('OK')
+        request.setResponseCode(statuscode, message=msg)
+        request.setHeader("Content-Type", 'application/json')
+        return make_response(
+            json.dumps(self.parent_server.playerinfo.map_info)
         )

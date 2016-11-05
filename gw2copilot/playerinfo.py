@@ -94,7 +94,10 @@ class PlayerInfo(object):
     def as_dict(self):
         """
         Return a dictionary representation of relevant information about the
-        current player.
+        current player. See source code for keys.
+
+        **Note:** when updating this property, also update the documentation on
+        :http:get:`/api/player_info`.
 
         :return: player information
         :rtype: dict
@@ -122,6 +125,76 @@ class PlayerInfo(object):
                 self._current_map_data['max_level']
             ),
             'position': self._position
+        }
+
+    @property
+    def position(self):
+        """
+        Return the player's current (x, y) continent coordinates.
+
+        **Note:** when updating this property, also update the documentation on
+        :http:get:`/api/position`.
+
+        :return: 2-tuple, (x, y) continent coordinates (floats).
+        :rtype: tuple
+        """
+        return self._position
+
+    @property
+    def map_info(self):
+        """
+        Return a dict about the player's current map. Dict contents are:
+
+        * ``map_id`` - *(int)*
+        * ``map_name`` - *(str)*
+        * ``map_level_range`` - *(str)*
+        * ``continent_id`` - *(int)*
+        * ``continent_name`` - *(str)*
+        * ``region_id`` - *(int)*
+        * ``region_name`` - *(str)*
+
+        **Note:** when updating this property, also update the documentation on
+        :http:get:`/api/map_info`.
+
+        :return: information on the player's current map
+        :rtype: dict
+        """
+        return {
+            'map_id': self._current_map,
+            'continent_id': self._continent_id,
+            'continent_name': self._continent_name,
+            'region_id': self._region_id,
+            'region_name': self._region_name,
+            'map_name': self._map_name,
+            'map_level_range': '%d-%d' % (
+                self._current_map_data['min_level'],
+                self._current_map_data['max_level']
+            )
+        }
+
+    @property
+    def player_dict(self):
+        """
+        Return a dict with only the information about the player. Keys are
+        ``name`` (str), ``level`` (int), ``race`` (str, ``race_name`` in the
+        return value of :py:attr:`~.PlayerInfo.as_dict`) and ``profession``
+        (str,``profession_name`` in the return value of
+        :py:attr:`~.PlayerInfo.as_dict`).
+
+        **Note:** when updating this property, also update the documentation on
+        :http:get:`/api/player_dict`.
+
+        :return: Dict of information about the player.
+        :rtype: dict
+        """
+        return {
+            'name': self._mumble_link_data['identity']['name'],
+            'profession': self.professions[
+                self._mumble_link_data['identity']['profession']
+            ],
+            'race': self.races[
+                self._mumble_link_data['identity']['race']
+            ]
         }
 
     def update_mumble_link(self, mumble_link_data):
