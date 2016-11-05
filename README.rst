@@ -84,6 +84,12 @@ If you're running under Linux (wine/PlayOnLinux), you'll also need to install Py
 Usage
 -----
 
+You'll need an `API Key <https://wiki.guildwars2.com/wiki/API:API_key>`_ for the GuildWars2 API;
+log in to your account and generate one, and then either export it as the ``GW2_API_KEY`` environment
+variable, or pass it via the ``-k`` / ``--api-key`` command line option. The key you generate
+must have at least the ``account``, ``characters`` and ``inventories`` permissions. It is recommended
+for security that each application you use have its own API key.
+
 @TODO this.
 
 Internals

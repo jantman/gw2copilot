@@ -89,6 +89,7 @@ class PlayerInfo(object):
         self._region_name = ''
         self._map_name = ''
         self._position = [0, 0]
+        self._char_api_info = None
 
     @property
     def as_dict(self):
@@ -217,6 +218,9 @@ class PlayerInfo(object):
         ) % 360
         self._elevation = m2i(mumble_link_data['fAvatarPosition'][1])
         self._update_position()
+        self._char_api_info = self._cache.character_info(
+            mumble_link_data['identity']['name']
+        )
 
     def _update_position(self):
         """

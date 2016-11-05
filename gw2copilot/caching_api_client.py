@@ -41,6 +41,7 @@ import logging
 import requests
 import os
 import json
+import urllib
 
 logger = logging.getLogger()
 
@@ -51,7 +52,7 @@ class CachingAPIClient(object):
     locally on disk.
     """
 
-    def __init__(self, parent_server, cache_dir):
+    def __init__(self, parent_server, cache_dir, api_key=None):
         """
         Initialize the cache class.
 
@@ -59,8 +60,12 @@ class CachingAPIClient(object):
         :type parent_server: :py:class:`~.TwistedServer`
         :param cache_dir: cache directory on filesystem
         :type cache_dir: str
+        :param api_key: GW2 API Key
+        :type api_key: str
         """
         self._cache_dir = cache_dir
+        self._api_key = api_key
+        self._characters = {}  # these don't get cached to disk
         if not os.path.exists(cache_dir):
             logger.debug('Creating cache directory at: %s', cache_dir)
             os.makedirs(cache_dir, 0700)
@@ -126,6 +131,30 @@ class CachingAPIClient(object):
         with open(p, 'w') as fh:
             fh.write(raw)
 
+    def _get(self, path, auth=False):
+        """
+        Perform a GET against the GW2 API. Return the response object.
+
+        :param path: path to request, beginning with version (e.g. ``/v1/foo``)
+        :type path: str
+        :param auth: whether or not to provide authentication
+        :type auth: bool
+        :return: response object
+        :rtype: requests.Response
+        """
+        url = 'https://api.guildwars2.com' + path
+
+        if auth:
+            # yeah, quick and dirty...
+            if '?' in url:
+                url += '&access_token=%s' % self._api_key
+            else:
+                url += '?access_token=%s' % self._api_key
+        logger.debug('GET %s (auth=%s)', url, auth)
+        r = requests.get(url)
+        logger.debug('GET %s returned status %d', url, r.status_code)
+        return r
+
     def map_data(self, map_id):
         """
         Return dict of map data for the given map ID.
@@ -138,11 +167,29 @@ class CachingAPIClient(object):
         cached = self._cache_get('mapdata', map_id)
         if cached is not None:
             return cached
-        url = 'https://api.guildwars2.com/v1/maps.json?map_id=%d' % map_id
-        logger.debug('GETting map data from: %s', url)
-        r = requests.get(url)
+        r = self._get('/v1/maps.json?map_id=%d' % map_id)
         logger.debug('Got map data (HTTP status %d) response length %d',
                      r.status_code, len(r.text))
         result = r.json()['maps'][str(map_id)]
         self._cache_set('mapdata', map_id, result)
         return result
+
+    def character_info(self, name):
+        """
+        Return character information for the named character. This is NOT cached
+        to disk; it is cached in-memory only.
+
+        :param name: character name
+        :type name: str
+        :return: GW2 API character information
+        :rtype: dict
+        """
+        if name in self._characters:
+            logger.debug('Using cached character info for: %s', name)
+            return self._characters[name]
+        path = '/v2/characters/%s' % urllib.quote(name)
+        r = self._get(path, auth=True)
+        j = r.json()
+        logger.debug('Got character information for %s: %s', name, j)
+        self._characters[name] = j
+        return j

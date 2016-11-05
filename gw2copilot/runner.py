@@ -105,7 +105,19 @@ class Runner(object):
                            ['"%s" - %s' % (
                                k, test_types[k]) for k in test_types.keys()]
                        ))
+        p.add_argument('-k', '--api-key', dest='api_key', action='store',
+                       type=str, default=None,
+                       help='API Key; exporting this as the GW2_API_KEY '
+                            'environment variable is preferred over specifying '
+                            'it on the command line')
         args = p.parse_args(argv)
+        if args.api_key is None:
+            k = os.environ.get('GW2_API_KEY', None)
+            if k is None:
+                raise Exception('You must specify your GW2 API Key either with '
+                                'the -k/--api-key option or as the GW2_API_KEY '
+                                'environment variable.')
+            args.api_key = k
         return args
 
     def console_entry_point(self):
@@ -121,7 +133,8 @@ class Runner(object):
             bind_port=args.bind_port,
             test=args.test_mumble,
             cache_dir=args.cache_dir,
-            ws_port=args.ws_port
+            ws_port=args.ws_port,
+            api_key=args.api_key
         )
         s.run()
 

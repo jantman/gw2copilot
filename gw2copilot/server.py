@@ -69,7 +69,7 @@ class TwistedServer(object):
     """
 
     def __init__(self, poll_interval=5.0, bind_port=8080, test=None,
-                 cache_dir=None, ws_port=8081):
+                 cache_dir=None, ws_port=8081, api_key=None):
         """
         Initialize the Twisted Server, the heart of the application...
 
@@ -85,9 +85,12 @@ class TwistedServer(object):
         :type cache_dir: str
         :param ws_port: port for websocket server to listen on
         :type ws_port: int
+        :param api_key: GW2 API Key
+        :type api_key: str
         """
         self._poll_interval = poll_interval
         self._bind_port = bind_port
+        self._api_key = api_key
         self._ws_port = ws_port
         self.reactor = reactor
         self._site = None
@@ -99,7 +102,7 @@ class TwistedServer(object):
             logger.debug('Defaulting cache directory to: %s', cd)
             cache_dir = cd
         self._cache_dir = cache_dir
-        self.cache = CachingAPIClient(self, cache_dir)
+        self.cache = CachingAPIClient(self, cache_dir, api_key=api_key)
         # @TODO perform the initial cache gets
         # saved state:
         self._mumble_link_data = None
