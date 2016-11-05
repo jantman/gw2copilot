@@ -43,9 +43,9 @@ window.onload = function() {
     var wsuri;
 
     if (window.location.protocol === "file:") {
-       wsuri = "ws://localhost:" + window.location.port + "/ws";
+       wsuri = "ws://localhost:" + ws_port;
     } else {
-       wsuri = "ws://" + window.location.hostname + ":" + window.location.port + "/ws";
+       wsuri = "ws://" + window.location.hostname + ":" + ws_port;
     }
 
     if ("WebSocket" in window) {

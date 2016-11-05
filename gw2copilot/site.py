@@ -50,7 +50,7 @@ from .utils import make_response, set_headers, log_request
 from .route_helpers import classroute, ClassRouteMixin
 from .version import VERSION, PROJECT_URL
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class GW2CopilotSite(ClassRouteMixin):
@@ -76,11 +76,24 @@ class GW2CopilotSite(ClassRouteMixin):
         """
         logger.debug('Initializing API')
         self.parent_server = parent_server
+        self._resource = None
         self._tmpl_env = Environment(
             loader=PackageLoader('gw2copilot', 'templates'),
             extensions=['jinja2.ext.loopcontrols']
         )
         self._add_routes()
+
+    @property
+    def resource(self):
+        """
+        Return the Twisted resource for the Klein app.
+
+        :return: Twisted site resource for Klein app.
+        :rtype: klein.resource.KleinResource
+        """
+        if self._resource is None:
+            self._resource = self.app.resource()
+        return self._resource
 
     def _render_template(self, tmpl_name, request, **kwargs):
         """
@@ -100,6 +113,7 @@ class GW2CopilotSite(ClassRouteMixin):
         tmpl = self._tmpl_env.get_template(tmpl_name)
         kwargs['VERSION'] = VERSION
         kwargs['PROJECT_URL'] = PROJECT_URL
+        kwargs['ws_port'] = self.parent_server.ws_port
         rendered = tmpl.render(**kwargs)
         return rendered
 

@@ -38,14 +38,18 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 """
 
 import logging
-from autobahn.twisted.websocket import WebSocketServerFactory, \
-    WebSocketServerProtocol, \
-    listenWS
+from autobahn.twisted.websocket import (
+    WebSocketServerFactory, WebSocketServerProtocol
+)
 
 logger = logging.getLogger(__name__)
 
 
 class BroadcastServerProtocol(WebSocketServerProtocol):
+    """
+    WebSocket Server Protocol for tracking connected clients and broadcasting
+    messages to them.
+    """
 
     def onOpen(self):
         self.factory.register(self)

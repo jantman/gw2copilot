@@ -85,6 +85,10 @@ class Runner(object):
         p.add_argument('-P', '--port', dest='bind_port', action='store',
                        type=int, default=8080,
                        help='Port number to listen on (default 8080)')
+        p.add_argument('-W', '--websocket-port', dest='ws_port', action='store',
+                       default=8081, type=int,
+                       help='Port number to listen on for websocket server'
+                            ' (default 8081)')
         cd = os.path.abspath(os.path.expanduser('~/.gw2copilot/cache'))
         p.add_argument('-c', '--cache-dir', dest='cache_dir', action='store',
                        default=cd, type=str,
@@ -116,7 +120,8 @@ class Runner(object):
             poll_interval=args.poll_interval,
             bind_port=args.bind_port,
             test=args.test_mumble,
-            cache_dir=args.cache_dir
+            cache_dir=args.cache_dir,
+            ws_port=args.ws_port
         )
         s.run()
 

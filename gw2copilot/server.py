@@ -45,7 +45,8 @@ import json
 from datetime import datetime
 from twisted.web.server import Site
 from twisted.internet import reactor
-from autobahn.twisted.resource import WebSocketResource
+from twisted.python import log
+from autobahn.twisted.websocket import listenWS
 
 import gw2copilot.site
 import gw2copilot.api
@@ -56,7 +57,9 @@ from .playerinfo import PlayerInfo
 from .caching_api_client import CachingAPIClient
 from .websockets import BroadcastServerFactory, BroadcastServerProtocol
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
+observer = log.PythonLoggingObserver(loggerName='twisted')
+observer.start()
 
 
 class TwistedServer(object):
@@ -66,7 +69,7 @@ class TwistedServer(object):
     """
 
     def __init__(self, poll_interval=5.0, bind_port=8080, test=None,
-                 cache_dir=None):
+                 cache_dir=None, ws_port=8081):
         """
         Initialize the Twisted Server, the heart of the application...
 
@@ -80,9 +83,12 @@ class TwistedServer(object):
         :type test: str
         :param cache_dir: absolute path to gw2copilot cache directory
         :type cache_dir: str
+        :param ws_port: port for websocket server to listen on
+        :type ws_port: int
         """
         self._poll_interval = poll_interval
         self._bind_port = bind_port
+        self._ws_port = ws_port
         self.reactor = reactor
         self._site = None
         self._api = None
@@ -130,6 +136,16 @@ class TwistedServer(object):
         self._ws_broadcast.broadcast(msg)
 
     @property
+    def ws_port(self):
+        """
+        Return the websocket port number
+
+        :return: websocket port number
+        :rtype: int
+        """
+        return self._ws_port
+
+    @property
     def mumble_update_datetime(self):
         """
         Return the datetime when mumble link data was last updated.
@@ -163,6 +179,14 @@ class TwistedServer(object):
         logger.warning('Setting TCP listener on port %d for HTTP requests',
                        self._bind_port)
         self.reactor.listenTCP(self._bind_port, site)
+
+    def _listenWS(self):
+        """
+        Setup websocket listener; helper method for testing.
+        """
+        logger.warning('Setting WebSocket listener on port %d', self._ws_port)
+        port = listenWS(self._ws_broadcast)
+        logger.debug("Websocket server listening on port %d", port.port)
 
     def _add_mumble_reader(self):
         """
@@ -200,18 +224,15 @@ class TwistedServer(object):
 
     def _setup_websockets(self):
         """
-        Setup the autobahn websocket server factory and protocol; configure it
-        as a child resource of ``self._app.resource()`` and ``/ws/``.
+        Setup the autobahn websocket server factory and protocol; set
+        ``self._ws_broadcast``.
         """
-        logger.debug('Initializing websocket server')
         self._ws_broadcast = BroadcastServerFactory(
-            u"ws://127.0.0.1:%d" % self._bind_port,
-            self.reactor, enable_tick=True
+            u"ws://127.0.0.1:%s" % self._ws_port,
+            self.reactor,
+            enable_tick=True
         )
         self._ws_broadcast.protocol = BroadcastServerProtocol
-        resource = WebSocketResource(self._ws_broadcast)
-        logger.debug('Running websocket server at /ws/')
-        self._app.resource().putChild(b"ws", resource)
 
     def run(self):
         """setup the web Site, start listening on port, setup the MumbleLink
@@ -219,7 +240,8 @@ class TwistedServer(object):
         # setup the web Site and HTTP listener
         self._setup_klein()
         self._setup_websockets()
-        self._listentcp(Site(self._app.resource()))
+        self._listentcp(Site(self._site.resource))
+        self._listenWS()
         # setup the MumbleLink reader
         self._add_mumble_reader()
         # run the main reactor event loop
