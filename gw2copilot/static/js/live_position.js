@@ -38,6 +38,9 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 */
 
 var sock = null;
+var playerinfo_dict = null;
+var playerinfo_map_info = null;
+var playerinfo_position = null;
 
 /**
  * Setup websocket server and hook in message handler.
@@ -93,14 +96,53 @@ function handleWebSocketMessage(data) {
 }
 
 /**
- * Perform the initial data request to initialize the UI.
+ * Perform the initial data request to initialize the UI. This requests all of
+ * the information that we receive via websockets, in case the app started
+ * and websocket broadcasts were sent before the page loaded.
  */
 function getInitialData() {
     console.log("Getting initial data.");
-    // request dicts from API identical to what websockets get, to update
-    // player info and initial location.
-    //
-    // we'll want PlayerInfo() to have methods for these, which will be called
-    // by the /api/ request methods, and will also be sent by websockets on
-    // playerinfo update IFF their response values have changed.
+    $.ajax({
+        url: "/api/player_dict"
+    }).done(function( data ){
+        handleUpdatePlayerDict(data);
+    });
+    $.ajax({
+        url: "/api/map_info"
+    }).done(function( data ){
+        handleUpdateMapInfo(data);
+    });
+    $.ajax({
+        url: "/api/position"
+    }).done(function( data ){
+        handleUpdatePosition(data);
+    });
+    console.log("done getting initial data.");
+}
+
+/**
+ * Handle an update to the player_dict data
+ *
+ * @param {object} data - player_dict data
+ */
+function handleUpdatePlayerDict(data) {
+    console.log("handleUpdatePlayerData(" + JSON.stringify(data) + ")");
+}
+
+/**
+ * Handle an update to the map_info data
+ *
+ * @param {object} data - map_info data
+ */
+function handleUpdateMapInfo(data) {
+    console.log("handleUpdateMapInfo(" + JSON.stringify(data) + ")");
+}
+
+/**
+ * Handle an update to the position data
+ *
+ * @param {array} data - position data
+ */
+function handleUpdatePosition(data) {
+    console.log("handleUpdatePosition(" + JSON.stringify(data) + ")");
 }
