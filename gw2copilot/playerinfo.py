@@ -49,6 +49,7 @@ class PlayerInfo(object):
     """
 
     professions = [
+        '',  # 1-based indexing
         'Guardian',
         'Warrior',
         'Engineer',
@@ -60,6 +61,7 @@ class PlayerInfo(object):
         'Revenant'
     ]
     races = [
+        '',  # 1-based indexing
         'Asura',
         'Charr',
         'Human',
