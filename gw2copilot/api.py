@@ -41,7 +41,7 @@ import logging
 import json
 from twisted.web._responses import OK
 
-from .utils import _make_response, _set_headers
+from .utils import make_response, set_headers, log_request
 from .route_helpers import classroute, ClassRouteMixin
 
 logger = logging.getLogger()
@@ -135,15 +135,12 @@ class GW2CopilotAPI(ClassRouteMixin):
         :>json position: *(2-tuple of floats)* current position in inches
         :statuscode 200: successfully returned result
         """
-        _set_headers(request)
+        log_request(request)
+        set_headers(request)
         statuscode = OK
-        msg = _make_response('OK')
+        msg = make_response('OK')
         request.setResponseCode(statuscode, message=msg)
         request.setHeader("Content-Type", 'application/json')
-        logger.info('RESPOND %d for %s%s request for %s from %s:%s',
-                    statuscode, ('QUEUED ' if request.queued else ''),
-                    str(request.method), request.uri,
-                    request.client.host, request.client.port)
-        return _make_response(
+        return make_response(
             json.dumps(self.parent_server.playerinfo.as_dict)
         )

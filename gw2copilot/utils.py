@@ -39,9 +39,13 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
 import sys
 from .version import VERSION
+import logging
+import inspect
+
+logger = logging.getLogger(__name__)
 
 
-def _make_response(s):
+def make_response(s):
     """
     Return the value for a Twisted/Klein response; if running under python 3+
     utf-8 encode the response, otherwise return ``s``.
@@ -56,7 +60,7 @@ def _make_response(s):
     return s.encode('utf-8')  # nocoverage - unreachable under py2
 
 
-def _set_headers(request):
+def set_headers(request):
     """
     Set headers that all HTTP responses should have.
 
@@ -69,3 +73,27 @@ def _set_headers(request):
     )[0]
     request.setHeader('server',
                       'gw2copilot/%s/%s' % (VERSION, twisted_server))
+
+
+def log_request(request):
+    """
+    Log request information and handling function, via Python logging.
+
+    :param request: incoming HTTP request
+    :type request: :py:class:`twisted.web.server.Request`
+    """
+    # find caller information
+    curframe = inspect.currentframe()
+    callingframe = inspect.getouterframes(curframe, 2)
+    caller_name = callingframe[1][3]
+    caller_class = callingframe[1][0].f_locals.get('self', None)
+    if caller_class is None:
+        class_name = ''
+    else:
+        class_name = caller_class.__class__.__name__ + '.'
+    caller = class_name + caller_name
+    logger.info('REQUEST %s%s for %s from %s:%s handled by %s()',
+                ('QUEUED ' if request.queued else ''),
+                str(request.method), request.uri,
+                request.client.host, request.client.port, caller
+                )

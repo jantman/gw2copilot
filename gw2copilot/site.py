@@ -46,8 +46,9 @@ from jinja2 import Environment, PackageLoader
 from klein import Klein
 import os
 
-from .utils import _make_response, _set_headers
+from .utils import make_response, set_headers, log_request
 from .route_helpers import classroute, ClassRouteMixin
+from .version import VERSION, PROJECT_URL
 
 logger = logging.getLogger()
 
@@ -97,6 +98,8 @@ class GW2CopilotSite(ClassRouteMixin):
         :rtype: str
         """
         tmpl = self._tmpl_env.get_template(tmpl_name)
+        kwargs['VERSION'] = VERSION
+        kwargs['PROJECT_URL'] = PROJECT_URL
         rendered = tmpl.render(**kwargs)
         return rendered
 
@@ -113,10 +116,12 @@ class GW2CopilotSite(ClassRouteMixin):
         :return: Twisted File resource
         :rtype: twisted.web.static.File
         """
+        log_request(request)
         path = os.path.join(
             os.path.abspath(os.path.dirname(__file__)),
             'static'
         )
+        set_headers(request)
         return File(path)
 
     @classroute('status')
@@ -131,19 +136,16 @@ class GW2CopilotSite(ClassRouteMixin):
         :return: HTML output
         :rtype: str
         """
-        _set_headers(request)
+        log_request(request)
+        set_headers(request)
         statuscode = OK
-        msg = _make_response('OK')
+        msg = make_response('OK')
         request.setResponseCode(statuscode, message=msg)
-        logger.info('RESPOND %d for %s%s request for %s from %s:%s',
-                    statuscode, ('QUEUED ' if request.queued else ''),
-                    str(request.method), request.uri,
-                    request.client.host, request.client.port)
         mumble_dt = self.parent_server.mumble_update_datetime
         mumble_td = (datetime.now() - mumble_dt)
         if mumble_td < timedelta(seconds=4):
             mumble_td = 'less than 4 seconds'
-        return _make_response(
+        return make_response(
             self._render_template(
                 'status.html',
                 request,
@@ -172,17 +174,86 @@ class GW2CopilotSite(ClassRouteMixin):
         :return: HTML output
         :rtype: str
         """
-        _set_headers(request)
+        log_request(request)
+        set_headers(request)
         statuscode = OK
-        msg = _make_response('OK')
+        msg = make_response('OK')
         request.setResponseCode(statuscode, message=msg)
-        logger.info('RESPOND %d for %s%s request for %s from %s:%s',
-                    statuscode, ('QUEUED ' if request.queued else ''),
-                    str(request.method), request.uri,
-                    request.client.host, request.client.port)
-        return _make_response(
+        return make_response(
             self._render_template(
                 'index.html',
+                request
+            )
+        )
+
+    @classroute('live')
+    def livedata(self, request):
+        """
+        Generate the end-user "Live" page.
+
+        This serves the ``/live`` UI page.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: HTML output
+        :rtype: str
+        """
+        log_request(request)
+        set_headers(request)
+        statuscode = OK
+        msg = make_response('OK')
+        request.setResponseCode(statuscode, message=msg)
+        return make_response(
+            self._render_template(
+                'live.html',
+                request
+            )
+        )
+
+    @classroute('crafting')
+    def crafting(self, request):
+        """
+        Generate the end-user "Crafting" page.
+
+        This serves the ``/crafting`` UI page.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: HTML output
+        :rtype: str
+        """
+        log_request(request)
+        set_headers(request)
+        statuscode = OK
+        msg = make_response('OK')
+        request.setResponseCode(statuscode, message=msg)
+        return make_response(
+            self._render_template(
+                'crafting.html',
+                request
+            )
+        )
+
+    @classroute('help')
+    def help_page(self, request):
+        """
+        Generate the end-user "Help" page.
+
+        This serves the ``/help`` UI page.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: HTML output
+        :rtype: str
+        """
+        log_request(request)
+        set_headers(request)
+        statuscode = OK
+        msg = make_response('OK')
+        request.setResponseCode(statuscode, message=msg)
+        return make_response(
+            self._render_template(
+                'help.html',
                 request
             )
         )
