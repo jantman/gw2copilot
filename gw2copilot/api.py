@@ -118,7 +118,23 @@ class GW2CopilotAPI(ClassRouteMixin):
           HTTP/1.1 200 OK
           Content-Type: application/json
 
-          {"something": "goes here"}
+          {
+              "facing_direction": 82.0783777035753,
+              "profession_id": 4,
+              "elevation": 822.0824978822708,
+              "region_id": 4,
+              "race_name": "Human",
+              "map_name": "Lion's Arch",
+              "map_id": 50,
+              "region_name": "Kryta",
+              "profession_name": "Ranger",
+              "map_level_range": "0-80",
+              "name": "Jantman",
+              "continent_id": 1,
+              "race_id": 3,
+              "continent_name": "Tyria",
+              "position": [16097.394906375821, 14788.844535192553]
+          }
 
         :>json facing_direction: *(float)* direction the character is facing
         :>json elevation: *(float)* character's elevation in inches
