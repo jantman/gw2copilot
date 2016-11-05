@@ -108,6 +108,7 @@ class PlayerInfo(object):
             'elevation': self._elevation,
             'map_id': self._current_map,
             'name': self._mumble_link_data['identity']['name'],
+            'level': self._char_api_info['level'],
             'profession_id': self._mumble_link_data['identity']['profession'],
             'profession_name': self.professions[
                 self._mumble_link_data['identity']['profession']
@@ -195,7 +196,8 @@ class PlayerInfo(object):
             ],
             'race': self.races[
                 self._mumble_link_data['identity']['race']
-            ]
+            ],
+            'level': self._char_api_info['level']
         }
 
     def update_mumble_link(self, mumble_link_data):

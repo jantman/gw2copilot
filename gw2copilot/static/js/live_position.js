@@ -129,7 +129,7 @@ function handleUpdatePlayerDict(data) {
     console.log("handleUpdatePlayerData(" + JSON.stringify(data) + ")");
     if ( playerinfo_dict != data ) {
         $("#player_info_header").text(
-            data["name"] + " (LEVEL " + data["race"] + " " +
+            data["name"] + " (" + data["level"] + " " + data["race"] + " " +
             data["profession"] + ") - "
         );
         playerinfo_dict = data;

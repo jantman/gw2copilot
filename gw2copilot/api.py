@@ -130,6 +130,7 @@ class GW2CopilotAPI(ClassRouteMixin):
               "profession_name": "Ranger",
               "map_level_range": "0-80",
               "name": "Jantman",
+              "level": 80,
               "continent_id": 1,
               "race_id": 3,
               "continent_name": "Tyria",
@@ -140,6 +141,7 @@ class GW2CopilotAPI(ClassRouteMixin):
         :>json elevation: *(float)* character's elevation in inches
         :>json map_id: *(int)* current map ID
         :>json name: *(string)* character name
+        :>json level: *(int)* character level
         :>json profession_id: *(int)* character profession ID
         :>json profession_name: *(string)* character profession name
         :>json race_id: *(int)* character race ID
@@ -246,12 +248,14 @@ class GW2CopilotAPI(ClassRouteMixin):
           {
               "name": "Character Name",
               "profession": "Profession",
-              "race": "Race"
+              "race": "Race",
+              "level": 80,
           }
 
         :>json name: *(string)* character name
         :>json profession: *(string)* character's profession
         :>json race: *(string)* character's race
+        :>json level: *(int)* character's level
         :statuscode 200: successfully returned result
         """
         log_request(request)
