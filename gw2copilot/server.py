@@ -245,7 +245,7 @@ class TwistedServer(object):
         self._ws_broadcast = BroadcastServerFactory(
             u"ws://127.0.0.1:%s" % self._ws_port,
             self.reactor,
-            enable_tick=True
+            enable_tick=False
         )
         self._ws_broadcast.protocol = BroadcastServerProtocol
 
