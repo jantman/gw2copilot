@@ -41,10 +41,11 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 import logging
 import platform
 import os
+import json
 from datetime import datetime
 from twisted.web.server import Site
 from twisted.internet import reactor
-from klein import Klein
+from autobahn.twisted.resource import WebSocketResource
 
 import gw2copilot.site
 import gw2copilot.api
@@ -53,6 +54,7 @@ from .native_mumble_reader import NativeMumbleLinkReader
 from .test_mumble_reader import TestMumbleLinkReader
 from .playerinfo import PlayerInfo
 from .caching_api_client import CachingAPIClient
+from .websockets import BroadcastServerFactory, BroadcastServerProtocol
 
 logger = logging.getLogger()
 
@@ -85,6 +87,7 @@ class TwistedServer(object):
         self._site = None
         self._api = None
         self._app = None
+        self._ws_broadcast = None
         if cache_dir is None:
             cd = os.path.abspath(os.path.expanduser('~/.gw2copilot/cache'))
             logger.debug('Defaulting cache directory to: %s', cd)
@@ -112,6 +115,19 @@ class TwistedServer(object):
         self._mumble_link_data = mumble_data
         self._mumble_update_datetime = datetime.now()
         self.playerinfo.update_mumble_link(mumble_data)
+        self._ws_send('playerinfo', self.playerinfo.as_dict)
+
+    def _ws_send(self, msg_type, data):
+        """
+        Send the given data to all clients via websocket broadcast.
+
+        :param msg_type: type of message; "tick" or "position" or "playerinfo"
+        :type msg_type: str
+        :param data: JSON-serializable data dict
+        :type data: dict
+        """
+        msg = json.dumps({'type': msg_type, 'data': data})
+        self._ws_broadcast.broadcast(msg)
 
     @property
     def mumble_update_datetime(self):
@@ -182,11 +198,27 @@ class TwistedServer(object):
         self._app = self._site.app
         self._api = gw2copilot.api.GW2CopilotAPI(self._site.app, self)
 
+    def _setup_websockets(self):
+        """
+        Setup the autobahn websocket server factory and protocol; configure it
+        as a child resource of ``self._app.resource()`` and ``/ws/``.
+        """
+        logger.debug('Initializing websocket server')
+        self._ws_broadcast = BroadcastServerFactory(
+            u"ws://127.0.0.1:%d" % self._bind_port,
+            self.reactor, enable_tick=True
+        )
+        self._ws_broadcast.protocol = BroadcastServerProtocol
+        resource = WebSocketResource(self._ws_broadcast)
+        logger.debug('Running websocket server at /ws/')
+        self._app.resource().putChild(b"ws", resource)
+
     def run(self):
         """setup the web Site, start listening on port, setup the MumbleLink
         reader, and start the Twisted reactor"""
         # setup the web Site and HTTP listener
         self._setup_klein()
+        self._setup_websockets()
         self._listentcp(Site(self._app.resource()))
         # setup the MumbleLink reader
         self._add_mumble_reader()

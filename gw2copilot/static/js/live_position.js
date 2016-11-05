@@ -1,5 +1,5 @@
-{#
-gw2copilot/templates/live.html
+/*
+gw2copilot/js/live_position.js
 
 The latest version of this package is available at:
 <https://github.com/jantman/gw2copilot>
@@ -35,27 +35,39 @@ either as a pull request on GitHub, or to me via email.
 AUTHORS:
 Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 ################################################################################
-#}
-{% extends "base.html" %}
-{% block title %}gw2copilot - live game data{% endblock %}
-{% block body %}
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-        <h2 id="playerinfo_header">
-            <span id="player_info">{{ playerinfo['name'] }} (LEVEL {{ playerinfo['race_name'] }} {{ playerinfo['profession_name'] }})</span>
-            -
-            <span id="map_name">{{ playerinfo['map_name'] }}</span>
-            (<span id="map_level_range">{{ playerinfo['map_level_range'] }}</span>),
-            <span id="region_name">{{ playerinfo['region_name'] }}</span>,
-            <span id="continent_name">{{ playerinfo['continent_name'] }}</span>
-        </h2>
-      </div>
-    </div>
+*/
 
-<div class="container" id="mapcontainer">
-    <h2>MAP GOES HERE</h2>
-</div>
+var sock = null;
 
-<script src="/static/js/live_position.js"></script>
-{% endblock %}
+window.onload = function() {
+    var wsuri;
+
+    if (window.location.protocol === "file:") {
+       wsuri = "ws://localhost:" + window.location.port + "/ws";
+    } else {
+       wsuri = "ws://" + window.location.hostname + ":" + window.location.port + "/ws";
+    }
+
+    if ("WebSocket" in window) {
+       sock = new WebSocket(wsuri);
+    } else if ("MozWebSocket" in window) {
+       sock = new MozWebSocket(wsuri);
+    } else {
+       log("Browser does not support WebSocket!");
+    }
+
+    if (sock) {
+       sock.onopen = function() {
+          console.log("Connected to " + wsuri);
+       }
+
+       sock.onclose = function(e) {
+          console.log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");
+          sock = null;
+       }
+
+       sock.onmessage = function(e) {
+          console.log("Got echo: " + e.data);
+       }
+    }
+};
