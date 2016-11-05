@@ -296,7 +296,8 @@ intersphinx_mapping = {
     'python': ('http://docs.python.org/2.7', None),
     'twisted': ('http://twistedmatrix.com/documents/current/api/', None),
     'psutil': ('https://pythonhosted.org/psutil/', None),
-    'Jinja2': ('http://jinja.pocoo.org/docs/dev/', None)
+    'Jinja2': ('http://jinja.pocoo.org/docs/dev/', None),
+    'autobahn': ('https://autobahn-python.readthedocs.io/en/latest/', None)
 }
 
 autoclass_content = 'class'
@@ -310,11 +311,13 @@ linkcheck_ignore = [
     r'https?://.*readthedocs\.org.*',
     r'https?://pypi\.python\.org/pypi/gw2copilot',
     r'https?://testpypi\.python\.org/pypi/gw2copilot',
-    r'https?://www\.guildwars2\.com*'
+    r'https?://www\.guildwars2\.com*',
+    r'https?://pytest\.org*'
 ]
 
 nitpick_ignore = [
-    ('py:class', '_ctypes.Structure')
+    ('py:class', '_ctypes.Structure'),
+    ('py:obj', 'klein.resource.KleinResource')
 ]
 
 # exclude module docstrings - see http://stackoverflow.com/a/18031024/211734
