@@ -40,7 +40,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 import logging
 import math
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class PlayerInfo(object):

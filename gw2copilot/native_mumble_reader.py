@@ -41,7 +41,7 @@ import logging
 from twisted.internet.task import LoopingCall
 from .read_mumble_link import GW2MumbleLinkReader
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class NativeMumbleLinkReader(object):

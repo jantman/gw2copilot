@@ -40,7 +40,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 import logging
 from functools import update_wrapper
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def classroute(url, *args, **kwargs):

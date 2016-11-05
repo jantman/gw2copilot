@@ -44,7 +44,7 @@ from twisted.web._responses import OK
 from .utils import make_response, set_headers, log_request
 from .route_helpers import classroute, ClassRouteMixin
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class GW2CopilotAPI(ClassRouteMixin):

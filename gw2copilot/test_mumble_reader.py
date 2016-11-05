@@ -40,7 +40,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 import logging
 from twisted.internet.task import LoopingCall
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class TestMumbleLinkReader(object):
