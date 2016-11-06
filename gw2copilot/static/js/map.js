@@ -38,21 +38,12 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 */
 
 var map;
+var m = {
+    WORLD_ZOOM: 2,
+    WORLD_COORDS: [-152, 126]
+};
 
-var m_WORLD_ZOOM = 2;
-var m_WORLD_COORDS = [-152, 126];
-
-function unproject(coord) {
-    return map.unproject(coord, map.getMaxZoom());
-}
-
-function onMapClick(e) {
-    console.log("You clicked the map at " + map.project(e.latlng) +
-    "; zoom=" + map.getZoom() + "; unprojected=" + e.latlng +
-    "; center=" + map.getCenter() + "; bounds=[" + map.getBounds().getSouthWest()
-    + ", " + map.getBounds().getNorthEast() + "]");
-}
-
+/* initialize map */
 $(document).ready(function () {
     "use strict";
 
@@ -60,7 +51,7 @@ $(document).ready(function () {
         minZoom: 1,
         maxZoom: 7,
         crs: L.CRS.Simple
-    }).setView(m_WORLD_COORDS, m_WORLD_ZOOM);
+    }).setView(m.WORLD_COORDS, m.WORLD_ZOOM);
 
     L.tileLayer("/api/tiles?continent=1&floor=1&zoom={z}&x={x}&y={y}", {
         attribution: "Map Data and Imagery &copy; " +
@@ -72,6 +63,66 @@ $(document).ready(function () {
     map.on("click", onMapClick);
 });
 
-$("#btn_zoom_world").click(function() {
-    map.setView(m_WORLD_COORDS, m_WORLD_ZOOM);
+/******************************************************
+ Binding functions for map-related buttons and clicks
+ ******************************************************/
+function onMapClick(e) {
+    console.log("You clicked the map at " + map.project(e.latlng) +
+    "; zoom=" + map.getZoom() + "; unprojected=" + e.latlng +
+    "; center=" + map.getCenter() + "; bounds=[" + map.getBounds().getSouthWest()
+    + ", " + map.getBounds().getNorthEast() + "]");
+}
+
+// Layer toggling
+
+$("#btn_toggle_all").click(function() {
+    alert("TODO: btn_toggle_all not implemented");
 });
+
+$("#btn_toggle_waypoints").click(function() {
+    alert("TODO: btn_toggle_waypoints not implemented");
+});
+
+$("#btn_toggle_hearts").click(function() {
+    alert("TODO: btn_toggle_hearts not implemented");
+});
+
+$("#btn_toggle_heropoints").click(function() {
+    alert("TODO: btn_toggle_herpoints not implemented");
+});
+
+$("#btn_toggle_POIs").click(function() {
+    alert("TODO: btn_toggle_POIs not implemented");
+});
+
+$("#btn_toggle_vistas").click(function() {
+    alert("TODO: btn_toggle_vistas not implemented");
+});
+
+$("#btn_toggle_events").click(function() {
+    alert("TODO: btn_toggle_events not implemented");
+});
+
+// Map movement and zooming
+
+$("#btn_center_player").click(function() {
+    alert("TODO: btn_center_player not implemented");
+});
+
+$("#btn_zoom_zone").click(function() {
+    alert("TODO: btn_zoom_zone not implemented");
+});
+
+$("#btn_zoom_player").click(function() {
+    alert("TODO: btn_zoom_player not implemented");
+});
+
+$("#btn_zoom_world").click(function() { map.setView(m.WORLD_COORDS, m.WORLD_ZOOM); });
+
+/******************************************************
+ Map utility functions
+ ******************************************************/
+
+function unproject(coord) {
+    return map.unproject(coord, map.getMaxZoom());
+}
