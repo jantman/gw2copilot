@@ -38,9 +38,13 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 */
 
 var map;
+var popup = L.popup();
 var m = {
     WORLD_ZOOM: 2,
-    WORLD_COORDS: [-152, 126]
+    WORLD_COORDS: [-152, 126],
+    playerMarker: null,
+    playerLatLng: null,
+    followPlayer: false
 };
 
 /* initialize map */
@@ -60,6 +64,8 @@ $(document).ready(function () {
         continuousWorld: true
     }).addTo(map);
 
+    addLayers();
+
     map.on("click", onMapClick);
 });
 
@@ -67,13 +73,18 @@ $(document).ready(function () {
  Binding functions for map-related buttons and clicks
  ******************************************************/
 function onMapClick(e) {
-    console.log("You clicked the map at " + map.project(e.latlng) +
+    popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + map.project(e.latlng) +
     "; zoom=" + map.getZoom() + "; unprojected=" + e.latlng +
     "; center=" + map.getCenter() + "; bounds=[" + map.getBounds().getSouthWest()
-    + ", " + map.getBounds().getNorthEast() + "]");
+    + ", " + map.getBounds().getNorthEast() + "]")
+        .openOn(map);
 }
 
+//
 // Layer toggling
+//
 
 $("#btn_toggle_all").click(function() {
     alert("TODO: btn_toggle_all not implemented");
@@ -103,20 +114,38 @@ $("#btn_toggle_events").click(function() {
     alert("TODO: btn_toggle_events not implemented");
 });
 
+//
 // Map movement and zooming
+//
 
-$("#btn_center_player").click(function() {
-    alert("TODO: btn_center_player not implemented");
+// center the map on the player
+$("#btn_center_player").click(function() { map.panTo(m.playerLatLng); });
+
+// follow the player - keep the map centered on them
+$("#btn_follow_player").click(function() {
+    if ( m.followPlayer === true ) {
+        // toggle off / false
+        $("#btn_follow_player").switchClass('btn-success', 'btn-danger');
+        m.followPlayer = false;
+    } else {
+        // toggle on / true
+        $("#btn_follow_player").switchClass('btn-danger', 'btn-success');
+        m.followPlayer = true;
+    }
 });
 
+// zoom the map to the player's current zone
 $("#btn_zoom_zone").click(function() {
     alert("TODO: btn_zoom_zone not implemented");
 });
 
+// zoom the map to the player, full zoom
 $("#btn_zoom_player").click(function() {
-    alert("TODO: btn_zoom_player not implemented");
+    map.setZoom(map.getMaxZoom());
+    map.panTo(m.playerLatLng);
 });
 
+// zoom the map out to the whole world
 $("#btn_zoom_world").click(function() { map.setView(m.WORLD_COORDS, m.WORLD_ZOOM); });
 
 /******************************************************
@@ -125,4 +154,14 @@ $("#btn_zoom_world").click(function() { map.setView(m.WORLD_COORDS, m.WORLD_ZOOM
 
 function unproject(coord) {
     return map.unproject(coord, map.getMaxZoom());
+}
+
+function addPlayerMarker(latlng) {
+    m.playerMarker = L.marker(latlng)
+        .bindPopup("Player position.")
+        .addTo(map);
+}
+
+function addLayers() {
+    console.log("adding layers");
 }

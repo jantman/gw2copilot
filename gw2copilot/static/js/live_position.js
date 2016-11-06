@@ -159,4 +159,13 @@ function handleUpdateMapInfo(data) {
  */
 function handleUpdatePosition(data) {
     console.log("handleUpdatePosition(" + JSON.stringify(data) + ")");
+    m.playerLatLng = unproject(data);
+    if ( m.playerMarker === null ) {
+        addPlayerMarker(m.playerLatLng);
+    } else {
+        m.playerMarker.setLatLng(m.playerLatLng);
+    }
+    if ( m.followPlayer === true ) {
+        map.panTo(m.playerLatLng);
+    }
 }
