@@ -76,7 +76,7 @@ function onMapClick(e) {
     popup
         .setLatLng(e.latlng)
         .setContent("You clicked the map at " + e.latlng + " (GW2 coords: " +
-        project(e.latlng) + ")")
+        latlon2gw(e.latlng).toString() + ")")
         .openOn(map);
 }
 
@@ -150,12 +150,26 @@ $("#btn_zoom_world").click(function() { map.setView(m.WORLD_COORDS, m.WORLD_ZOOM
  Map utility functions
  ******************************************************/
 
-function unproject(coord) {
+/**
+ * Convert gw2 coordinates to map lat/long.
+ * wrapper around ``map.unproject()``.
+ *
+ * @param {Point} coord - gw2 (x, y) coordinate
+ * @returns {LatLng} map lat/long coordinate
+ */
+function gw2latlon(coord) {
     return map.unproject(coord, map.getMaxZoom());
 }
 
-function project(coord) {
-    return map.project(coord, map.getMaxZoom());
+/**
+ * Convert Leaflet map lat/long to gw2 (x, y) coordinates.
+ * Wrapper around ``map.project()``.
+ *
+ * @param {array} coord - (x, y) lat/long map coordinate
+ * @returns {Point} gw2 (x, y) coordinate
+ */
+function latlon2gw(latlon) {
+    return map.project(latlon, map.getMaxZoom());
 }
 
 function addPlayerMarker(latlng) {

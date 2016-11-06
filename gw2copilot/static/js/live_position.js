@@ -159,7 +159,7 @@ function handleUpdateMapInfo(data) {
  */
 function handleUpdatePosition(data) {
     console.log("handleUpdatePosition(" + JSON.stringify(data) + ")");
-    m.playerLatLng = unproject(data);
+    m.playerLatLng = gw2latlon(data);
     if ( m.playerMarker === null ) {
         addPlayerMarker(m.playerLatLng);
     } else {
