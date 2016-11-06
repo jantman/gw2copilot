@@ -371,14 +371,20 @@ class GW2CopilotAPI(ClassRouteMixin):
         """
         log_request(request)
         set_headers(request)
-
+        required = ['continent', 'floor']
+        if sorted(request.args.keys()) != required:
+            request.setResponseCode(500, message='MISSING PARAMETERS')
+            return ''
+        data = self.parent_server.cache.map_floor(
+            int(request.args['continent'][0]),
+            int(request.args['floor'][0]))
+        if data is None:
+            request.setResponseCode(500, message='CACHE ERROR')
+            return ''
         statuscode = OK
         msg = make_response('OK')
         request.setResponseCode(statuscode, message=msg)
-        request.setHeader("Content-Type", 'application/json')
-        return make_response(
-            json.dumps(self.parent_server.playerinfo.map_info)
-        )
+        return make_response(json.dumps(data))
 
     @classroute('tiles')
     def tiles(self, request):
@@ -423,11 +429,22 @@ class GW2CopilotAPI(ClassRouteMixin):
         """
         log_request(request)
         set_headers(request)
-
+        required = ['continent', 'floor', 'x', 'y', 'zoom']
+        if sorted(request.args.keys()) != required:
+            request.setResponseCode(500, message='MISSING PARAMETERS')
+            return ''
+        data = self.parent_server.cache.tile(
+            int(request.args['continent'][0]),
+            int(request.args['floor'][0]),
+            int(request.args['zoom'][0]),
+            int(request.args['x'][0]),
+            int(request.args['y'][0])
+        )
+        if data is None:
+            request.setResponseCode(500, message='CACHE ERROR')
+            return ''
         statuscode = OK
         msg = make_response('OK')
         request.setResponseCode(statuscode, message=msg)
-        request.setHeader("Content-Type", 'application/json')
-        return make_response(
-            json.dumps(self.parent_server.playerinfo.map_info)
-        )
+        request.setHeader("Content-Type", 'image/jpeg')
+        return data

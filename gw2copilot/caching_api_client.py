@@ -211,11 +211,14 @@ class CachingAPIClient(object):
         cached = self._cache_get('map_floors', key)
         if cached is not None:
             return cached
-        r = self._get('/v1/maps_floor.json?continent_id=%d&floor=%d' % (
+        r = self._get('/v1/map_floor.json?continent_id=%d&floor=%d' % (
             continent_id, floor
         ))
         logger.debug('Got map floor data (HTTP status %d) response length %d',
                      r.status_code, len(r.text))
+        if r.status_code != 200:
+            logger.debug("Response: %s", r.text)
+            return None
         result = r.json()
         self._cache_set('map_floors', key, result)
         return result
@@ -256,7 +259,7 @@ class CachingAPIClient(object):
         :type y: int
         :return: binary tile JPG content
         """
-        cache_key = '%d_%d_%d_%d_%d'
+        cache_key = '%d_%d_%d_%d_%d' % (continent, floor, zoom, x, y)
         cached = self._cache_get('tiles', cache_key, binary=True,
                                  extension='jpg')
         if cached:
