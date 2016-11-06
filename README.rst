@@ -52,6 +52,8 @@ Planned features
 Status
 ------
 
+See the Waffle.io board for development tasks and status: `https://waffle.io/jantman/gw2copilot <https://waffle.io/jantman/gw2copilot>`_.
+
 This is *very alpha* software. I wrote it for myself and a small number of friends. If it's useful to you, great, but I don't intend on doing a whole lot of development on it. The codebase is pretty rough, and I'm probably not even going to write tests for it, let alone the rest of what goes along with real released software; sorry, but I have too many personal projects, and I just want the end result of this.
 
 Note that running natively under Windows is *not currently functional*, as I can't get GW2 to
