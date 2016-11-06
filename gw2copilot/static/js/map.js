@@ -75,10 +75,8 @@ $(document).ready(function () {
 function onMapClick(e) {
     popup
         .setLatLng(e.latlng)
-        .setContent("You clicked the map at " + map.project(e.latlng) +
-    "; zoom=" + map.getZoom() + "; unprojected=" + e.latlng +
-    "; center=" + map.getCenter() + "; bounds=[" + map.getBounds().getSouthWest()
-    + ", " + map.getBounds().getNorthEast() + "]")
+        .setContent("You clicked the map at " + e.latlng + " (GW2 coords: " +
+        project(e.latlng) + ")")
         .openOn(map);
 }
 
@@ -154,6 +152,10 @@ $("#btn_zoom_world").click(function() { map.setView(m.WORLD_COORDS, m.WORLD_ZOOM
 
 function unproject(coord) {
     return map.unproject(coord, map.getMaxZoom());
+}
+
+function project(coord) {
+    return map.project(coord, map.getMaxZoom());
 }
 
 function addPlayerMarker(latlng) {
