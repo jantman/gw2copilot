@@ -1,3 +1,4 @@
 include CHANGES.rst
 include LICENSE
+include LICENSES.third-party
 include README.rst

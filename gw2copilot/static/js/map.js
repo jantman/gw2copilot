@@ -53,9 +53,7 @@ function onMapClick(e) {
 $(document).ready(function () {
     "use strict";
 
-    var southWest, northEast;
-
-    map = L.map("mapcontainer", {
+    map = L.map("map", {
         minZoom: 1,
         maxZoom: 7,
         crs: L.CRS.Simple

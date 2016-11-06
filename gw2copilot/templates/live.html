@@ -38,23 +38,27 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 #}
 {% extends "base.html" %}
 {% block title %}gw2copilot - live game data{% endblock %}
+{% block extra_head_css %}
+<!-- BEGIN block extra_head_css (live.html) -->
+        <link rel="stylesheet" href="/static/css/leaflet-1.0.1.css">
+        <link rel="stylesheet" href="/static/css/bootleaf.css">
+<!-- END block extra_head_css (live.html) -->
+{% endblock %}
 {% block body %}
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-        <h2 id="playerinfo_header">
-            <span id="player_info_header">Waiting for data...</span>
-            <span id="map_info_header"></span>
-        </h2>
-      </div>
+<!-- BEGIN block body (live.html) -->
+    <div id="container">
+{% include 'live-sidebar.html' %}
+      <div id="map"></div>
     </div>
-
-<div class="container" id="mapcontainer">
-    <h2>MAP GOES HERE</h2>
-</div>
-
+<!-- END block body (live.html) -->
+{% endblock %}
+{% block extra_foot_script %}
+<!-- BEGIN block extra_foot_script (live.html) -->
 <script type="text/javascript">
     var ws_port = {{ ws_port }};
 </script>
+<script src="/static/js/vendor/leaflet-1.0.1.js"></script>
+<script src="/static/js/map.js"></script>
 <script src="/static/js/live_position.js"></script>
+<!-- END block extra_foot_script (live.html) -->
 {% endblock %}
