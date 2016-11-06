@@ -329,3 +329,55 @@ class GW2CopilotAPI(ClassRouteMixin):
         return make_response(
             json.dumps(self.parent_server.playerinfo.map_info)
         )
+
+    @classroute('tiles')
+    def tiles(self, request):
+        """
+        Provides local filesystem caching of GW2 map tiles. If the requested tile
+        is not already in the cache, it will be requested from the  GW2 Tiles API.
+
+        This serves :http:get:`/api/tiles` endpoint.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: JSON response data string
+        :rtype: str
+
+        <HTTPAPI>
+        Return the specified GW2 map tile, from cache on disk.
+
+        Served by :py:meth:`.tiles`.
+
+        **Example request**:
+
+        .. sourcecode:: http
+
+          GET /tiles?continent=1&floor=1&zoom=1&x=x&y=y HTTP/1.1
+          Host: example.com
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+          HTTP/1.1 200 OK
+          Content-Type: image/png
+
+          <binary data>
+
+        :query int continent: continent ID
+        :query int floor: floor number
+        :query int zoom: zoom level
+        :query int x: x coordinate
+        :query int y: y coordinate
+        :statuscode 200: successfully returned result
+        """
+        log_request(request)
+        set_headers(request)
+
+        statuscode = OK
+        msg = make_response('OK')
+        request.setResponseCode(statuscode, message=msg)
+        request.setHeader("Content-Type", 'application/json')
+        return make_response(
+            json.dumps(self.parent_server.playerinfo.map_info)
+        )

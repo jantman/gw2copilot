@@ -71,7 +71,7 @@ class CachingAPIClient(object):
             os.makedirs(cache_dir, 0700)
         logger.debug('Initialized with cache directory at: %s', cache_dir)
 
-    def _cache_path(self, cache_type, cache_key):
+    def _cache_path(self, cache_type, cache_key, extn):
         """
         Return the path on disk to the cache file of the given type and key.
 
@@ -79,12 +79,16 @@ class CachingAPIClient(object):
         :type cache_type: str
         :param cache_key: the cache key (filename without extension)
         :type cache_key: str
+        :param extn: file extension
+        :type extn: str
         :returns: absolute path to cache file
         :rtype: str
         """
-        return os.path.join(self._cache_dir, cache_type, '%s.json' % cache_key)
+        return os.path.join(
+            self._cache_dir, cache_type, '%s.%s' % (cache_key, extn)
+        )
 
-    def _cache_get(self, cache_type, cache_key):
+    def _cache_get(self, cache_type, cache_key, binary=False, extension='json'):
         """
         Read the cache file from disk for the given cache type and cache key;
         return None if it does not exist. If it does exist, return the decoded
@@ -94,22 +98,31 @@ class CachingAPIClient(object):
         :type cache_type: str
         :param cache_key: the cache key (filename without extension)
         :type cache_key: str
+        :param binary: whether to read as binary data
+        :type binary: bool
+        :param extension: file extension to save in cache with
+        :type extension: str
         :returns: cache data or None
         :rtype: dict
         """
-        p = self._cache_path(cache_type, cache_key)
+        p = self._cache_path(cache_type, cache_key, extn=extension)
         if not os.path.exists(p):
             logger.debug('cache MISS for type=%s key=%s (path: %s)',
                          cache_type, cache_key, p)
             return None
         logger.debug('cache HIT for type=%s key=%s (path: %s)',
                      cache_type, cache_key, p)
+        if binary:
+            with open(p, 'rb') as fh:
+                r = fh.read()
+            return r
         with open(p, 'r') as fh:
             raw = fh.read()
         j = json.loads(raw)
         return j
 
-    def _cache_set(self, cache_type, cache_key, data):
+    def _cache_set(self, cache_type, cache_key, data, binary=False,
+                   extension='json'):
         """
         Cache the given data.
 
@@ -119,14 +132,22 @@ class CachingAPIClient(object):
         :type cache_key: str
         :param data: the data to cache (value)
         :type data: dict
+        :param binary: if True, write as binary data
+        :type binary: bool
+        :param extension: file extension to save in cache with
+        :type extension: str
         """
-        p = self._cache_path(cache_type, cache_key)
+        p = self._cache_path(cache_type, cache_key, extn=extension)
         logger.debug('cache SET type=%s key=%s (path: %s)',
                      cache_type, cache_key, p)
         cd = os.path.join(self._cache_dir, cache_type)
         if not os.path.exists(cd):
             logger.debug('Creating cache directory: %s', cd)
             os.mkdir(cd, 0700)
+        if binary:
+            with open(p, 'wb') as fh:
+                fh.write(data)
+            return
         raw = json.dumps(data)
         with open(p, 'w') as fh:
             fh.write(raw)
@@ -193,3 +214,40 @@ class CachingAPIClient(object):
         logger.debug('Got character information for %s: %s', name, j)
         self._characters[name] = j
         return j
+
+    def tile(self, continent, floor, zoom, x, y):
+        """
+        Get a tile from local cache, or if not cached, from the GW2 Tile Service
+
+        :param continent: continent ID
+        :type continent: int
+        :param floor: floor number
+        :type floor: int
+        :param zoom: zoom level
+        :type zoom: int
+        :param x: x coordinate
+        :type x: int
+        :param y: y coordinate
+        :type y: int
+        :return: binary tile JPG content
+        """
+        cache_key = '%d_%d_%d_%d_%d'
+        cached = self._cache_get('tiles', cache_key, binary=True,
+                                 extension='jpg')
+        if cached:
+            return cached
+        url = 'https://tiles.guildwars2.com/{continent_id}/{floor}/' \
+              '{zoom}/{x}/{y}.jpg'.format(
+            continent_id=continent,
+            floor=floor,
+            zoom=zoom,
+            x=x,
+            y=y
+        )
+        logger.debug('GET %s', url)
+        r = requests.get(url)
+        logger.debug('GET %s returned status %d, %d bytes', url,
+                     r.status_code, len(r.content))
+        self._cache_set('tiles', cache_key, r.content, binary=True,
+                        extension='jpg')
+        return r.content
