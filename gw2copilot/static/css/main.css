@@ -57,7 +57,9 @@ html, body, .container {
 }
 
 #mapcontainer {
-    width: auto;
-    overflow: hidden;
+    width: 100px;
+    height: 100px;
     min-height: 100%;
+    min-width: 100%;
+    display: block;
 }
