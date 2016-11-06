@@ -106,6 +106,7 @@ gw2copilot is built on the shoulders of giants; it makes use of the following Fr
 * The python `psutil <https://pythonhosted.org/psutil/>`_ package, which greatly simplifies finding the running GW2 wine environment.
 * Crossbar's `autobahn Python <http://crossbar.io/autobahn/>`_ websocket server.
 * `leaflet <http://leafletjs.com/>`_ for rendering the interactive maps, greatly helped by the `example on the GW wiki <https://wiki.guildwars2.com/wiki/API:Maps>`_ and `an example from Cliff Spradlin <http://jsfiddle.net/cliff/CRRGC/>`_.
+* `bootleaf <https://github.com/bmcbride/bootleaf>`_ to integrate Bootstrap and Leaflet.
 
 Reading the MumbleLink File
 +++++++++++++++++++++++++++
