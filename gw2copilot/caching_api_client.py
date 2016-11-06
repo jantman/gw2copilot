@@ -195,6 +195,31 @@ class CachingAPIClient(object):
         self._cache_set('mapdata', map_id, result)
         return result
 
+    def map_floor(self, continent_id, floor):
+        """
+        Return dict of map floor information for the given continent ID and
+        floor.
+
+        :param continent_id: requested continent ID
+        :type continent_id: int
+        :param floor: floor number
+        :type floor: int
+        :return: map data
+        :rtype: dict
+        """
+        key = '%d_%d' % (continent_id, floor)
+        cached = self._cache_get('map_floors', key)
+        if cached is not None:
+            return cached
+        r = self._get('/v1/maps_floor.json?continent_id=%d&floor=%d' % (
+            continent_id, floor
+        ))
+        logger.debug('Got map floor data (HTTP status %d) response length %d',
+                     r.status_code, len(r.text))
+        result = r.json()
+        self._cache_set('map_floors', key, result)
+        return result
+
     def character_info(self, name):
         """
         Return character information for the named character. This is NOT cached

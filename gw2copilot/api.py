@@ -330,6 +330,56 @@ class GW2CopilotAPI(ClassRouteMixin):
             json.dumps(self.parent_server.playerinfo.map_info)
         )
 
+    @classroute('map_floors')
+    def map_floors(self, request):
+        """
+        Provides local filesystem caching of GW2 map floor information. If the
+        requested data is not already in the cache, it will be requested from
+        the  GW2 Tiles API.
+
+        This serves :http:get:`/api/map_floors` endpoint.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: JSON response data string
+        :rtype: str
+
+        <HTTPAPI>
+        Return the specified GW2 map floor information, from cache on disk.
+
+        Served by :py:meth:`.map_floors`.
+
+        **Example request**:
+
+        .. sourcecode:: http
+
+          GET /map_floors?continent=1&floor=1 HTTP/1.1
+          Host: example.com
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+          HTTP/1.1 200 OK
+          Content-Type: application/json
+
+          <JSON here>
+
+        :query int continent: continent ID
+        :query int floor: floor number
+        :statuscode 200: successfully returned result
+        """
+        log_request(request)
+        set_headers(request)
+
+        statuscode = OK
+        msg = make_response('OK')
+        request.setResponseCode(statuscode, message=msg)
+        request.setHeader("Content-Type", 'application/json')
+        return make_response(
+            json.dumps(self.parent_server.playerinfo.map_info)
+        )
+
     @classroute('tiles')
     def tiles(self, request):
         """
