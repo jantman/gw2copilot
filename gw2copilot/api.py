@@ -426,6 +426,8 @@ class GW2CopilotAPI(ClassRouteMixin):
         :query int x: x coordinate
         :query int y: y coordinate
         :statuscode 200: successfully returned result
+        :statuscode 500: invalid parameters
+        :statuscode 403: tile not available
         """
         log_request(request)
         set_headers(request)
@@ -441,7 +443,7 @@ class GW2CopilotAPI(ClassRouteMixin):
             int(request.args['y'][0])
         )
         if data is None:
-            request.setResponseCode(500, message='CACHE ERROR')
+            request.setResponseCode(403, message='CACHE ERROR')
             return ''
         statuscode = OK
         msg = make_response('OK')
