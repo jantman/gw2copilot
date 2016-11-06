@@ -54,10 +54,12 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
 <div class="container" id="mapcontainer"></div>
 
-<script type="text/javascript">
-    var ws_port = {{ ws_port }};
-</script>
-<script src="/static/js/live_position.js"></script>
-<script src="/static/js/leaflet-1.0.1.js"></script>
-<script src="/static/js/map.js"></script>
+{% endblock %}
+{% block bodyendscript %}
+    <script type="text/javascript">
+        var ws_port = {{ ws_port }};
+    </script>
+    <script src="/static/js/live_position.js"></script>
+    <script src="/static/js/leaflet-1.0.1.js"></script>
+    <script src="/static/js/map.js"></script>
 {% endblock %}
