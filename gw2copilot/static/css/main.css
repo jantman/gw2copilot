@@ -41,6 +41,23 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
    Author's custom styles
    ========================================================================== */
 
-#mapcontainer {
+/* the following is required to get the Leaflet map to work */
+
+html, body, .container {
     height: 100%;
+    width: 100%;
+}
+
+.fill
+{
+    min-height: 100%;
+    height: 100%;
+    width: 100%;
+    min-width: 100%;
+}
+
+#mapcontainer {
+    width: auto;
+    overflow: hidden;
+    min-height: 100%;
 }

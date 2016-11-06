@@ -44,7 +44,10 @@ function unproject(coord) {
 }
 
 function onMapClick(e) {
-    console.log("You clicked the map at " + map.project(e.latlng));
+    console.log("You clicked the map at " + map.project(e.latlng) +
+    "; zoom=" + map.getZoom() + "; unprojected=" + e.latlng +
+    "; center=" + map.getCenter() + "; bounds=[" + map.getBounds().getSouthWest()
+    + ", " + map.getBounds().getNorthEast() + "]");
 }
 
 $(document).ready(function () {
@@ -53,45 +56,15 @@ $(document).ready(function () {
     var southWest, northEast;
 
     map = L.map("mapcontainer", {
-        minZoom: 0,
+        minZoom: 1,
         maxZoom: 7,
         crs: L.CRS.Simple
-    }).setView([0, 0], 0);
-
-    southWest = unproject([0, 32768]);
-    northEast = unproject([32768, 0]);
-
-    map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
+    }).setView([-152, 126], 2);
 
     L.tileLayer("/api/tiles?continent=1&floor=1&zoom={z}&x={x}&y={y}", {
-        minZoom: 0,
-        maxZoom: 7,
+        attribution: "&copy; GuildWars2/ArenaNet",
         continuousWorld: true
     }).addTo(map);
 
     map.on("click", onMapClick);
-
-    $.getJSON("/api/map_floors?continent=1&floor=1", function (data) {
-        var region, gameMap, i, il, poi;
-
-        for (region in data.regions) {
-            region = data.regions[region];
-
-            for (gameMap in region.maps) {
-                gameMap = region.maps[gameMap];
-
-                for (i = 0, il = gameMap.points_of_interest.length; i < il; i++) {
-                    poi = gameMap.points_of_interest[i];
-
-                    if (poi.type != "waypoint") {
-                        continue;
-                    }
-
-                    L.marker(unproject(poi.coord), {
-                        title: poi.name
-                    }).addTo(map);
-                }
-            }
-        }
-    });
 });
