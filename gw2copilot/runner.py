@@ -95,7 +95,10 @@ class Runner(object):
                        help='cache directory path (default: %s)' % cd)
         test_types = {
             'staticdata': 'always send the same fake data, except timestamp',
-            'once': 'send fake data, but only once'
+            'once': 'send fake data, but only once',
+            'runfast': 'move west to east across the map, 1% of width per poll '
+                       'interval, then reverse',
+            'lightspeed': 'like runfast, but 10% per poll interval'
         }
         p.add_argument('-t', '--test', dest='test_mumble', action='store',
                        type=str, default=None, choices=test_types.keys(),

@@ -116,13 +116,27 @@ class TestMumbleLinkReader(object):
         self._poll_interval = poll_interval
         self.uiTick = 2
         self._looping_deferred = None
+        self._loop_movement = False
         if test_type == 'staticdata':
             self._add_update_loop()
         elif test_type == 'once':
             logger.debug('Test type "once" - not adding update loop')
             self._read()
+        elif test_type in ['runfast', 'lightspeed']:
+            logger.debug('Test type: %s', test_type)
+            self._looping_test(test_type)
         else:
             raise Exception("Invalid test type: %s" % test_type)
+
+    def _looping_test(self, test_type):
+        """
+        Setup a looping test that moves the player position along a defined path
+
+        :param test_type: type of test to run
+        :type test_type: str
+        """
+        self._loop_movement = True
+        # @TODO - implement looping movement
 
     def _add_update_loop(self):
         """
@@ -145,4 +159,7 @@ class TestMumbleLinkReader(object):
         logger.warning("STATIC TEST DATA ONLY - not actually from game!")
         self.uiTick += 1
         self.mumble_data['uiTick'] = self.uiTick
+        if self._loop_movement:
+            # @TODO implement looping movement
+            pass
         self.server.update_mumble_data(self.mumble_data)
