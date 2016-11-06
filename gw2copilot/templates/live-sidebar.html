@@ -44,31 +44,26 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
               <h3 class="panel-title"><span id="player_info_header"></span><br /><span id="map_info_header"></span></h3>
             </div> <!-- END div class="panel-heading" -->
             <div class="panel-body">
-              <div class="row">
-                <div class="col-xs-8 col-md-8">
-                  <input type="text" class="form-control search" placeholder="Filter" />
-                </div>
-                <div class="col-xs-4 col-md-4">
-                  <button type="button" class="btn btn-primary pull-right sort" data-sort="feature-name" id="sort-btn"><i class="fa fa-sort"></i>&nbsp;&nbsp;Sort</button>
-                </div>
+              <div class="list-group">
+                  <p class="list-group-item active">Show/Hide Layers</p>
+                  <p class="list-group-item">
+                      <button type="button" class="btn btn-sm btn-success" id="btn_toggle_all">ALL</button><br />
+                      <button type="button" class="btn btn-sm btn-success" id="btn_toggle_waypoints">Waypoints</button>
+                      <button type="button" class="btn btn-sm btn-success" id="btn_toggle_hearts">Hearts</button>
+                      <button type="button" class="btn btn-sm btn-success" id="btn_toggle_heropoints">Hero Points</button>
+                      <button type="button" class="btn btn-sm btn-success" id="btn_toggle_POIs">POIs</button>
+                      <button type="button" class="btn btn-sm btn-success" id="btn_toggle_vistas">Vistas</button>
+                      <button type="button" class="btn btn-sm btn-success" id="btn_toggle_events">Events</button>
+                  </p>
+              </div>
+              <div class="list-group">
+                  <p class="list-group-item active">Map Controls</p>
+                  <p class="list-group-item"><button type="button" class="btn btn-sm btn-success" id="btn_center_me">Center On Player</button></p>
+                  <p class="list-group-item"><button type="button" class="btn btn-sm btn-success" id="btn_zoom_zone">Zoom to Zone</button></p>
+                  <p class="list-group-item"><button type="button" class="btn btn-sm btn-success" id="btn_zoom_player">Zoom to Player</button></p>
+                  <p class="list-group-item"><button type="button" class="btn btn-sm btn-success" id="btn_zoom_world">Zoom to World</button></p>
               </div>
             </div> <!--END div class="panel-body" -->
-            <div class="sidebar-table">
-              <table class="table table-hover" id="feature-list">
-                <thead class="hidden">
-                  <tr>
-                    <th>Icon</th>
-                  <tr>
-                  <tr>
-                    <th>Name</th>
-                  <tr>
-                  <tr>
-                    <th>Chevron</th>
-                  <tr>
-                </thead>
-                <tbody class="list"></tbody>
-              </table>
-            </div> <!-- END div class="sidebar-table" -->
           </div> <!-- END div class="panel panel-default" id="features" -->
         </div> <!-- END div class="sidebar-wrapper" -->
       </div> <!-- END div id="sidebar" -->
