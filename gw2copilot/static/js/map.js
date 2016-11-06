@@ -157,7 +157,13 @@ function unproject(coord) {
 }
 
 function addPlayerMarker(latlng) {
-    m.playerMarker = L.marker(latlng)
+    var playerIcon = L.icon({
+        iconUrl: '/static/img/crosshair_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    });
+    m.playerMarker = L.marker(latlng, {icon: playerIcon})
         .bindPopup("Player position.")
         .addTo(map);
 }
