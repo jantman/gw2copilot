@@ -62,7 +62,7 @@ $(document).ready(function () {
     }).setView([-152, 126], 2);
 
     L.tileLayer("/api/tiles?continent=1&floor=1&zoom={z}&x={x}&y={y}", {
-        attribution: "&copy; GuildWars2/ArenaNet",
+        attribution: "Map Data and Imagery &copy; GuildWars2/ArenaNet",
         continuousWorld: true
     }).addTo(map);
 
