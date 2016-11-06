@@ -39,13 +39,34 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 {% extends "base.html" %}
 {% block title %}gw2copilot - application status{% endblock %}
 {% block body %}
-<p>MumbleLink Last Update: {{ mumble_td }} ago ({{ mumble_time }})</p>
-<p>MumbleLink Raw Data:</p>
-<pre>
-{{ mumble_data }}
-</pre>
-<p>PlayerInfo Calculated Data:</p>
-<pre>
-{{ playerinfo }}
-</pre>
+    <div class="page-heading">
+      <div class="container">
+        <h2>Status</h2>
+      </div>
+    </div>
+
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>MumbleLink Last Update</td>
+                    <td>{{ mumble_td }} ago ({{ mumble_time }})</td>
+                </tr>
+                <tr>
+                    <td>MumbleLink Raw Data</td>
+                    <td><pre>{{ mumble_data }}</pre></td>
+                </tr>
+                <tr>
+                    <td>PlayerInfo Calculated Data</td>
+                    <td><pre>{{ playerinfo }}</pre></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

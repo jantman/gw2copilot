@@ -60,7 +60,9 @@ $(document).ready(function () {
     }).setView([-152, 126], 2);
 
     L.tileLayer("/api/tiles?continent=1&floor=1&zoom={z}&x={x}&y={y}", {
-        attribution: "Map Data and Imagery &copy; GuildWars2/ArenaNet",
+        attribution: "Map Data and Imagery &copy; " +
+            "<a href=\"https://wiki.guildwars2.com/wiki/API:Main\">GuildWars2/ArenaNet</a>" +
+            "; <a href=\"https://github.com/jantman/gw2copilot\">gw2copilot is AGPL Free Software</a>",
         continuousWorld: true
     }).addTo(map);
 
