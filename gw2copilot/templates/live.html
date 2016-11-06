@@ -38,6 +38,9 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 #}
 {% extends "base.html" %}
 {% block title %}gw2copilot - live game data{% endblock %}
+{% block headtags %}
+        <link rel="stylesheet" href="/static/css/leaflet-1.0.1.css">
+{% endblock %}
 {% block body %}
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
@@ -49,12 +52,12 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
       </div>
     </div>
 
-<div class="container" id="mapcontainer">
-    <h2>MAP GOES HERE</h2>
-</div>
+<div class="container" id="mapcontainer"></div>
 
 <script type="text/javascript">
     var ws_port = {{ ws_port }};
 </script>
 <script src="/static/js/live_position.js"></script>
+<script src="/static/js/leaflet-1.0.1.js"></script>
+<script src="/static/js/map.js"></script>
 {% endblock %}
