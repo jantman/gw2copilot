@@ -39,6 +39,9 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
 var map;
 
+var m_WORLD_ZOOM = 2;
+var m_WORLD_COORDS = [-152, 126];
+
 function unproject(coord) {
     return map.unproject(coord, map.getMaxZoom());
 }
@@ -57,7 +60,7 @@ $(document).ready(function () {
         minZoom: 1,
         maxZoom: 7,
         crs: L.CRS.Simple
-    }).setView([-152, 126], 2);
+    }).setView(m_WORLD_COORDS, m_WORLD_ZOOM);
 
     L.tileLayer("/api/tiles?continent=1&floor=1&zoom={z}&x={x}&y={y}", {
         attribution: "Map Data and Imagery &copy; " +
@@ -67,4 +70,8 @@ $(document).ready(function () {
     }).addTo(map);
 
     map.on("click", onMapClick);
+});
+
+$("#btn_zoom_world").click(function() {
+    map.setView(m_WORLD_COORDS, m_WORLD_ZOOM);
 });
