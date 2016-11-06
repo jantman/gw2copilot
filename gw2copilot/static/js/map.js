@@ -63,7 +63,7 @@ $(document).ready(function () {
 
     map.setMaxBounds(new L.LatLngBounds(southWest, northEast));
 
-    L.tileLayer("https://tiles.guildwars2.com/1/1/{z}/{x}/{y}.jpg", {
+    L.tileLayer("/api/tiles?continent=1&floor=1&zoom={z}&x={x}&y={y}", {
         minZoom: 0,
         maxZoom: 7,
         continuousWorld: true
@@ -71,7 +71,7 @@ $(document).ready(function () {
 
     map.on("click", onMapClick);
 
-    $.getJSON("https://api.guildwars2.com/v1/map_floor.json?continent_id=1&floor=1", function (data) {
+    $.getJSON("/api/map_floors?continent=1&floor=1", function (data) {
         var region, gameMap, i, il, poi;
 
         for (region in data.regions) {

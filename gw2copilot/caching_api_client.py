@@ -276,6 +276,9 @@ class CachingAPIClient(object):
         r = requests.get(url)
         logger.debug('GET %s returned status %d, %d bytes', url,
                      r.status_code, len(r.content))
+        if r.status_code != 200:
+            logger.debug("Response: %s", r.text)
+            return None
         self._cache_set('tiles', cache_key, r.content, binary=True,
                         extension='jpg')
         return r.content
