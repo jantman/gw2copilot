@@ -233,6 +233,11 @@ class PlayerInfo(object):
         x = m2i(self._mumble_link_data['fAvatarPosition'][0])
         y = m2i(self._mumble_link_data['fAvatarPosition'][2])
         self._position = self._continent_coords(con_rect, map_rect, x, y)
+        logger.error('Calculated Position: %s', self._position)
+        logger.error('MumbleLink x=%s y=%s', x, y)
+        rev_x, rev_y = self._map_coords_from_position(self._position)
+        logger.error('Reversed:  x=%s y=%s', rev_x, rev_y)
+        raise NotImplementedError("DEBUG")
 
     def _continent_coords(self, con_rect, map_rect, x, y):
         """
@@ -251,12 +256,87 @@ class PlayerInfo(object):
         :return: continent coordinate (x, y) 2-tuple
         :rtype: tuple
         """
-        con_x = (x - map_rect[0][0]) / (map_rect[1][0] - map_rect[0][0]) * \
-                (con_rect[1][0] - con_rect[0][0]) + con_rect[0][0]
-        con_y = ((-1 * y) - map_rect[0][1]) / \
-                (map_rect[1][1] - map_rect[0][1]) * \
-                (con_rect[1][1] - con_rect[0][1]) + con_rect[0][1]
+        # to make the following a bit more sane...
+        # map and con rect are [southwest, northeast] where each is [x,y]
+        map_sw_x = map_rect[0][0]
+        map_ne_x = map_rect[1][0]
+        con_sw_x = con_rect[0][0]
+        con_ne_x = con_rect[1][0]
+        map_sw_y = map_rect[0][1]
+        map_ne_y = map_rect[1][1]
+        con_sw_y = con_rect[0][1]
+        con_ne_y = con_rect[1][1]
+        con_x = (x - map_sw_x) / (map_ne_x - map_sw_x) * \
+                (con_ne_x - con_sw_x) + con_sw_x
+        con_y = ((-1 * y) - map_sw_y) / \
+                (map_ne_y - map_sw_y) * \
+                (con_ne_y - con_sw_y) + con_sw_y
         return con_x, con_y
+
+    def _map_coords_from_position(self, pos):
+        """
+        Given a continent coordinates position (i.e. the **output** of
+        :py:meth:`~._continent_coords`), calculate the continent, map and map
+        coordinates position that corresponds to them. This is the mathematical
+        inverse of :py:meth:`~._continent_coords`.
+
+        This function really only exists to be used by
+        :py:class:`~.TestMumbleLinkReader`.
+
+        :param pos: continent coordinates position 2-tuple (x, y)
+        :type pos: tuple
+        :return: 2-tuple: (continent_id, map_id, map_x, map_y)
+        :rtype: tuple
+        """
+        con_x, con_y = pos
+        map_id, map_rect, con_rect = self._find_map_for_position(pos)
+
+        # to make the following a bit more sane...
+        # map and con rect are [southwest, northeast] where each is [x,y]
+        map_sw_x = map_rect[0][0]
+        map_ne_x = map_rect[1][0]
+        con_sw_x = con_rect[0][0]
+        con_ne_x = con_rect[1][0]
+        map_sw_y = map_rect[0][1]
+        map_ne_y = map_rect[1][1]
+        con_sw_y = con_rect[0][1]
+        con_ne_y = con_rect[1][1]
+        x = (
+                (con_x - con_sw_x) / \
+                (con_ne_x - con_sw_x) * \
+                (map_ne_x - map_sw_x)
+            ) + map_sw_x
+        y = (
+                (
+                    (con_y - con_sw_y) / \
+                    (con_ne_y - con_sw_y) * \
+                    (map_ne_y - map_sw_y)
+                ) + map_sw_y
+        ) * -1
+        return x, y
+
+    def _find_map_for_position(self, pos):
+        """
+        Given a continent coordinates position (i.e. the **output** of
+        py:meth:`~._continent_coords`), find the map_id, map_rect and
+        continent_rect corresponding to that position.
+
+        :param pos: continent coordinates position 2-tuple (x, y)
+        :type pos: tuple
+        :return: 3-tuple: (map_id, map_rect, continent_rect)
+        :rtype: tuple
+        """
+        x, y = pos
+        for map_id, map in self._cache.all_maps.items():
+            x1 = map['continent_rect'][0][0]
+            x2 = map['continent_rect'][1][0]
+            y1 = map['continent_rect'][0][1]
+            y2 = map['continent_rect'][1][1]
+            if x1 <= x <= x2 and y1 <= y <= y2:
+                logger.debug('Found player in map %d', map_id)
+                return map_id, map['map_rect'], map['continent_rect']
+        raise Exception('Error: could not find map for point %s', pos)
+
 
     def _handle_map_change(self, new_map_id):
         """
