@@ -233,11 +233,6 @@ class PlayerInfo(object):
         x = m2i(self._mumble_link_data['fAvatarPosition'][0])
         y = m2i(self._mumble_link_data['fAvatarPosition'][2])
         self._position = self._continent_coords(con_rect, map_rect, x, y)
-        logger.error('Calculated Position: %s', self._position)
-        logger.error('MumbleLink x=%s y=%s', x, y)
-        rev_x, rev_y = self._map_coords_from_position(self._position)
-        logger.error('Reversed:  x=%s y=%s', rev_x, rev_y)
-        raise NotImplementedError("DEBUG")
 
     def _continent_coords(self, con_rect, map_rect, x, y):
         """
@@ -256,21 +251,11 @@ class PlayerInfo(object):
         :return: continent coordinate (x, y) 2-tuple
         :rtype: tuple
         """
-        # to make the following a bit more sane...
-        # map and con rect are [southwest, northeast] where each is [x,y]
-        map_sw_x = map_rect[0][0]
-        map_ne_x = map_rect[1][0]
-        con_sw_x = con_rect[0][0]
-        con_ne_x = con_rect[1][0]
-        map_sw_y = map_rect[0][1]
-        map_ne_y = map_rect[1][1]
-        con_sw_y = con_rect[0][1]
-        con_ne_y = con_rect[1][1]
-        con_x = (x - map_sw_x) / (map_ne_x - map_sw_x) * \
-                (con_ne_x - con_sw_x) + con_sw_x
-        con_y = ((-1 * y) - map_sw_y) / \
-                (map_ne_y - map_sw_y) * \
-                (con_ne_y - con_sw_y) + con_sw_y
+        con_x = (x - map_rect[0][0]) / (map_rect[1][0] - map_rect[0][0]) * \
+                (con_rect[1][0] - con_rect[0][0]) + con_rect[0][0]
+        con_y = ((-1 * y) - map_rect[0][1]) / \
+                (map_rect[1][1] - map_rect[0][1]) * \
+                (con_rect[1][1] - con_rect[0][1]) + con_rect[0][1]
         return con_x, con_y
 
     def _map_coords_from_position(self, pos):
@@ -285,35 +270,24 @@ class PlayerInfo(object):
 
         :param pos: continent coordinates position 2-tuple (x, y)
         :type pos: tuple
-        :return: 2-tuple: (continent_id, map_id, map_x, map_y)
+        :return: 3-tuple: (continent_id, map_id, map_x, map_y)
         :rtype: tuple
         """
         con_x, con_y = pos
         map_id, map_rect, con_rect = self._find_map_for_position(pos)
-
-        # to make the following a bit more sane...
-        # map and con rect are [southwest, northeast] where each is [x,y]
-        map_sw_x = map_rect[0][0]
-        map_ne_x = map_rect[1][0]
-        con_sw_x = con_rect[0][0]
-        con_ne_x = con_rect[1][0]
-        map_sw_y = map_rect[0][1]
-        map_ne_y = map_rect[1][1]
-        con_sw_y = con_rect[0][1]
-        con_ne_y = con_rect[1][1]
         x = (
-                (con_x - con_sw_x) / \
-                (con_ne_x - con_sw_x) * \
-                (map_ne_x - map_sw_x)
-            ) + map_sw_x
+                (con_x - con_rect[0][0]) / \
+                (con_rect[1][0] - con_rect[0][0]) * \
+                (map_rect[1][0] - map_rect[0][0])
+            ) + map_rect[0][0]
         y = (
                 (
-                    (con_y - con_sw_y) / \
-                    (con_ne_y - con_sw_y) * \
-                    (map_ne_y - map_sw_y)
-                ) + map_sw_y
+                    (con_y - con_rect[0][1]) / \
+                    (con_rect[1][1] - con_rect[0][1]) * \
+                    (map_rect[1][1] - map_rect[0][1])
+                ) + map_rect[0][1]
         ) * -1
-        return x, y
+        return map_id, x, y
 
     def _find_map_for_position(self, pos):
         """
