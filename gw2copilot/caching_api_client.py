@@ -43,7 +43,7 @@ import os
 import json
 import urllib
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class CachingAPIClient(object):
@@ -66,10 +66,18 @@ class CachingAPIClient(object):
         self._cache_dir = cache_dir
         self._api_key = api_key
         self._characters = {}  # these don't get cached to disk
+        self._all_maps = None  # cache in memory as well
         if not os.path.exists(cache_dir):
             logger.debug('Creating cache directory at: %s', cache_dir)
             os.makedirs(cache_dir, 0700)
         logger.debug('Initialized with cache directory at: %s', cache_dir)
+
+    def fill_persistent_cache(self):
+        """
+        Ensure we have cached data for things we *know* we will need...
+        """
+        # ensure we have all map data cached
+        _ = self.all_maps
 
     def _cache_path(self, cache_type, cache_key, extn):
         """
@@ -110,8 +118,6 @@ class CachingAPIClient(object):
             logger.debug('cache MISS for type=%s key=%s (path: %s)',
                          cache_type, cache_key, p)
             return None
-        logger.debug('cache HIT for type=%s key=%s (path: %s)',
-                     cache_type, cache_key, p)
         if binary:
             with open(p, 'rb') as fh:
                 r = fh.read()
@@ -176,6 +182,28 @@ class CachingAPIClient(object):
         logger.debug('GET %s returned status %d', url, r.status_code)
         return r
 
+    @property
+    def all_maps(self):
+        """
+        Return a dict of map data for ALL maps, keys are map IDs and values are
+        map data, as would be returned by :py:meth:`~.map_data`.
+
+        :return: dict of all map data, keys are map ID and values are map data
+        :rtype: dict
+        """
+        if self._all_maps is not None:
+            logger.debug('Already have all maps in cache')
+            return self._all_maps
+        r = self._get('/v2/maps')
+        ids = r.json()
+        logger.debug('Got list of all %d map IDs', len(ids))
+        maps = {}
+        for _id in ids:
+            maps[_id] = self.map_data(_id)
+        logger.debug('Got and cached all maps')
+        self._all_maps = maps
+        return self._all_maps
+
     def map_data(self, map_id):
         """
         Return dict of map data for the given map ID.
@@ -185,6 +213,8 @@ class CachingAPIClient(object):
         :return: map data
         :rtype: dict
         """
+        if self._all_maps is not None and map_id in self._all_maps:
+            return self._all_maps[map_id]
         cached = self._cache_get('mapdata', map_id)
         if cached is not None:
             return cached
