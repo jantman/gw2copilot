@@ -38,9 +38,13 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 */
 
 var sock = null;
-var playerinfo_dict = null;
-var playerinfo_map_info = null;
-var playerinfo_position = null;
+
+/* player info */
+var P = {
+    dict: null,
+    map_info: null,
+    position: null
+};
 
 /**
  * Setup websocket server and hook in message handler.
@@ -138,12 +142,12 @@ function getInitialData() {
  */
 function handleUpdatePlayerDict(data) {
     console.log("handleUpdatePlayerData(" + JSON.stringify(data) + ")");
-    if ( playerinfo_dict != data ) {
+    if ( P.dict != data ) {
         $("#player_info_header").text(
             data["name"] + " (" + data["level"] + " " + data["race"] + " " +
             data["profession"] + ")"
         );
-        playerinfo_dict = data;
+        P.dict = data;
     }
 }
 
@@ -154,12 +158,12 @@ function handleUpdatePlayerDict(data) {
  */
 function handleUpdateMapInfo(data) {
     console.log("handleUpdateMapInfo(" + JSON.stringify(data) + ")");
-    if ( playerinfo_map_info != data ) {
+    if ( P.map_info != data ) {
         $("#map_info_header").text(
             data["map_name"] + " (" + data["map_level_range"] + "), " +
             data["region_name"] + ", " + data["continent_name"]
         );
-        playerinfo_map_info = data;
+        P.map_info = data;
     }
 }
 
@@ -170,6 +174,7 @@ function handleUpdateMapInfo(data) {
  */
 function handleUpdatePosition(data) {
     console.log("handleUpdatePosition(" + JSON.stringify(data) + ")");
+    P.position = data;
     m.playerLatLng = gw2latlon(data);
     if ( m.playerMarker === null ) {
         addPlayerMarker(m.playerLatLng);

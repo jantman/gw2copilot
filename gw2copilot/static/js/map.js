@@ -134,7 +134,9 @@ $("#btn_follow_player").click(function() {
 
 // zoom the map to the player's current zone
 $("#btn_zoom_zone").click(function() {
-    alert("TODO: btn_zoom_zone not implemented");
+    sw_latlng = gw2latlon(P.map_info['continent_rect'][0]);
+    ne_latlng = gw2latlon(P.map_info['continent_rect'][1]);
+    map.fitBounds([sw_latlng, ne_latlng]);
 });
 
 // zoom the map to the player, full zoom
