@@ -198,9 +198,10 @@ class CachingAPIClient(object):
         ids = r.json()
         logger.debug('Got list of all %d map IDs', len(ids))
         maps = {}
+        logger.info("Starting to fill map data cache...")
         for _id in ids:
             maps[_id] = self.map_data(_id)
-        logger.debug('Got and cached all maps')
+        logger.info('Cached all map data')
         self._all_maps = maps
         return self._all_maps
 
