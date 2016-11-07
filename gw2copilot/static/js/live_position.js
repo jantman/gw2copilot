@@ -90,6 +90,14 @@ window.onload = function() {
 };
 
 /**
+ * Handle the "edit reminders" link modal
+ */
+function handleEditReminders() {
+    $("#remindersModal").modal("show");
+    return false;
+}
+
+/**
  * Handle an incoming websocket message; dispatch it to the correct
  * handle_* function.
  *

@@ -1,5 +1,5 @@
 {#
-gw2copilot/templates/live.html
+gw2copilot/templates/live-edit-modal.html
 
 The latest version of this package is available at:
 <https://github.com/jantman/gw2copilot>
@@ -36,32 +36,18 @@ AUTHORS:
 Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 ################################################################################
 #}
-{% extends "base.html" %}
-{% block title %}gw2copilot - live game data{% endblock %}
-{% block extra_head_css %}
-<!-- BEGIN block extra_head_css (live.html) -->
-        <link rel="stylesheet" href="/static/css/leaflet-1.0.1.css">
-        <link rel="stylesheet" href="/static/css/bootleaf.css">
-<!-- END block extra_head_css (live.html) -->
-{% endblock %}
-{% block body %}
-<!-- BEGIN block body (live.html) -->
-    <div id="container">
-{% include 'live-sidebar.html' %}
-{% include 'live-edit-modal.html' %}
-
-      <div id="map"></div>
-    </div>
-<!-- END block body (live.html) -->
-{% endblock %}
-{% block extra_foot_script %}
-<!-- BEGIN block extra_foot_script (live.html) -->
-<script type="text/javascript">
-    var ws_port = {{ ws_port }};
-</script>
-<script src="/static/js/vendor/leaflet-1.0.1.js"></script>
-<script src="/static/js/vendor/jquery-ui.min.js"></script>
-<script src="/static/js/map.js"></script>
-<script src="/static/js/live_position.js"></script>
-<!-- END block extra_foot_script (live.html) -->
-{% endblock %}
+<!-- BEGIN live-edit-modal.html -->
+    <div class="modal fade" id="remindersModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Welcome to the BootLeaf template!</h4>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+<!-- END live-edit-modal.html -->
