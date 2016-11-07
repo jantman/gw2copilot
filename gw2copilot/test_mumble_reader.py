@@ -158,18 +158,21 @@ class TestMumbleLinkReader(object):
         logger.debug('curr_x=%s curr_y=%s', self.curr_x, self.curr_y)
         self.curr_x = self._step('x')
         self.curr_y = self._step('y')
-        map_id, map_x, map_y = \
-            self.server.playerinfo._map_coords_from_position(
-                (self.curr_x, self.curr_y)
-        )
-        # meters to inches
-        map_x /= 39.3701
-        map_y /= 39.3701
-        logger.debug('new_x=%s new_y=%s map_id=%d map_x=%s map_y=%s',
-                     self.curr_x, self.curr_y, map_id, map_x, map_y)
-        self.mumble_data['fAvatarPosition'][0] = map_x
-        self.mumble_data['fAvatarPosition'][2] = map_y
-        self.mumble_data['context']['mapId'] = map_id
+        try:
+            map_id, map_x, map_y = \
+                self.server.playerinfo._map_coords_from_position(
+                    (self.curr_x, self.curr_y)
+            )
+            # meters to inches
+            map_x /= 39.3701
+            map_y /= 39.3701
+            logger.debug('new_x=%s new_y=%s map_id=%d map_x=%s map_y=%s',
+                         self.curr_x, self.curr_y, map_id, map_x, map_y)
+            self.mumble_data['fAvatarPosition'][0] = map_x
+            self.mumble_data['fAvatarPosition'][2] = map_y
+            self.mumble_data['context']['mapId'] = map_id
+        except Exception:
+            self._looping_test()
 
     def _step(self, axis):
         """
