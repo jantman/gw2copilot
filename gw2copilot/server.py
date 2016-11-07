@@ -103,7 +103,7 @@ class TwistedServer(object):
             cache_dir = cd
         self._cache_dir = cache_dir
         self.cache = CachingAPIClient(self, cache_dir, api_key=api_key)
-        # @TODO perform the initial cache gets
+        self.cache.fill_persistent_cache()
         # saved state:
         self._mumble_link_data = None
         self._mumble_update_datetime = None
