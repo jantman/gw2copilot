@@ -116,27 +116,87 @@ class TestMumbleLinkReader(object):
         self._poll_interval = poll_interval
         self.uiTick = 2
         self._looping_deferred = None
+        # vars for loop movement tests
         self._loop_movement = False
-        if test_type == 'staticdata':
-            self._add_update_loop()
-        elif test_type == 'once':
+        self.x_step = 0  # how far to move every _read()
+        self.y_step = 0  # how far to move every _read()
+        # these values are world coordinates and need to be run through
+        # self.parent_server.playerinfo._map_coords_from_position()
+        # and then divided by 39.3701 before being returned as MumbleLink data
+        self.min_x = 1100.8
+        self.max_x = 30976
+        self.min_y = 14976
+        self.max_y = 14976
+        self.curr_x = self.min_x
+        self.curr_y = self.min_y
+        self.x_direction = 1
+        self.y_direction = 1
+        if test_type == 'once':
             logger.debug('Test type "once" - not adding update loop')
             self._read()
-        elif test_type in ['runfast', 'lightspeed']:
+        elif test_type in ['runfast', 'lightspeed', 'staticdata']:
             logger.debug('Test type: %s', test_type)
-            self._looping_test(test_type)
+            if test_type == 'runfast':
+                self._loop_movement = True
+                self.x_step = (self.max_x - self.min_x) * .01
+                self.y_step = (self.max_y - self.min_y) * .01
+            elif test_type == 'lightspeed':
+                self._loop_movement = True
+                self.x_step = (self.max_x - self.min_x) * .1
+                self.y_step = (self.max_y - self.min_y) * .1
+            self._add_update_loop()
         else:
             raise Exception("Invalid test type: %s" % test_type)
 
-    def _looping_test(self, test_type):
+    def _looping_test(self):
         """
         Setup a looping test that moves the player position along a defined path
 
         :param test_type: type of test to run
         :type test_type: str
         """
-        self._loop_movement = True
-        # @TODO - implement looping movement
+        logger.debug('curr_x=%s curr_y=%s', self.curr_x, self.curr_y)
+        self.curr_x = self._step('x')
+        self.curr_y = self._step('y')
+        map_id, map_x, map_y = \
+            self.server.playerinfo._map_coords_from_position(
+                (self.curr_x, self.curr_y)
+        )
+        # meters to inches
+        map_x /= 39.3701
+        map_y /= 39.3701
+        logger.debug('new_x=%s new_y=%s map_id=%d map_x=%s map_y=%s',
+                     self.curr_x, self.curr_y, map_id, map_x, map_y)
+        self.mumble_data['fAvatarPosition'][0] = map_x
+        self.mumble_data['fAvatarPosition'][2] = map_y
+        self.mumble_data['context']['mapId'] = map_id
+
+    def _step(self, axis):
+        """
+        Step a value by the step amount; if we run over max or under min,
+        reverse direction.
+
+        :param axis: the axis to step, "x" or "y"
+        :type axis: str
+        :return: new value
+        :rtype: float
+        """
+        curr = getattr(self, 'curr_%s' % axis)
+        min_v = getattr(self, 'min_%s' % axis)
+        max_v = getattr(self, 'max_%s' % axis)
+        step_amt = getattr(self, '%s_step' % axis)
+        direction = getattr(self, '%s_direction' % axis)
+        step = step_amt * direction
+        if (curr + step) > max_v:
+            logger.debug('reversing direction - going backwards')
+            setattr(self, '%s_direction' % axis, -1)
+            step = step_amt * -1
+        elif (curr + step) < min_v:
+            logger.debug('reversing direction - going forwards')
+            setattr(self, '%s_direction' % axis, 1)
+            step = step_amt
+        curr += step
+        return curr
 
     def _add_update_loop(self):
         """
@@ -160,6 +220,5 @@ class TestMumbleLinkReader(object):
         self.uiTick += 1
         self.mumble_data['uiTick'] = self.uiTick
         if self._loop_movement:
-            # @TODO implement looping movement
-            pass
+            self._looping_test()
         self.server.update_mumble_data(self.mumble_data)
