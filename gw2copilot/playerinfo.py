@@ -154,6 +154,9 @@ class PlayerInfo(object):
         * ``continent_name`` - *(str)*
         * ``region_id`` - *(int)*
         * ``region_name`` - *(str)*
+        * ``continent_rect`` - *(list)* - list of current map southwest and
+           northeast corners as continent coordinates, each as [x, y] pairs,
+           i.e. [[sw_x, sw_y], [ne_x], [ne_y]]
 
         **Note:** when updating this property, also update the documentation on
         :http:get:`/api/map_info`.
@@ -171,7 +174,8 @@ class PlayerInfo(object):
             'map_level_range': '%d-%d' % (
                 self._current_map_data['min_level'],
                 self._current_map_data['max_level']
-            )
+            ),
+            'continent_rect': self._current_map_data['continent_rect']
         }
 
     @property

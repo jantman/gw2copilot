@@ -308,7 +308,8 @@ class GW2CopilotAPI(ClassRouteMixin):
               "continent_name": "Tyria",
               "continent_id": 1,
               "region_name": "Kryta",
-              "region_id": 4
+              "region_id": 4,
+              "continent_rect": [[15232, 14336], [17664, 15872]]
           }
 
         :>json map_name: *(string)* current map name
@@ -318,6 +319,9 @@ class GW2CopilotAPI(ClassRouteMixin):
         :>json continent_id: *(int)* current continent ID
         :>json region_name: *(string)* current region name
         :>json region_id: *(int)* current region ID
+        :>json continent_rect: *(array)* list of current map southwest and
+           northeast corners as continent coordinates, each as [x, y] pairs,
+           i.e. [[sw_x, sw_y], [ne_x], [ne_y]]
         :statuscode 200: successfully returned result
         """
         log_request(request)
