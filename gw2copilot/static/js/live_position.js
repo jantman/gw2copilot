@@ -93,6 +93,17 @@ window.onload = function() {
  */
 function handleWebSocketMessage(data) {
     console.log("handleWebSocketMessage(" + JSON.stringify(data) + ")");
+    if ( data.type == "position") {
+        handleUpdatePosition(data.data);
+    } else if ( data.type == "map_info" ) {
+        handleUpdateMapInfo(data.data);
+    } else if ( data.type == "player_dict" ) {
+        handleUpdatePlayerDict(data.data);
+    } else {
+        console.log("handleWebSocketMessage got message of unknown type: "
+            + JSON.stringify(data) + ")"
+        );
+    }
 }
 
 /**
