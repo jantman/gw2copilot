@@ -6,6 +6,8 @@
 * Dual licensed under the LGPL (http://www.gnu.org/licenses/lgpl.html)
 * and MIT (http://www.opensource.org/licenses/mit-license.php) licenses.
 *
+* Modified by Jason Antman for gw2copilot.
+*
 * Depends:
 * jQuery v1.11.1+
 * jQuery UI v1.11.1+
