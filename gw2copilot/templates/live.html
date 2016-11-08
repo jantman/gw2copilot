@@ -42,7 +42,6 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 <!-- BEGIN block extra_head_css (live.html) -->
         <link rel="stylesheet" href="/static/css/leaflet-1.0.1.css">
         <link rel="stylesheet" href="/static/css/bootleaf.css">
-        <link rel="stylesheet" href="/static/css/jquery.appendGrid-1.6.2.css">
 <!-- END block extra_head_css (live.html) -->
 {% endblock %}
 {% block body %}
@@ -76,11 +75,11 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
             hideButtons: {
                 removeLast: true,
                 moveUp: true,
-                moveDown: true
+                moveDown: true,
+                insert: true
             },
             customGridButtons: {
                 append: function() { return $('<button/>').attr({ type: 'button' }).append('<span class="ui-button-icon-primary ui-icon ui-icon-plusthick"></span>', '<span class="ui-button-text"></span>'); },
-                insert: function() { return $('<button/>').attr({ type: 'button' }).append('<span class="ui-button-icon-primary ui-icon ui-icon-arrowreturnthick-1-w"></span>', '<span class="ui-button-text"></span>'); },
                 remove: function() { return $('<button/>').attr({ type: 'button' }).append('<span class="ui-button-icon-primary ui-icon ui-icon-trash"></span>', '<span class="ui-button-text"></span>'); }
             }
         });
