@@ -94,8 +94,16 @@ window.onload = function() {
  */
 function handleEditReminders() {
     $("#remindersModal").modal("show");
+    console.log("TODO: populate data from server THEN show");
     return false;
 }
+
+/**
+ * Handle the "Save" button on the Edit Reminders modal
+ */
+$('#saveZoneRemindersTable').click(function () {
+    alert('Here is the serialized data!!\n' + $(document.forms[0]).serialize());
+});
 
 /**
  * Handle an incoming websocket message; dispatch it to the correct
