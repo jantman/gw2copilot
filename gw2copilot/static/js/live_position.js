@@ -102,7 +102,17 @@ function handleEditReminders() {
  * Handle the "Save" button on the Edit Reminders modal
  */
 $('#saveZoneRemindersTable').click(function () {
-    alert('Here is the serialized data!!\n' + $(document.forms[0]).serialize());
+    data = [];
+    $('#remindersModal tbody tr')
+      .each(function( index ) {
+          d = {
+              'map_id': $(this).find('select').first().find(':selected').val(),
+              'text': $(this).find('input').first().val()
+          };
+          if ( d['map_id'] != 0 ) { data.push(d); }
+      });
+    console.log(data);
+    // TODO - POST to server as JSON
 });
 
 /**

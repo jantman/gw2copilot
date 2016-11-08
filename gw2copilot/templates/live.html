@@ -64,12 +64,13 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 <script src="/static/js/map.js"></script>
 <script src="/static/js/live_position.js"></script>
 <script type="text/javascript">
+    zone_options = { 0: '{Select a Zone}', 1: 'Foo', 2: 'Bar'};
     $(function () {
         $('#zoneRemindersTable').appendGrid({
             initRows: 1,
             columns: [
-                { name: 'Zone', display: 'Zone', type: 'text', ctrlCss: { width: '100%' } },
-                { name: 'Reminder Text', display: 'Reminder Text', type: 'text', ctrlCss: { width: '100%' } },
+                { name: 'map_id', display: 'Zone', type: 'select', ctrlOptions: zone_options, ctrlCss: { width: '100%' } },
+                { name: 'text', display: 'Reminder Text', type: 'text', ctrlCss: { width: '100%' } },
                 { name: 'id', type: 'hidden', value: 0 }
             ],
             hideButtons: {
