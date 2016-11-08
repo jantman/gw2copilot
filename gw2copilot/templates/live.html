@@ -73,8 +73,15 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
                 { name: 'Reminder Text', display: 'Reminder Text', type: 'text', ctrlCss: { width: '100%' } },
                 { name: 'id', type: 'hidden', value: 0 }
             ],
+            hideButtons: {
+                removeLast: true,
+                moveUp: true,
+                moveDown: true
+            },
             customGridButtons: {
-                append: function() { return $('<button/>').attr({ type: 'button' }).append('<span class="ui-button-icon-primary ui-icon ui-icon-plusthick"></span>', '<span class="ui-button-text"></span>'); }
+                append: function() { return $('<button/>').attr({ type: 'button' }).append('<span class="ui-button-icon-primary ui-icon ui-icon-plusthick"></span>', '<span class="ui-button-text"></span>'); },
+                insert: function() { return $('<button/>').attr({ type: 'button' }).append('<span class="ui-button-icon-primary ui-icon ui-icon-arrowreturnthick-1-w"></span>', '<span class="ui-button-text"></span>'); },
+                remove: function() { return $('<button/>').attr({ type: 'button' }).append('<span class="ui-button-icon-primary ui-icon ui-icon-trash"></span>', '<span class="ui-button-text"></span>'); }
             }
         });
     });
