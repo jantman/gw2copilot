@@ -72,7 +72,10 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
                 { name: 'Zone', display: 'Zone', type: 'text', ctrlCss: { width: '100%' } },
                 { name: 'Reminder Text', display: 'Reminder Text', type: 'text', ctrlCss: { width: '100%' } },
                 { name: 'id', type: 'hidden', value: 0 }
-            ]
+            ],
+            customGridButtons: {
+                append: function() { return $('<button/>').attr({ type: 'button' }).append('<span class="ui-button-icon-primary ui-icon ui-icon-plusthick"></span>', '<span class="ui-button-text"></span>'); }
+            }
         });
     });
 </script>
