@@ -230,23 +230,23 @@
                 }
                 // Create thead and tbody
                 tbHead = document.createElement('thead');
-                tbHead.className = 'ui-widget-header';
+                //tbHead.className = 'ui-widget-header';
                 tbBody = document.createElement('tbody');
-                tbBody.className = 'ui-widget-content';
+                //tbBody.className = 'ui-widget-content';
                 tbFoot = document.createElement('tfoot');
-                tbFoot.className = 'ui-widget-header';
+                //tbFoot.className = 'ui-widget-header';
                 tbColGp = document.createElement('colgroup');
                 // Prepare the table element
                 settings._wrapperId = settings.idPrefix + '-wrapper';
                 tbWrap = document.createElement('div');
                 $(tbWrap).attr('id', settings._wrapperId).addClass('appendGrid').insertAfter(tbWhole);
-                $(tbWhole).empty().addClass('ui-widget').appendTo(tbWrap);
+                $(tbWhole).empty().appendTo(tbWrap);
                 // Check if content scrolling is enabled
                 if (settings.maxBodyHeight > 0) {
                     // Seperate the thead and tfoot from source table
-                    $('<table></table>').addClass('ui-widget head').append(tbHead).prependTo(tbWrap);
+                    $('<table></table>').addClass('table-striped').addClass('table').append(tbHead).prependTo(tbWrap);
                     $(tbWhole).addClass('body').wrap($('<div></div>').addClass('scroller').css('max-height', settings.maxBodyHeight)).append(tbColGp, tbBody);
-                    $('<table></table>').addClass('ui-widget foot').append(tbFoot).appendTo(tbWrap);
+                    $('<table></table>').addClass('table-striped').addClass('table').append(tbFoot).appendTo(tbWrap);
                 } else {
                     // Add thead, tbody and tfoot to the same table
                     $(tbWhole).addClass('head body foot').append(tbColGp, tbHead, tbBody, tbFoot);
@@ -261,7 +261,7 @@
                 }
                 if (!settings.hideRowNumColumn) {
                     tbRow.appendChild(tbHeadCellRowNum = document.createElement('td'));
-                    tbHeadCellRowNum.className = 'ui-widget-header first';
+                    tbHeadCellRowNum.className = 'first';
                     // Add column group for scrolling
                     tbColGp.appendChild(document.createElement('col'));
                 }
@@ -279,7 +279,7 @@
                         }
                         // Check skip header colSpan
                         if (pendingSkipCol == 0) {
-                            var className = 'ui-widget-header';
+                            var className = 'foobar';
                             if (settings.columns[z].invisible) className += ' invisible';
                             if (settings.columns[z].resizable) className += ' resizable';
                             tbRow.appendChild(tbCell = document.createElement('td'));
@@ -341,7 +341,7 @@
                     } else {
                         tbRow.appendChild(tbHeadCellRowButton = document.createElement('td'));
                     }
-                    tbHeadCellRowButton.className = 'ui-widget-header last';
+                    tbHeadCellRowButton.className = 'last';
                     // Add column group for scrolling
                     tbColGp.appendChild(document.createElement('col'));
                 }
@@ -965,7 +965,7 @@
             // Add row number
             if (!settings.hideRowNumColumn) {
                 tbRow.appendChild(tbCell = document.createElement('td'));
-                $(tbCell).addClass('ui-widget-content first').text(settings._rowOrder.length);
+                $(tbCell).addClass('first').text(settings._rowOrder.length);
                 if (settings.useSubPanel) tbCell.rowSpan = 2;
             }
             // Process on each columns
@@ -976,7 +976,7 @@
                     continue;
                 }
                 // Check column invisble
-                var className = 'ui-widget-content';
+                var className = 'foobar';
                 if (settings.columns[y].invisible) className += ' invisible';
                 // Insert cell
                 tbRow.appendChild(tbCell = document.createElement('td'));
@@ -1144,7 +1144,7 @@
                 } else {
                     tbRow.insertBefore(tbCell = document.createElement('td'), tbRow.firstChild);
                 }
-                tbCell.className = 'ui-widget-content last';
+                tbCell.className = 'last';
                 if (settings._hideLastColumn) tbCell.style.display = 'none';
                 // Add standard buttons
                 if (!settings.hideButtons.insert) {
@@ -1243,7 +1243,7 @@
             // Create sub panel
             if (settings.useSubPanel) {
                 tbSubRow.appendChild(tbCell = document.createElement('td'));
-                tbCell.className = 'ui-widget-content';
+                tbCell.className = 'foobar';
                 tbCell.colSpan = settings._visibleCount + (settings._hideLastColumn ? 0 : 1);
                 if ($.isFunction(settings.subPanelBuilder)) {
                     settings.subPanelBuilder(tbCell, uniqueIndex);
