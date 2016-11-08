@@ -51,3 +51,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
   color: inherit;
   background-color: #eee;
 }
+
+#zoneRemindersTable thead tr td {
+    font-weight: bold;
+}
