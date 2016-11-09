@@ -124,8 +124,9 @@ function handleEditReminders() {
         url: "/api/zone_reminders"
     }).done(function( data ){
         data = JSON.parse(data);
-        if ( data != '[]' ) {
+        if ( data.length > 0 ) {
             $('#zoneRemindersTable').appendGrid('load', data);
+            makeZoneRemindersCache(data);
         }
         $("#remindersModal").modal("show");
     });
@@ -151,12 +152,26 @@ $('#saveZoneRemindersTable').click(function () {
         url: '/api/zone_reminders',
         type: 'PUT',
         data: s,
-        success: function(data) {
+        success: function(d) {
             $("#remindersModal").modal("hide");
-
+            makeZoneRemindersCache(data);
         }
     });
 });
+
+/**
+ * Get zone reminders from API; update the cache at ``P.zone_reminders``.
+ */
+function getZoneRemindersFromAPI() {
+    $.ajax({
+        url: "/api/zone_reminders"
+    }).done(function( data ){
+        data = JSON.parse(data);
+        if ( data.length > 0 ) {
+            makeZoneRemindersCache(data);
+        }
+    });
+}
 
 /**
  * Update the in-memory zone reminders object, from the list of reminders.
@@ -168,7 +183,11 @@ function makeZoneRemindersCache(rlist) {
     c = {};
     rlist.map( function(item) {
         // item is the reminder object
-
+        if ( ! c.hasOwnProperty(item["map_id"]) ) { c[item["map_id"]] = []; }
+        c[item["map_id"]].push(item["text"]);
     });
     P.zone_reminders = c;
+    if ( typeof P !== 'undefined' && P.hasOwnProperty("map_info") && P.map_info.hasOwnProperty("map_id") ) {
+        doZoneReminder(P.map_info["map_id"]);
+    }
 }

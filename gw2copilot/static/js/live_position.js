@@ -41,9 +41,14 @@ var sock = null;
 
 /* player info */
 var P = {
+    /* player dict; updated by handleUpdatePlayerDict() */
     dict: null,
+    /* map information; updated by handleUpdateMapInfo() */
     map_info: null,
+    /* position information; updated by handleUpdatePosition() */
     position: null,
+    /* object with keys of map_id, values list of string zone reminders */
+    /* updated by live_edit_modal.js makeZoneRemindersCache() */
     zone_reminders: {}
 };
 
@@ -133,6 +138,8 @@ function getInitialData() {
     }).done(function( data ){
         handleUpdatePosition(data);
     });
+    // fill the zone/map reminders cache
+    getZoneRemindersFromAPI();
     console.log("done getting initial data.");
 }
 
@@ -165,6 +172,7 @@ function handleUpdateMapInfo(data) {
             data["region_name"] + ", " + data["continent_name"]
         );
         P.map_info = data;
+        doZoneReminder(data["map_id"]);
     }
 }
 
@@ -184,5 +192,40 @@ function handleUpdatePosition(data) {
     }
     if ( m.followPlayer === true ) {
         map.panTo(m.playerLatLng);
+    }
+}
+
+/**
+ * When we change maps, update the Zone Reminders as necessary
+ *
+ * @param {integer} map_id - the new map ID
+ */
+function doZoneReminder(map_id) {
+    // first, hide and empty the current span
+    $('#zone_reminder_span').hide();
+    $('#zone_reminder_span').text('');
+    // now, if we have new reminder(s), show them
+    if ( P.zone_reminders.hasOwnProperty(map_id) && P.zone_reminders[map_id].length > 0 ) {
+        reminders = P.zone_reminders[map_id];
+        html = '';
+        if ( reminders.length < 2 ) {
+            html = reminders[0] + '<br />';
+        } else {
+            reminders.map( function(item) {
+                html = html + item + '<br /><br />';
+            });
+        }
+        $('#zone_reminder_span').html(html);
+        $('#zone_reminder_span').show();
+        // flash the containing box red...
+        // slowly turn it red...
+        $('#zoneRemindersListItem').animate(
+            {backgroundColor:'#f00'}, 1000, "swing", function() {
+                // ...and then when that's complete, back to white
+                $('#zoneRemindersListItem').animate(
+                    {backgroundColor:'#fff'}, 1000
+                );
+            }
+        );
     }
 }
