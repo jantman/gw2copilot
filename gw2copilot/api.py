@@ -108,7 +108,7 @@ class GW2CopilotAPI(ClassRouteMixin):
 
         .. sourcecode:: http
 
-          GET /player_info HTTP/1.1
+          GET /api/player_info HTTP/1.1
           Host: example.com
 
         **Example Response**:
@@ -116,7 +116,7 @@ class GW2CopilotAPI(ClassRouteMixin):
         .. sourcecode:: http
 
           HTTP/1.1 200 OK
-          Content-Type: application/json
+          Content-Type: text/javascript
 
           {
               "facing_direction": 82.0783777035753,
@@ -187,7 +187,7 @@ class GW2CopilotAPI(ClassRouteMixin):
 
         .. sourcecode:: http
 
-          GET /position HTTP/1.1
+          GET /api/position HTTP/1.1
           Host: example.com
 
         **Example Response**:
@@ -195,7 +195,7 @@ class GW2CopilotAPI(ClassRouteMixin):
         .. sourcecode:: http
 
           HTTP/1.1 200 OK
-          Content-Type: application/json
+          Content-Type: text/javascript
 
           [1.234, 5.678]
 
@@ -235,7 +235,7 @@ class GW2CopilotAPI(ClassRouteMixin):
 
         .. sourcecode:: http
 
-          GET /player_dict HTTP/1.1
+          GET /api/player_dict HTTP/1.1
           Host: example.com
 
         **Example Response**:
@@ -243,7 +243,7 @@ class GW2CopilotAPI(ClassRouteMixin):
         .. sourcecode:: http
 
           HTTP/1.1 200 OK
-          Content-Type: application/json
+          Content-Type: text/javascript
 
           {
               "name": "Character Name",
@@ -291,7 +291,7 @@ class GW2CopilotAPI(ClassRouteMixin):
 
         .. sourcecode:: http
 
-          GET /map_info HTTP/1.1
+          GET /api/map_info HTTP/1.1
           Host: example.com
 
         **Example Response**:
@@ -299,7 +299,7 @@ class GW2CopilotAPI(ClassRouteMixin):
         .. sourcecode:: http
 
           HTTP/1.1 200 OK
-          Content-Type: application/json
+          Content-Type: text/javascript
 
           {
               "map_name": "Lion's Arch",
@@ -357,7 +357,7 @@ class GW2CopilotAPI(ClassRouteMixin):
 
         .. sourcecode:: http
 
-          GET /map_floors?continent=1&floor=1 HTTP/1.1
+          GET /api/map_floors?continent=1&floor=1 HTTP/1.1
           Host: example.com
 
         **Example Response**:
@@ -365,12 +365,12 @@ class GW2CopilotAPI(ClassRouteMixin):
         .. sourcecode:: http
 
           HTTP/1.1 200 OK
-          Content-Type: application/json
+          Content-Type: text/javascript
 
           <JSON here>
 
-        :query int continent: continent ID
-        :query int floor: floor number
+        :query integer continent: continent ID
+        :query integer floor: floor number
         :statuscode 200: successfully returned result
         """
         log_request(request)
@@ -412,7 +412,7 @@ class GW2CopilotAPI(ClassRouteMixin):
 
         .. sourcecode:: http
 
-          GET /tiles?continent=1&floor=1&zoom=1&x=x&y=y HTTP/1.1
+          GET /api/tiles?continent=1&floor=1&zoom=1&x=x&y=y HTTP/1.1
           Host: example.com
 
         **Example Response**:
@@ -424,11 +424,11 @@ class GW2CopilotAPI(ClassRouteMixin):
 
           <binary data>
 
-        :query int continent: continent ID
-        :query int floor: floor number
-        :query int zoom: zoom level
-        :query int x: x coordinate
-        :query int y: y coordinate
+        :query integer continent: continent ID
+        :query integer floor: floor number
+        :query integer zoom: zoom level
+        :query integer x: x coordinate
+        :query integer y: y coordinate
         :statuscode 200: successfully returned result
         :statuscode 500: invalid parameters
         :statuscode 403: tile not available
@@ -454,3 +454,103 @@ class GW2CopilotAPI(ClassRouteMixin):
         request.setResponseCode(statuscode, message=msg)
         request.setHeader("Content-Type", 'image/jpeg')
         return data
+
+    @classroute('zone_reminders', methods=['GET'])
+    def get_zone_reminders(self, request):
+        """
+        Retrieve the per-zone reminders user setting data from cache. This is
+        simply a wrapper around :py:attr:`~.CachingAPIClient.zone_reminders`.
+
+        This serves :http:get:`/api/zone_reminders` endpoint.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: JSON response data string
+        :rtype: str
+
+        <HTTPAPI>
+        Return the user-configured per-zone reminders as JSON.
+
+        Served by :py:meth:`.get_zone_reminders`.
+
+        **Example request**:
+
+        .. sourcecode:: http
+
+          GET /api/zone_reminders HTTP/1.1
+          Host: example.com
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+          HTTP/1.1 200 OK
+          Content-Type: text/javascript
+
+          [{"map_id": 15, "text": "my reminder"}]
+
+        :>jsonarr integer map_id: the map_id for the zone reminder is set on
+        :>jsonarr string text: reminder text
+        :statuscode 200: successfully returned result
+        """
+        log_request(request)
+        set_headers(request)
+        data = self.parent_server.cache.zone_reminders
+        statuscode = OK
+        msg = make_response('OK')
+        request.setResponseCode(statuscode, message=msg)
+        return make_response(json.dumps(data))
+
+
+    @classroute('zone_reminders', methods=['PUT'])
+    def set_zone_reminders(self, request):
+        """
+        Set the per-zone reminders user setting data in cache. This is
+        simply a wrapper around
+        :py:meth:`~.CachingAPIClient.set_zone_reminders`. Incoming data
+        completely replaces any existing data (PUT).
+
+        This serves :http:put:`/api/zone_reminders` endpoint.
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: JSON response data string
+        :rtype: str
+
+        <HTTPAPI>
+        Set the per-zone reminders user setting in cache to the supplied data.
+        Existing data is completely replaced.
+
+        Served by :py:meth:`~.GW2CopilotAPI.set_zone_reminders`.
+
+        **Example request**:
+
+        .. sourcecode:: http
+
+          PUT /api/zone_reminders HTTP/1.1
+          Content-Type: application/json
+          Host: example.com
+
+          [{"map_id": 15, "text": "my reminder"}]
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+          HTTP/1.1 201 Created
+          Content-Type: text/javascript
+
+          <empty response>
+
+        :<jsonarr integer map_id: the map_id for the zone reminder is set on
+        :<jsonarr string text: reminder text
+        :statuscode 201: saved to cache
+        """
+        log_request(request)
+        set_headers(request)
+        raw = request.content.getvalue()
+        data = json.loads(raw)
+        self.parent_server.cache.set_zone_reminders(data)
+        msg = make_response('UPSERTED')
+        request.setResponseCode(201, message=msg)
+        return

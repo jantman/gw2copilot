@@ -297,7 +297,8 @@ intersphinx_mapping = {
     'twisted': ('http://twistedmatrix.com/documents/current/api/', None),
     'psutil': ('https://pythonhosted.org/psutil/', None),
     'Jinja2': ('http://jinja.pocoo.org/docs/dev/', None),
-    'autobahn': ('https://autobahn-python.readthedocs.io/en/latest/', None)
+    'autobahn': ('https://autobahn-python.readthedocs.io/en/latest/', None),
+    'requests': ('http://docs.python-requests.org/en/master/', None)
 }
 
 autoclass_content = 'class'
@@ -317,7 +318,9 @@ linkcheck_ignore = [
 
 nitpick_ignore = [
     ('py:class', '_ctypes.Structure'),
-    ('py:obj', 'klein.resource.KleinResource')
+    ('py:obj', 'klein.resource.KleinResource'),
+    ('http:obj', 'integer'),
+    ('http:obj', 'string')
 ]
 
 # exclude module docstrings - see http://stackoverflow.com/a/18031024/211734

@@ -67,6 +67,7 @@ class CachingAPIClient(object):
         self._api_key = api_key
         self._characters = {}  # these don't get cached to disk
         self._all_maps = None  # cache in memory as well
+        self._zone_reminders = None  # cache in memory as well
         if not os.path.exists(cache_dir):
             logger.debug('Creating cache directory at: %s', cache_dir)
             os.makedirs(cache_dir, 0700)
@@ -322,3 +323,32 @@ class CachingAPIClient(object):
         self._cache_set('tiles', cache_key, r.content, binary=True,
                         extension='jpg')
         return r.content
+
+    @property
+    def zone_reminders(self):
+        """
+        Return list of zone reminders. Each list element is a dict with keys
+        "map_id" (int map ID) and "text" (string).
+
+        :return: zone reminders (list of dicts)
+        :rtype: list
+        """
+        if self._zone_reminders is not None:
+            return self._zone_reminders
+        r = self._cache_get('user_settings', 'zone_reminders')
+        if r is None:
+            r = []
+        self._zone_reminders = r
+        return r
+
+    def set_zone_reminders(self, reminders):
+        """
+        Set the zone_reminders in cache and in memory. Parameter is a list of
+        zone reminders. Each list element is a dict with keys "map_id"
+        (int map ID) and "text" (string).
+
+        :param reminders: list of reminder dicts
+        :type reminders: list
+        """
+        self._zone_reminders = reminders
+        self._cache_set('user_settings', 'zone_reminders', reminders)
