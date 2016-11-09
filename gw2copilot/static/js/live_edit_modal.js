@@ -114,3 +114,61 @@ $(function () {
         }
     });
 });
+
+/**
+ * Handle the "edit reminders" link modal
+ */
+function handleEditReminders() {
+    // populate the appendGrid table
+    $.ajax({
+        url: "/api/zone_reminders"
+    }).done(function( data ){
+        data = JSON.parse(data);
+        if ( data != '[]' ) {
+            $('#zoneRemindersTable').appendGrid('load', data);
+        }
+        $("#remindersModal").modal("show");
+    });
+    return false;
+}
+
+/**
+ * Handle the "Save" button on the Edit Reminders modal
+ */
+$('#saveZoneRemindersTable').click(function () {
+    data = [];
+    $('#remindersModal tbody tr')
+      .each(function( index ) {
+          d = {
+              'map_id': $(this).find('select').first().find(':selected').val(),
+              'text': $.trim($(this).find('input').first().val())
+          };
+          if ( d['map_id'] != 0 && d['text'] != '' ) { data.push(d); }
+    });
+    if ( data.length == 0 ) { return false; }
+    s = JSON.stringify(data);
+    $.ajax({
+        url: '/api/zone_reminders',
+        type: 'PUT',
+        data: s,
+        success: function(data) {
+            $("#remindersModal").modal("hide");
+
+        }
+    });
+});
+
+/**
+ * Update the in-memory zone reminders object, from the list of reminders.
+ *
+ * @param {array} rlist - list of reminder objects, as seen in
+ *   ``handleEditReminders()`` and ``$('#saveZoneRemindersTable').click()``
+ */
+function makeZoneRemindersCache(rlist) {
+    c = {};
+    rlist.map( function(item) {
+        // item is the reminder object
+
+    });
+    P.zone_reminders = c;
+}

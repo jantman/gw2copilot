@@ -43,7 +43,8 @@ var sock = null;
 var P = {
     dict: null,
     map_info: null,
-    position: null
+    position: null,
+    zone_reminders: {}
 };
 
 /**
@@ -88,32 +89,6 @@ window.onload = function() {
 
     getInitialData();
 };
-
-/**
- * Handle the "edit reminders" link modal
- */
-function handleEditReminders() {
-    $("#remindersModal").modal("show");
-    console.log("TODO: populate data from server THEN show");
-    return false;
-}
-
-/**
- * Handle the "Save" button on the Edit Reminders modal
- */
-$('#saveZoneRemindersTable').click(function () {
-    data = [];
-    $('#remindersModal tbody tr')
-      .each(function( index ) {
-          d = {
-              'map_id': $(this).find('select').first().find(':selected').val(),
-              'text': $(this).find('input').first().val()
-          };
-          if ( d['map_id'] != 0 ) { data.push(d); }
-      });
-    console.log(data);
-    // TODO - POST to server as JSON
-});
 
 /**
  * Handle an incoming websocket message; dispatch it to the correct
