@@ -50,6 +50,7 @@ var m = {
         waypoints: []
     },
     ZOOM_THRESH: 4, // cutoff between showing detailed data or not; >= this is detailed
+    lastShownZone: null
 };
 
 var ICONS = {
@@ -244,9 +245,9 @@ function addLayers() {
         //m.layerGroups.waypoints.push(m.zones[map_id].layers.waypoints);
 
         // add the borders layer and set mouse handlers on it
-        m.zones[map_id].layers.borders.on('mouseover', function(e) { handleZoneMouseIn(e, map_id); });
-        m.zones[map_id].layers.borders.on('mouseout', function(e) { handleZoneMouseOut(e, map_id); });
-        m.zones[map_id].layers.borders.on('contextmenu', function(e) { handleZoneContextMenu(e, map_id); });
+        m.zones[map_id].layers.borders.on('mouseover', handleZoneMouseIn, { map_id: map_id });
+        m.zones[map_id].layers.borders.on('mouseout', handleZoneMouseOut, { map_id: map_id });
+        m.zones[map_id].layers.borders.on('contextmenu', handleZoneContextMenu, { map_id: map_id });
         m.zones[map_id].layers.borders.addTo(map);
     }
     console.log("done adding layers.");
@@ -263,7 +264,6 @@ function addZoneMarkersToLayers(map_id) {
     // waypoints
     for (idx in MAP_INFO[map_id]["points_of_interest"]["waypoint"]) {
         poi = MAP_INFO[map_id]["points_of_interest"]["waypoint"][idx];
-        console.log(poi);
         layers.waypoints.addLayer(
             L.marker(
                 gw2latlon(poi["coord"]),
@@ -281,55 +281,57 @@ function addZoneMarkersToLayers(map_id) {
 /**
  * Handler for when the user's mouse/cursor enters a zone layer.
  *
+ * The handler's context (``this``) will be an object with one property,
+ * ``map_id``.
+ *
  * @param {MouseEvent} e - Leaflet
  *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
- * @param {int} map_id - map_id that layer corresponds to
  */
-function handleZoneMouseIn(e, map_id) {
-    console.log("Mouse entered " + map_id);
-    console.log("zoom=" + map.getZoom());
-    if (map.getZoom() >= m.ZOOM_THRESH) {
-        m.zones[map_id].layers.waypoints.addTo(map);
-        m.zones[map_id].layers.waypoints.bringToFront();
+function handleZoneMouseIn(e) {
+    //console.log("Mouse entered " + this.map_id);
+    // only toggle markers on mouse if zoomed out past m.ZOOM_THRESH
+    if (map.getZoom() < m.ZOOM_THRESH) {
+        if (m.lastShownZone !== null && m.lastShownZone != this.map_id) {
+            map.removeLayer(m.zones[m.lastShownZone].layers.waypoints);
+        }
+        console.log("add waypoints for map_id " + this.map_id);
+        map.addLayer(m.zones[this.map_id].layers.waypoints);
+        m.zones[map_id].layers.borders.bringToFront();
+        console.log(m.zones[this.map_id].layers.waypoints);
+        m.lastShownZone = this.map_id;
     }
-    /*
-    e.target.setStyle({
-        weight: 5,
-        color: '#03f',
-        dashArray: '',
-        fillOpacity: 0.7,
-        fill: true
-    });
-    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-        e.target.bringToFront();
-    }
-    */
 }
 
 /**
  * Handler for when the user's mouse/cursor exits a zone layer.
  *
+ * The handler's context (``this``) will be an object with one property,
+ * ``map_id``.
+ *
  * @param {MouseEvent} e - Leaflet
  *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
- * @param {int} map_id - map_id that layer corresponds to
  */
-function handleZoneMouseOut(e, map_id) {
-    console.log("Mouse exited " + map_id);
-    console.log("zoom=" + map.getZoom());
-    if (map.getZoom() >= m.ZOOM_THRESH) {
-        map.removeLayer(m.zones[map_id].layers.waypoints);
+function handleZoneMouseOut(e) {
+    if (! e.target.getBounds().contains(e.latlng)) {
+        //console.log("Mouse exited " + this.map_id);
+        // only toggle markers on mouse if zoomed out past m.ZOOM_THRESH
+        if (map.getZoom() < m.ZOOM_THRESH) {
+            console.log("remove waypoints for map_id " + this.map_id);
+            map.removeLayer(m.zones[this.map_id].layers.waypoints);
+        }
     }
-    //e.target.setStyle(initial_layer_style);
 }
 
 /**
  * Handler for when the user right-clicks on a zone layer.
  *
+ * The handler's context (``this``) will be an object with one property,
+ * ``map_id``.
+ *
  * @param {MouseEvent} e - Leaflet
  *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
- * @param {int} map_id - map_id that layer corresponds to
  */
-function handleZoneContextMenu(e, map_id) {
+function handleZoneContextMenu(e) {
     console.log("Right-click on zone layer " + map_id);
     console.log(e);
 }

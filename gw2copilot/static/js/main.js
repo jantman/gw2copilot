@@ -94,3 +94,22 @@ function objectValues(obj) {
     }
     return props;
 }
+
+/**
+ * Return true if the specified position is inside the specified map, or false
+ * otherwise.
+ *
+ * @param {LatLng} pos - position to test
+ * @param {integer} map_id - map_id to test if it's in
+ */
+function positionInMap(pos, map_id) {
+    data = MAP_INFO[map_id];
+    ne = gw2latlon(data.continent_rect[0]);
+    sw = gw2latlon(data.continent_rect[1]);
+
+    if ((ne.lat <= pos.lat <= sw.lat || ne.lat >= pos.lat >= sw.lat) &&
+       (ne.lng <= pos.lng <= sw.lng || ne.lng >= pos.lng >= sw.lng)) {
+        return true;
+    }
+    return false;
+}
