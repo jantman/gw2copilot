@@ -41,6 +41,7 @@ import sys
 from .version import VERSION
 import logging
 import inspect
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -97,3 +98,20 @@ def log_request(request):
                 str(request.method), request.uri,
                 request.client.host, request.client.port, caller
                 )
+
+
+def dict2js(varname, data):
+    """
+    Convert dict ``data`` to javascript source code for a javascript variable
+    named ``varname``.
+
+    :param varname: name of the JS source variable
+    :type varname: str
+    :param data: dict to represent as an object
+    :type data: dict
+    :return: javascript source snippet
+    :rtype: str
+    """
+    return "var %s = %s;\n" % (
+        varname, json.dumps(data, sort_keys=True, indent=4)
+    )

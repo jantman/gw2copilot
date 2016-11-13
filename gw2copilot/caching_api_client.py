@@ -43,6 +43,9 @@ import os
 import json
 import urllib
 
+from .utils import dict2js
+from .static_data import world_zones
+
 logger = logging.getLogger(__name__)
 
 
@@ -79,6 +82,7 @@ class CachingAPIClient(object):
         """
         # ensure we have all map data cached
         _ = self.all_maps
+        self._make_map_data_js()
 
     def _cache_path(self, cache_type, cache_key, extn):
         """
@@ -128,7 +132,7 @@ class CachingAPIClient(object):
         j = json.loads(raw)
         return j
 
-    def _cache_set(self, cache_type, cache_key, data, binary=False,
+    def _cache_set(self, cache_type, cache_key, data, binary=False, raw=False,
                    extension='json'):
         """
         Cache the given data.
@@ -141,6 +145,8 @@ class CachingAPIClient(object):
         :type data: dict
         :param binary: if True, write as binary data
         :type binary: bool
+        :param raw: if True, write exact string provided
+        :type raw: bool
         :param extension: file extension to save in cache with
         :type extension: str
         """
@@ -153,6 +159,10 @@ class CachingAPIClient(object):
             os.mkdir(cd, 0700)
         if binary:
             with open(p, 'wb') as fh:
+                fh.write(data)
+            return
+        if raw:
+            with open(p, 'w') as fh:
                 fh.write(data)
             return
         raw = json.dumps(data)
@@ -204,7 +214,25 @@ class CachingAPIClient(object):
             maps[_id] = self.map_data(_id)
         logger.info('Cached all map data')
         self._all_maps = maps
+        self._cache_set('mapdata', 'all_maps', maps)
         return self._all_maps
+
+    def _make_map_data_js(self):
+        """
+        Write a javascript source file to
+        ``{self._cache_dir}/mapdata/mapdata.js`` that contains javascript source
+        for ``all_maps`` as well as the standard world zones, as id to name and
+        name to id.
+        """
+        s = "// generated at server start by gw2copilot.caching_api_client." \
+            "CachingAPIClient._make_map_data_js()\n"
+        s += dict2js('MAP_INFO', self._all_maps)
+        s += dict2js('WORLD_ZONES_IDtoNAME', world_zones)
+        zones_name_to_id = {}
+        for id, name in world_zones.iteritems():
+            zones_name_to_id[name] = id
+        s += dict2js('WORLD_ZONES_NAMEtoID', zones_name_to_id)
+        self._cache_set('mapdata', 'mapdata', s, extension='js', raw=True)
 
     def map_data(self, map_id):
         """
