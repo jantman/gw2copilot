@@ -83,6 +83,7 @@ class CachingAPIClient(object):
         # ensure we have all map data cached
         _ = self.all_maps
         self._make_map_data_js()
+        self._get_gw2_api_files()
 
     @property
     def cache_dir(self):
@@ -361,6 +362,57 @@ class CachingAPIClient(object):
         self._cache_set('tiles', cache_key, r.content, binary=True,
                         extension='jpg')
         return r.content
+
+    def _get_gw2_api_files(self):
+        """
+        Get assets that we need from the GW2
+        `files API <https://wiki.guildwars2.com/wiki/API:1/files>`_ and add them
+        to cache; this is mainly map icons.
+        """
+        files_to_get = [
+            'map_adventure',
+            'map_adventure_complete',
+            'map_adventure_locked',
+            'map_complete',
+            'map_heart_empty',
+            'map_heart_full',
+            'map_heropoint',
+            'map_node_harvesting',
+            'map_node_logging',
+            'map_node_mining',
+            'map_poi',
+            'map_special_event',
+            'map_story',
+            'map_vista',
+            'map_waypoint',
+            'map_waypoint_contested',
+            'map_waypoint_hover',
+        ]
+        logger.debug('Getting assets from GW2 files API')
+        r = self._get('/v1/files.json', auth=True)
+        files = r.json()
+        for name in files_to_get:
+            if os.path.exists(self._cache_path('assets', name, 'png')):
+                logger.debug('Already have asset: %s', name)
+                continue
+            if name not in files:
+                logger.error("Error: /v1/files no longer contains: %s", name)
+                continue
+            f = files[name]
+            url = '{base}/file/{signature}/{file_id}.{format}'.format(
+                base='https://render.guildwars2.com',
+                signature=f['signature'],
+                file_id=f['file_id'],
+                format='png'
+            )
+            r = requests.get(url)
+            if r.status_code != 200:
+                logger.debug("HTTP %d response for %s: %s", r.status_code, url,
+                             r.text)
+                continue
+            self._cache_set('assets', name, r.content, binary=True,
+                            extension='png')
+        logger.debug('Done getting assets')
 
     @property
     def zone_reminders(self):
