@@ -44,7 +44,8 @@ var m = {
     WORLD_COORDS: [-152, 126],
     playerMarker: null,
     playerLatLng: null,
-    followPlayer: false
+    followPlayer: false,
+    zones: {}
 };
 
 /* initialize map */
@@ -174,6 +175,11 @@ function latlon2gw(latlon) {
     return map.project(latlon, map.getMaxZoom());
 }
 
+/**
+ * Add the player marker at the current position.
+ *
+ * @param {array} latlng - (x, y) map Lat/Long position
+ */
 function addPlayerMarker(latlng) {
     var playerIcon = L.icon({
         iconUrl: '/static/img/crosshair_32x32.png',
@@ -186,6 +192,78 @@ function addPlayerMarker(latlng) {
         .addTo(map);
 }
 
+/**
+ * Add the per-zone layers to the map.
+ */
 function addLayers() {
     console.log("adding layers");
+    for (map_id in WORLD_ZONES_IDtoNAME) {
+        data = MAP_INFO[map_id];
+        layer_bounds = [
+            gw2latlon(data.continent_rect[0]),
+            gw2latlon(data.continent_rect[1])
+        ]
+        console.log("map_id=" + map_id + " layer_bounds=" + layer_bounds);
+        // build the data object, and the layers
+        m.zones[map_id] = {
+            data: data,
+            layers: {
+                borders: L.rectangle(layer_bounds)
+            }
+        };
+        // create the featureGroup
+        m.zones[map_id].feature_group = L.featureGroup(
+            objectValues(m.zones[map_id].layers)
+        );
+        m.zones[map_id].feature_group.on('mouseover', handleZoneMouseIn);
+        m.zones[map_id].feature_group.on('mouseout', handleZoneMouseOut);
+        m.zones[map_id].feature_group.on('dblclick', handleZoneDblClick);
+        m.zones[map_id].feature_group.on('contextmenu', handleZoneContextMenu);
+        m.zones[map_id].feature_group.addTo(map);
+    }
+    console.log("done adding layers.");
+}
+
+/**
+ * Handler for when the user's mouse/cursor enters a zone layer.
+ *
+ * @param {MouseEvent} e - Leaflet
+ *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
+ */
+function handleZoneMouseIn(e) {
+    console.log("Mouse entered");
+    console.log(e);
+}
+
+/**
+ * Handler for when the user's mouse/cursor exits a zone layer.
+ *
+ * @param {MouseEvent} e - Leaflet
+ *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
+ */
+function handleZoneMouseOut(e) {
+    console.log("Mouse exited");
+    console.log(e);
+}
+
+/**
+ * Handler for when the user right-clicks on a zone layer.
+ *
+ * @param {MouseEvent} e - Leaflet
+ *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
+ */
+function handleZoneContextMenu(e) {
+    console.log("Right-click on zone layer");
+    console.log(e);
+}
+
+/**
+ * Handler for when the user double-clicks on a zone layer.
+ *
+ * @param {MouseEvent} e - Leaflet
+ *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
+ */
+function handleZoneDblClick(e) {
+    console.log("Double-click on zone layer");
+    console.log(e);
 }

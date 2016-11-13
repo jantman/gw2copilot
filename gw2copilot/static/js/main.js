@@ -50,7 +50,17 @@ $(document).ready(function () {
     };
 });
 
-// from https://gist.github.com/umidjons/9614157
+
+
+/**
+ * Given an Object, return an array of its properties as [key, value] arrays,
+ * sorted by value.
+ *
+ * from https://gist.github.com/umidjons/9614157
+ *
+ * @param {Object} obj - input object
+ * @returns {Array} array of [key, value] object property arrays, sorted by val
+ */
 function sortProperties(obj)
 {
   // convert object into array
@@ -67,4 +77,20 @@ function sortProperties(obj)
         return x<y ? -1 : x>y ? 1 : 0;
     });
     return sortable; // array in format [ [ key1, val1 ], [ key2, val2 ], ... ]
+}
+
+/**
+ * Given an object, return an array of the values of all of its properties.
+ *
+ * @param {Object} obj - input object
+ * @returns {Array} array of obj's property values
+ */
+function objectValues(obj) {
+    props = [];
+    for(key in obj){
+        if(obj.hasOwnProperty(key)) {
+            props.push(obj[key]);
+        }
+    }
+    return props;
 }
