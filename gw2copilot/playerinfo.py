@@ -132,15 +132,19 @@ class PlayerInfo(object):
     @property
     def position(self):
         """
-        Return the player's current (x, y) continent coordinates.
+        Return the player's current (x, y) continent coordinates and map_id.
 
         **Note:** when updating this property, also update the documentation on
         :http:get:`/api/position`.
 
-        :return: 2-tuple, (x, y) continent coordinates (floats).
+        :return: dict: "position", 2-tuple, (x, y) of float continent
+          coordinates and "map_id" (int, map id)
         :rtype: tuple
         """
-        return self._position
+        return {
+            'position': self._position,
+            'map_id': self._current_map
+        }
 
     @property
     def map_info(self):

@@ -43,10 +43,9 @@ var sock = null;
 var P = {
     /* player dict; updated by handleUpdatePlayerDict() */
     dict: null,
-    /* map information; updated by handleUpdateMapInfo() */
-    map_info: null,
-    /* position information; updated by handleUpdatePosition() */
+    /* position information and map_id; updated by handleUpdatePosition() */
     position: null,
+    map_id: null,
     /* object with keys of map_id, values list of string zone reminders */
     /* updated by live_edit_modal.js makeZoneRemindersCache() */
     zone_reminders: {}
@@ -83,7 +82,7 @@ window.onload = function() {
        }
 
        sock.onmessage = function(e) {
-          console.log("Got websocket message: " + e.data);
+          //console.log("Got websocket message: " + e.data);
           j = JSON.parse(e.data);
           if ( j["type"] == "tick" ) {
               console.log("ignoring websocket tick");
@@ -102,11 +101,9 @@ window.onload = function() {
  * @param {object} data - the JSON-decoded message content
  */
 function handleWebSocketMessage(data) {
-    console.log("handleWebSocketMessage(" + JSON.stringify(data) + ")");
+    //console.log("handleWebSocketMessage(" + JSON.stringify(data) + ")");
     if ( data.type == "position") {
         handleUpdatePosition(data.data);
-    } else if ( data.type == "map_info" ) {
-        handleUpdateMapInfo(data.data);
     } else if ( data.type == "player_dict" ) {
         handleUpdatePlayerDict(data.data);
     } else {
@@ -129,11 +126,6 @@ function getInitialData() {
         handleUpdatePlayerDict(data);
     });
     $.ajax({
-        url: "/api/map_info"
-    }).done(function( data ){
-        handleUpdateMapInfo(data);
-    });
-    $.ajax({
         url: "/api/position"
     }).done(function( data ){
         handleUpdatePosition(data);
@@ -149,7 +141,7 @@ function getInitialData() {
  * @param {object} data - player_dict data
  */
 function handleUpdatePlayerDict(data) {
-    console.log("handleUpdatePlayerData(" + JSON.stringify(data) + ")");
+    //console.log("handleUpdatePlayerData(" + JSON.stringify(data) + ")");
     if ( P.dict != data ) {
         $("#player_info_header").text(
             data["name"] + " (" + data["level"] + " " + data["race"] + " " +
@@ -160,31 +152,14 @@ function handleUpdatePlayerDict(data) {
 }
 
 /**
- * Handle an update to the map_info data
- *
- * @param {object} data - map_info data
- */
-function handleUpdateMapInfo(data) {
-    console.log("handleUpdateMapInfo(" + JSON.stringify(data) + ")");
-    if ( P.map_info != data ) {
-        $("#map_info_header").text(
-            data["map_name"] + " (" + data["map_level_range"] + "), " +
-            data["region_name"] + ", " + data["continent_name"]
-        );
-        P.map_info = data;
-        doZoneReminder(data["map_id"]);
-    }
-}
-
-/**
  * Handle an update to the position data
  *
  * @param {array} data - position data
  */
 function handleUpdatePosition(data) {
-    console.log("handleUpdatePosition(" + JSON.stringify(data) + ")");
-    P.position = data;
-    m.playerLatLng = gw2latlon(data);
+    //console.log("handleUpdatePosition(" + JSON.stringify(data) + ")");
+    P.position = data["position"];
+    m.playerLatLng = gw2latlon(P.position);
     if ( m.playerMarker === null ) {
         addPlayerMarker(m.playerLatLng);
     } else {
@@ -192,6 +167,20 @@ function handleUpdatePosition(data) {
     }
     if ( m.followPlayer === true ) {
         map.panTo(m.playerLatLng);
+    }
+    if ( P.map_id === null || P.map_id != data["map_id"] ) {
+        console.log("change maps from " + P.map_id + " to " + data["map_id"]);
+        P.map_id = data["map_id"];
+        $("#map_info_header").text(
+            MAP_INFO[P.map_id]["map_name"] +
+            " (" +
+            MAP_INFO[P.map_id]["min_level"] + "-" +
+            MAP_INFO[P.map_id]["max_level"] +
+            "), " +
+            MAP_INFO[P.map_id]["region_name"] + ", " +
+            MAP_INFO[P.map_id]["continent_name"]
+        );
+        doZoneReminder(P.map_id);
     }
 }
 

@@ -168,8 +168,8 @@ class GW2CopilotAPI(ClassRouteMixin):
     @classroute('position')
     def position(self, request):
         """
-        Return the player's current position. This returns the exact return
-        value of :py:attr:`~.PlayerInfo.position`.
+        Return the player's current position and map_id. This returns the exact
+        return value of :py:attr:`~.PlayerInfo.position`.
 
         This serves :http:get:`/api/position` endpoint.
 
@@ -197,10 +197,11 @@ class GW2CopilotAPI(ClassRouteMixin):
           HTTP/1.1 200 OK
           Content-Type: text/javascript
 
-          [1.234, 5.678]
+          {"position": [1.234, 5.678], "map_id": 123}
 
-        :>jsonarr x: *(float)* player's X coordinate
-        :>jsonarr y: *(float)* player's Y coordinate
+        :>json position: *(array)* array of player's current position,
+          [x (float), y (float)]
+        :>json map_id: *(int)* player's current map_id
         :statuscode 200: successfully returned result
         """
         log_request(request)
