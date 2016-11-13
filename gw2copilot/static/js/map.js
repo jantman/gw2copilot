@@ -192,6 +192,11 @@ function addPlayerMarker(latlng) {
         .addTo(map);
 }
 
+var initial_layer_style = {
+    weight: 0,
+    fill: false
+};
+
 /**
  * Add the per-zone layers to the map.
  */
@@ -203,22 +208,26 @@ function addLayers() {
             gw2latlon(data.continent_rect[0]),
             gw2latlon(data.continent_rect[1])
         ]
-        console.log("map_id=" + map_id + " layer_bounds=" + layer_bounds);
         // build the data object, and the layers
         m.zones[map_id] = {
             data: data,
             layers: {
-                borders: L.rectangle(layer_bounds)
+                borders: L.rectangle(layer_bounds).setStyle(initial_layer_style)
             }
         };
         // create the featureGroup
         m.zones[map_id].feature_group = L.featureGroup(
             objectValues(m.zones[map_id].layers)
         );
-        m.zones[map_id].feature_group.on('mouseover', handleZoneMouseIn);
-        m.zones[map_id].feature_group.on('mouseout', handleZoneMouseOut);
-        m.zones[map_id].feature_group.on('dblclick', handleZoneDblClick);
-        m.zones[map_id].feature_group.on('contextmenu', handleZoneContextMenu);
+        m.zones[map_id].feature_group.on('mouseover', function(e) {
+            handleZoneMouseIn(e, map_id);
+        });
+        m.zones[map_id].feature_group.on('mouseout', function(e) {
+            handleZoneMouseOut(e, map_id);
+        });
+        m.zones[map_id].feature_group.on('contextmenu', function(e) {
+            handleZoneContextMenu(e, map_id);
+        });
         m.zones[map_id].feature_group.addTo(map);
     }
     console.log("done adding layers.");
@@ -229,10 +238,21 @@ function addLayers() {
  *
  * @param {MouseEvent} e - Leaflet
  *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
+ * @param {int} map_id - map_id that layer corresponds to
  */
-function handleZoneMouseIn(e) {
-    console.log("Mouse entered");
+function handleZoneMouseIn(e, map_id) {
+    console.log("Mouse entered " + map_id);
     console.log(e);
+    e.target.setStyle({
+        weight: 5,
+        color: '#03f',
+        dashArray: '',
+        fillOpacity: 0.7,
+        fill: true
+    });
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        e.target.bringToFront();
+    }
 }
 
 /**
@@ -240,10 +260,12 @@ function handleZoneMouseIn(e) {
  *
  * @param {MouseEvent} e - Leaflet
  *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
+ * @param {int} map_id - map_id that layer corresponds to
  */
-function handleZoneMouseOut(e) {
-    console.log("Mouse exited");
+function handleZoneMouseOut(e, map_id) {
+    console.log("Mouse exited " + map_id);
     console.log(e);
+    e.target.setStyle(initial_layer_style);
 }
 
 /**
@@ -251,19 +273,9 @@ function handleZoneMouseOut(e) {
  *
  * @param {MouseEvent} e - Leaflet
  *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
+ * @param {int} map_id - map_id that layer corresponds to
  */
-function handleZoneContextMenu(e) {
-    console.log("Right-click on zone layer");
-    console.log(e);
-}
-
-/**
- * Handler for when the user double-clicks on a zone layer.
- *
- * @param {MouseEvent} e - Leaflet
- *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
- */
-function handleZoneDblClick(e) {
-    console.log("Double-click on zone layer");
+function handleZoneContextMenu(e, map_id) {
+    console.log("Right-click on zone layer " + map_id);
     console.log(e);
 }
