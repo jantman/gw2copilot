@@ -48,12 +48,19 @@ var m = {
     zones: {},
     layerGroups: {
         waypoints: []
-    }
+    },
+    ZOOM_THRESH: 4, // cutoff between showing detailed data or not; >= this is detailed
 };
 
 var ICONS = {
     player: L.icon({
         iconUrl: '/static/img/crosshair_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    waypoint: L.icon({
+        iconUrl: '/cache/assets/map_waypoint_32x32.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 0]
@@ -85,6 +92,13 @@ $(document).ready(function () {
 /******************************************************
  Binding functions for map-related buttons and clicks
  ******************************************************/
+
+/**
+ * Handle clicks on the map.
+ *
+ * @param {MouseEvent} e - Leaflet
+ *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
+ */
 function onMapClick(e) {
     popup
         .setLatLng(e.latlng)
@@ -227,22 +241,13 @@ function addLayers() {
         addZoneMarkersToLayers(map_id);
 
         // add layer groups to the global lists for toggling
-        m.layerGroups.waypoints.push(m.zones[map_id].layers.waypoints);
+        //m.layerGroups.waypoints.push(m.zones[map_id].layers.waypoints);
 
-        // create the featureGroup
-        m.zones[map_id].feature_group = L.featureGroup(
-            objectValues(m.zones[map_id].layers)
-        );
-        m.zones[map_id].feature_group.on('mouseover', function(e) {
-            handleZoneMouseIn(e, map_id);
-        });
-        m.zones[map_id].feature_group.on('mouseout', function(e) {
-            handleZoneMouseOut(e, map_id);
-        });
-        m.zones[map_id].feature_group.on('contextmenu', function(e) {
-            handleZoneContextMenu(e, map_id);
-        });
-        m.zones[map_id].feature_group.addTo(map);
+        // add the borders layer and set mouse handlers on it
+        m.zones[map_id].layers.borders.on('mouseover', function(e) { handleZoneMouseIn(e, map_id); });
+        m.zones[map_id].layers.borders.on('mouseout', function(e) { handleZoneMouseOut(e, map_id); });
+        m.zones[map_id].layers.borders.on('contextmenu', function(e) { handleZoneContextMenu(e, map_id); });
+        m.zones[map_id].layers.borders.addTo(map);
     }
     console.log("done adding layers.");
 }
@@ -265,7 +270,8 @@ function addZoneMarkersToLayers(map_id) {
                 {
                     title: poi.name + " (" + poi.poi_id + ")",
                     alt: poi.name + " (" + poi.poi_id + ")",
-                    riseOnHover: true
+                    riseOnHover: true,
+                    icon: ICONS.waypoint
                 }
             )
         );
@@ -281,7 +287,12 @@ function addZoneMarkersToLayers(map_id) {
  */
 function handleZoneMouseIn(e, map_id) {
     console.log("Mouse entered " + map_id);
-    console.log(e);
+    console.log("zoom=" + map.getZoom());
+    if (map.getZoom() >= m.ZOOM_THRESH) {
+        m.zones[map_id].layers.waypoints.addTo(map);
+        m.zones[map_id].layers.waypoints.bringToFront();
+    }
+    /*
     e.target.setStyle({
         weight: 5,
         color: '#03f',
@@ -292,6 +303,7 @@ function handleZoneMouseIn(e, map_id) {
     if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
         e.target.bringToFront();
     }
+    */
 }
 
 /**
@@ -303,8 +315,11 @@ function handleZoneMouseIn(e, map_id) {
  */
 function handleZoneMouseOut(e, map_id) {
     console.log("Mouse exited " + map_id);
-    console.log(e);
-    e.target.setStyle(initial_layer_style);
+    console.log("zoom=" + map.getZoom());
+    if (map.getZoom() >= m.ZOOM_THRESH) {
+        map.removeLayer(m.zones[map_id].layers.waypoints);
+    }
+    //e.target.setStyle(initial_layer_style);
 }
 
 /**
