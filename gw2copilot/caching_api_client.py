@@ -84,6 +84,16 @@ class CachingAPIClient(object):
         _ = self.all_maps
         self._make_map_data_js()
 
+    @property
+    def cache_dir(self):
+        """
+        Return the current cache directory on disk.
+
+        :return: cache directory path
+        :rtype: str
+        """
+        return self._cache_dir
+
     def _cache_path(self, cache_type, cache_key, extn):
         """
         Return the path on disk to the cache file of the given type and key.

@@ -122,19 +122,86 @@ class GW2CopilotSite(ClassRouteMixin):
         """
         Meta-endpoint for serving static files from the ``static/`` directory.
 
-        This serves the ``/static/`` endpoint via
-        :py:class:twisted.web.static.File`
+        This serves the :http:get:`/static/` endpoint via
+        :py:class:`twisted.web.static.File`
 
         :param request: incoming HTTP request
         :type request: :py:class:`twisted.web.server.Request`
         :return: Twisted File resource
         :rtype: twisted.web.static.File
+
+        <HTTPAPI>
+        Serve a static file from the source package, under ``/static/``.
+
+        Served by :py:meth:`.static_files`.
+
+        **Example request**:
+
+        .. sourcecode:: http
+
+          GET /static/js/main.js HTTP/1.1
+          Host: example.com
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+          HTTP/1.1 200 OK
+          Content-Type: text/javascript
+
+          <content of file here>
+
+        :statuscode 200: successfully returned result
         """
         log_request(request)
         path = os.path.join(
             os.path.abspath(os.path.dirname(__file__)),
             'static'
         )
+        set_headers(request)
+        return File(path)
+
+    @classroute('cache/', branch=True)
+    def cache_files(self, request):
+        """
+        Meta-endpoint for serving program-generated cache files from the
+        :py:class:`~.CachingAPIClient` ``cache_dir`` directory. This directly
+        serves files that are written to the on-disk cache by
+        :py:class:`~.CachingAPIClient`.
+
+        This serves the :http:get:`/cache/` endpoint via
+        :py:class:`twisted.web.static.File`
+
+        :param request: incoming HTTP request
+        :type request: :py:class:`twisted.web.server.Request`
+        :return: Twisted File resource
+        :rtype: twisted.web.static.File
+
+        <HTTPAPI>
+        Serve a cache file written to disk by :py:class:`~.CachingAPIClient`.
+
+        Served by :py:meth:`.cache_files`.
+
+        **Example request**:
+
+        .. sourcecode:: http
+
+          GET /cache/mapdata/mapdata.js HTTP/1.1
+          Host: example.com
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+          HTTP/1.1 200 OK
+          Content-Type: text/javascript
+
+          <content of file here>
+
+        :statuscode 200: successfully returned result
+        """
+        log_request(request)
+        path = os.path.abspath(self.parent_server.cache.cache_dir)
         set_headers(request)
         return File(path)
 
