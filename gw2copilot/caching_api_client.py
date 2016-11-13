@@ -71,6 +71,7 @@ class CachingAPIClient(object):
         self._characters = {}  # these don't get cached to disk
         self._all_maps = None  # cache in memory as well
         self._zone_reminders = None  # cache in memory as well
+        self._map_floors = {}  # cached in memory as well
         if not os.path.exists(cache_dir):
             logger.debug('Creating cache directory at: %s', cache_dir)
             os.makedirs(cache_dir, 0700)
@@ -247,7 +248,9 @@ class CachingAPIClient(object):
 
     def map_data(self, map_id):
         """
-        Return dict of map data for the given map ID.
+        Return dict of map data for the given map ID. This combines the data
+        container in the GW2 API's ``/v1/maps.json?map_id=ID`` endpoint with
+        the POI information from the ``/v1/map_floor.json`` endpoint.
 
         :param map_id: requested map ID
         :type map_id: int
@@ -263,6 +266,23 @@ class CachingAPIClient(object):
         logger.debug('Got map data (HTTP status %d) response length %d',
                      r.status_code, len(r.text))
         result = r.json()['maps'][str(map_id)]
+        # get the floor
+        floor = self.map_floor(result['continent_id'], result['default_floor'])
+        try:
+            f_info = floor['regions'][
+                str(result['region_id'])]['maps'][str(map_id)]
+            result['points_of_interest'] = {}
+            for poi in f_info['points_of_interest']:
+                if poi['type'] not in result['points_of_interest']:
+                    result['points_of_interest'][poi['type']] = []
+                result['points_of_interest'][poi['type']].append(poi)
+            result['skill_challenges'] = f_info.get('skill_challenges', [])
+            result['tasks'] = f_info.get('tasks', [])
+        except (TypeError, KeyError):
+            logger.error("Could not find floor info for map_id %d "
+                         "(contient_id=%d default_floor=%d region_id=%d)",
+                         map_id, result['continent_id'],
+                         result['default_floor'], result['region_id'])
         self._cache_set('mapdata', map_id, result)
         return result
 
@@ -279,8 +299,11 @@ class CachingAPIClient(object):
         :rtype: dict
         """
         key = '%d_%d' % (continent_id, floor)
+        if key in self._map_floors:
+            return self._map_floors[key]
         cached = self._cache_get('map_floors', key)
         if cached is not None:
+            self._map_floors[key] = cached
             return cached
         r = self._get('/v1/map_floor.json?continent_id=%d&floor=%d' % (
             continent_id, floor
@@ -292,6 +315,7 @@ class CachingAPIClient(object):
             return None
         result = r.json()
         self._cache_set('map_floors', key, result)
+        self._map_floors[key] = cached
         return result
 
     def character_info(self, name):
