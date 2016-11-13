@@ -134,8 +134,8 @@ $("#btn_follow_player").click(function() {
 
 // zoom the map to the player's current zone
 $("#btn_zoom_zone").click(function() {
-    sw_latlng = gw2latlon(P.map_info['continent_rect'][0]);
-    ne_latlng = gw2latlon(P.map_info['continent_rect'][1]);
+    sw_latlng = gw2latlon(MAP_INFO[P.map_id]['continent_rect'][0]);
+    ne_latlng = gw2latlon(MAP_INFO[P.map_id]['continent_rect'][1]);
     map.fitBounds([sw_latlng, ne_latlng]);
 });
 

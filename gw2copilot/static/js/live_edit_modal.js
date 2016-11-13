@@ -187,7 +187,7 @@ function makeZoneRemindersCache(rlist) {
         c[item["map_id"]].push(item["text"]);
     });
     P.zone_reminders = c;
-    if ( typeof P !== 'undefined' && P.hasOwnProperty("map_info") && P.map_info.hasOwnProperty("map_id") ) {
-        doZoneReminder(P.map_info["map_id"]);
+    if ( typeof P !== 'undefined' && P.hasOwnProperty("map_id") ) {
+        doZoneReminder(P.map_id);
     }
 }
