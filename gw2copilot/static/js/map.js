@@ -45,7 +45,19 @@ var m = {
     playerMarker: null,
     playerLatLng: null,
     followPlayer: false,
-    zones: {}
+    zones: {},
+    layerGroups: {
+        waypoints: []
+    }
+};
+
+var ICONS = {
+    player: L.icon({
+        iconUrl: '/static/img/crosshair_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    })
 };
 
 /* initialize map */
@@ -181,13 +193,7 @@ function latlon2gw(latlon) {
  * @param {array} latlng - (x, y) map Lat/Long position
  */
 function addPlayerMarker(latlng) {
-    var playerIcon = L.icon({
-        iconUrl: '/static/img/crosshair_32x32.png',
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-        popupAnchor: [0, 0]
-    });
-    m.playerMarker = L.marker(latlng, {icon: playerIcon})
+    m.playerMarker = L.marker(latlng, {icon: ICONS.player})
         .bindPopup("Player position.")
         .addTo(map);
 }
@@ -212,9 +218,17 @@ function addLayers() {
         m.zones[map_id] = {
             data: data,
             layers: {
-                borders: L.rectangle(layer_bounds).setStyle(initial_layer_style)
+                borders: L.rectangle(layer_bounds).setStyle(initial_layer_style),
+                waypoints: L.layerGroup()
             }
         };
+
+        // add markers to the layer groups
+        addZoneMarkersToLayers(map_id);
+
+        // add layer groups to the global lists for toggling
+        m.layerGroups.waypoints.push(m.zones[map_id].layers.waypoints);
+
         // create the featureGroup
         m.zones[map_id].feature_group = L.featureGroup(
             objectValues(m.zones[map_id].layers)
@@ -231,6 +245,31 @@ function addLayers() {
         m.zones[map_id].feature_group.addTo(map);
     }
     console.log("done adding layers.");
+}
+
+/**
+ * Add the various markers for the zone to their layers.
+ *
+ * Updates ``m.zones[map_id]``
+ */
+function addZoneMarkersToLayers(map_id) {
+    layers = m.zones[map_id].layers;
+
+    // waypoints
+    for (idx in MAP_INFO[map_id]["points_of_interest"]["waypoint"]) {
+        poi = MAP_INFO[map_id]["points_of_interest"]["waypoint"][idx];
+        console.log(poi);
+        layers.waypoints.addLayer(
+            L.marker(
+                gw2latlon(poi["coord"]),
+                {
+                    title: poi.name + " (" + poi.poi_id + ")",
+                    alt: poi.name + " (" + poi.poi_id + ")",
+                    riseOnHover: true
+                }
+            )
+        );
+    }
 }
 
 /**
