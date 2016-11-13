@@ -88,6 +88,7 @@ $(document).ready(function () {
     addLayers();
 
     map.on("click", onMapClick);
+    map.on("zoomend", onZoomChange);
 });
 
 /******************************************************
@@ -106,6 +107,26 @@ function onMapClick(e) {
         .setContent("You clicked the map at " + e.latlng + " (GW2 coords: " +
         latlon2gw(e.latlng).toString() + ")")
         .openOn(map);
+}
+
+/**
+ * Handle when the map zoom changes
+ *
+ * @param {Event} e - Leaflet event
+ */
+function onZoomChange(e) {
+    z = map.getZoom();
+    if (z >= m.ZOOM_THRESH) {
+        // waypoints
+        for (idx in m.layerGroups.waypoints) {
+            map.addLayer(m.layerGroups.waypoints[idx]);
+        }
+    } else {
+        // hide all POIs; let the mouseover handle them
+        for (idx in m.layerGroups.waypoints) {
+            map.removeLayer(m.layerGroups.waypoints[idx]);
+        }
+    }
 }
 
 //
@@ -242,7 +263,7 @@ function addLayers() {
         addZoneMarkersToLayers(map_id);
 
         // add layer groups to the global lists for toggling
-        //m.layerGroups.waypoints.push(m.zones[map_id].layers.waypoints);
+        m.layerGroups.waypoints.push(m.zones[map_id].layers.waypoints);
 
         // add the borders layer and set mouse handlers on it
         m.zones[map_id].layers.borders.on('mouseover', handleZoneMouseIn, { map_id: map_id });
@@ -294,10 +315,8 @@ function handleZoneMouseIn(e) {
         if (m.lastShownZone !== null && m.lastShownZone != this.map_id) {
             map.removeLayer(m.zones[m.lastShownZone].layers.waypoints);
         }
-        console.log("add waypoints for map_id " + this.map_id);
         map.addLayer(m.zones[this.map_id].layers.waypoints);
         m.zones[map_id].layers.borders.bringToFront();
-        console.log(m.zones[this.map_id].layers.waypoints);
         m.lastShownZone = this.map_id;
     }
 }
