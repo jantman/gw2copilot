@@ -111,7 +111,6 @@ class TwistedServer(object):
         self._test = test
         self.playerinfo = PlayerInfo(self.cache)
         self._pi_position = None
-        self._pi_map_info = None
         self._pi_player_dict = None
 
     def update_mumble_data(self, mumble_data):
@@ -131,10 +130,6 @@ class TwistedServer(object):
             logger.debug('player_dict changed')
             self._pi_player_dict = self.playerinfo.player_dict
             self._ws_send('player_dict', self._pi_player_dict)
-        if self.playerinfo.map_info != self._pi_map_info:
-            logger.debug('map_info changed')
-            self._pi_map_info = self.playerinfo.map_info
-            self._ws_send('map_info', self._pi_map_info)
         if self.playerinfo.position != self._pi_position:
             logger.debug('position changed')
             self._pi_position = self.playerinfo.position
@@ -144,8 +139,7 @@ class TwistedServer(object):
         """
         Send the given data to all clients via websocket broadcast.
 
-        :param msg_type: type of message; "tick", "position", "player_dict",
-           or "map_info"
+        :param msg_type: type of message; "tick", "position", "player_dict"
         :type msg_type: str
         :param data: JSON-serializable data dict
         :type data: dict

@@ -147,42 +147,6 @@ class PlayerInfo(object):
         }
 
     @property
-    def map_info(self):
-        """
-        Return a dict about the player's current map. Dict contents are:
-
-        * ``map_id`` - *(int)*
-        * ``map_name`` - *(str)*
-        * ``map_level_range`` - *(str)*
-        * ``continent_id`` - *(int)*
-        * ``continent_name`` - *(str)*
-        * ``region_id`` - *(int)*
-        * ``region_name`` - *(str)*
-        * ``continent_rect`` - *(list)* - list of current map southwest and
-           northeast corners as continent coordinates, each as [x, y] pairs,
-           i.e. [[sw_x, sw_y], [ne_x], [ne_y]]
-
-        **Note:** when updating this property, also update the documentation on
-        :http:get:`/api/map_info`.
-
-        :return: information on the player's current map
-        :rtype: dict
-        """
-        return {
-            'map_id': self._current_map,
-            'continent_id': self._continent_id,
-            'continent_name': self._continent_name,
-            'region_id': self._region_id,
-            'region_name': self._region_name,
-            'map_name': self._map_name,
-            'map_level_range': '%d-%d' % (
-                self._current_map_data['min_level'],
-                self._current_map_data['max_level']
-            ),
-            'continent_rect': self._current_map_data['continent_rect']
-        }
-
-    @property
     def player_dict(self):
         """
         Return a dict with only the information about the player. Keys are
