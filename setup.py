@@ -49,7 +49,8 @@ requires = [
     'psutil>=4.4.0,<5.0',
     'klein>=15.0.0,<16.0.0',
     'Jinja2>=2.8.0, <2.9.0',
-    'autobahn>=0.16.0,<0.17.0'
+    'autobahn>=0.16.0,<0.17.0',
+    'pillow>=3.4.0,<4.0.0'
 ]
 
 classifiers = [

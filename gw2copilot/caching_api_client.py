@@ -42,6 +42,8 @@ import requests
 import os
 import json
 import urllib
+from PIL import Image
+from StringIO import StringIO
 
 from .utils import dict2js
 from .static_data import world_zones
@@ -436,7 +438,26 @@ class CachingAPIClient(object):
                 continue
             self._cache_set('assets', name, r.content, binary=True,
                             extension='png')
+            self._resize_asset(name, r.content)
         logger.debug('Done getting assets')
+
+    def _resize_asset(self, name, bin_content):
+        """
+        Given the filename and binary content of a PNG image asset, resize it
+        to 32x32 and write it to cache with a "_32x32" suffix on the filename.
+
+        :param name: asset/file name
+        :type name: str
+        :param bin_content: image binary content
+        :type bin_content: bytes
+        """
+        name += '_32x32'
+        img = Image.open(StringIO(bin_content))
+        img.thumbnail((32, 32))
+        sio = StringIO()
+        img.save(sio, format='png')
+        self._cache_set('assets', name, sio.getvalue(), binary=True,
+                        extension='png')
 
     @property
     def zone_reminders(self):
