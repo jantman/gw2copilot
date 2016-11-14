@@ -149,11 +149,15 @@ function onZoomChange(e) {
         map.addLayer(m.layerGroups.waypoints);
         map.addLayer(m.layerGroups.POIs);
         map.addLayer(m.layerGroups.vistas);
+        map.addLayer(m.layerGroups.heropoints);
+        map.addLayer(m.layerGroups.hearts);
     } else {
         // hide all POIs; let the mouseover handle them
         map.removeLayer(m.layerGroups.waypoints);
         map.removeLayer(m.layerGroups.POIs);
         map.removeLayer(m.layerGroups.vistas);
+        map.removeLayer(m.layerGroups.heropoints);
+        map.removeLayer(m.layerGroups.hearts);
     }
 }
 
@@ -279,7 +283,6 @@ function addLayers() {
     m.layerGroups.heropoints = L.layerGroup();
     m.layerGroups.POIs = L.layerGroup();
     m.layerGroups.vistas = L.layerGroup();
-    m.layerGroups.events = L.layerGroup();
 
     for (map_id in WORLD_ZONES_IDtoNAME) {
         data = MAP_INFO[map_id];
@@ -296,8 +299,7 @@ function addLayers() {
                 hearts: L.layerGroup(),
                 heropoints: L.layerGroup(),
                 POIs: L.layerGroup(),
-                vistas: L.layerGroup(),
-                events: L.layerGroup()
+                vistas: L.layerGroup()
             }
         };
 
@@ -310,7 +312,6 @@ function addLayers() {
         m.layerGroups.heropoints.addLayer(m.zones[map_id].layers.heropoints);
         m.layerGroups.POIs.addLayer(m.zones[map_id].layers.POIs);
         m.layerGroups.vistas.addLayer(m.zones[map_id].layers.vistas);
-        m.layerGroups.events.addLayer(m.zones[map_id].layers.events);
 
         // add the borders layer and set mouse handlers on it
         m.zones[map_id].layers.borders.on('mouseover', handleZoneMouseIn, { map_id: map_id });
@@ -345,7 +346,7 @@ function addZoneMarkersToLayers(map_id) {
         );
     }
 
-    // POIs
+    // POIs / "landmarks"
     for (idx in MAP_INFO[map_id]["points_of_interest"]["landmark"]) {
         poi = MAP_INFO[map_id]["points_of_interest"]["landmark"][idx];
         layers.POIs.addLayer(
@@ -376,6 +377,40 @@ function addZoneMarkersToLayers(map_id) {
             )
         );
     }
+
+    // heropoints / "skill_challenges"
+    for (idx in MAP_INFO[map_id]["skill_challenges"]) {
+        poi = MAP_INFO[map_id]["skill_challenges"][idx];
+        layers.heropoints.addLayer(
+            L.marker(
+                gw2latlon(poi["coord"]),
+                {
+                    title: poi.idx,
+                    alt: poi.idx,
+                    riseOnHover: true,
+                    icon: ICONS.heropoint
+                }
+            )
+        );
+    }
+
+    // hearts
+    for (idx in MAP_INFO[map_id]["tasks"]) {
+        poi = MAP_INFO[map_id]["tasks"][idx];
+        layers.hearts.addLayer(
+            L.marker(
+                gw2latlon(poi["coord"]),
+                {
+                    title: poi.objective + " (" + poi.task_id + ")",
+                    alt: poi.objective + " (" + poi.task_id + ")",
+                    riseOnHover: true,
+                    icon: ICONS.heart
+                }
+            )
+        );
+    }
+
+    // @TODO: events
 }
 
 /**
