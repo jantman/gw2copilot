@@ -46,9 +46,7 @@ var m = {
     playerLatLng: null,
     followPlayer: false,
     zones: {},
-    layerGroups: {
-        waypoints: []
-    },
+    layerGroups: {}, // populated by addLayers()
     ZOOM_THRESH: 4, // cutoff between showing detailed data or not; >= this is detailed
     lastShownZone: null
 };
@@ -62,6 +60,36 @@ var ICONS = {
     }),
     waypoint: L.icon({
         iconUrl: '/cache/assets/map_waypoint_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    poi: L.icon({
+        iconUrl: '/cache/assets/map_poi_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    vista: L.icon({
+        iconUrl: '/cache/assets/map_vista_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    heart: L.icon({
+        iconUrl: '/cache/assets/map_heart_empty_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    heropoint: L.icon({
+        iconUrl: '/cache/assets/map_heropoint_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    event: L.icon({
+        iconUrl: '/cache/assets/map_special_event_32x32.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 0]
@@ -118,14 +146,14 @@ function onZoomChange(e) {
     z = map.getZoom();
     if (z >= m.ZOOM_THRESH) {
         // waypoints
-        for (idx in m.layerGroups.waypoints) {
-            map.addLayer(m.layerGroups.waypoints[idx]);
-        }
+        map.addLayer(m.layerGroups.waypoints);
+        map.addLayer(m.layerGroups.POIs);
+        map.addLayer(m.layerGroups.vistas);
     } else {
         // hide all POIs; let the mouseover handle them
-        for (idx in m.layerGroups.waypoints) {
-            map.removeLayer(m.layerGroups.waypoints[idx]);
-        }
+        map.removeLayer(m.layerGroups.waypoints);
+        map.removeLayer(m.layerGroups.POIs);
+        map.removeLayer(m.layerGroups.vistas);
     }
 }
 
@@ -138,7 +166,9 @@ $("#btn_toggle_all").click(function() {
 });
 
 $("#btn_toggle_waypoints").click(function() {
-    alert("TODO: btn_toggle_waypoints not implemented");
+    if( map.hasLayer() ) {
+    } else {
+    }
 });
 
 $("#btn_toggle_hearts").click(function() {
@@ -244,6 +274,13 @@ var initial_layer_style = {
  */
 function addLayers() {
     console.log("adding layers");
+    m.layerGroups.waypoints = L.layerGroup();
+    m.layerGroups.hearts = L.layerGroup();
+    m.layerGroups.heropoints = L.layerGroup();
+    m.layerGroups.POIs = L.layerGroup();
+    m.layerGroups.vistas = L.layerGroup();
+    m.layerGroups.events = L.layerGroup();
+
     for (map_id in WORLD_ZONES_IDtoNAME) {
         data = MAP_INFO[map_id];
         layer_bounds = [
@@ -255,7 +292,12 @@ function addLayers() {
             data: data,
             layers: {
                 borders: L.rectangle(layer_bounds).setStyle(initial_layer_style),
-                waypoints: L.layerGroup()
+                waypoints: L.layerGroup(),
+                hearts: L.layerGroup(),
+                heropoints: L.layerGroup(),
+                POIs: L.layerGroup(),
+                vistas: L.layerGroup(),
+                events: L.layerGroup()
             }
         };
 
@@ -263,7 +305,12 @@ function addLayers() {
         addZoneMarkersToLayers(map_id);
 
         // add layer groups to the global lists for toggling
-        m.layerGroups.waypoints.push(m.zones[map_id].layers.waypoints);
+        m.layerGroups.waypoints.addLayer(m.zones[map_id].layers.waypoints);
+        m.layerGroups.hearts.addLayer(m.zones[map_id].layers.hearts);
+        m.layerGroups.heropoints.addLayer(m.zones[map_id].layers.heropoints);
+        m.layerGroups.POIs.addLayer(m.zones[map_id].layers.POIs);
+        m.layerGroups.vistas.addLayer(m.zones[map_id].layers.vistas);
+        m.layerGroups.events.addLayer(m.zones[map_id].layers.events);
 
         // add the borders layer and set mouse handlers on it
         m.zones[map_id].layers.borders.on('mouseover', handleZoneMouseIn, { map_id: map_id });
@@ -293,6 +340,38 @@ function addZoneMarkersToLayers(map_id) {
                     alt: poi.name + " (" + poi.poi_id + ")",
                     riseOnHover: true,
                     icon: ICONS.waypoint
+                }
+            )
+        );
+    }
+
+    // POIs
+    for (idx in MAP_INFO[map_id]["points_of_interest"]["landmark"]) {
+        poi = MAP_INFO[map_id]["points_of_interest"]["landmark"][idx];
+        layers.POIs.addLayer(
+            L.marker(
+                gw2latlon(poi["coord"]),
+                {
+                    title: poi.name + " (" + poi.poi_id + ")",
+                    alt: poi.name + " (" + poi.poi_id + ")",
+                    riseOnHover: true,
+                    icon: ICONS.poi
+                }
+            )
+        );
+    }
+
+    // vistas
+    for (idx in MAP_INFO[map_id]["points_of_interest"]["vista"]) {
+        poi = MAP_INFO[map_id]["points_of_interest"]["vista"][idx];
+        layers.vistas.addLayer(
+            L.marker(
+                gw2latlon(poi["coord"]),
+                {
+                    title: poi.name + " (" + poi.poi_id + ")",
+                    alt: poi.name + " (" + poi.poi_id + ")",
+                    riseOnHover: true,
+                    icon: ICONS.vista
                 }
             )
         );
