@@ -449,7 +449,7 @@ class CachingAPIClient(object):
         :param name: asset/file name
         :type name: str
         :param bin_content: image binary content
-        :type bin_content: bytes
+        :type bin_content: str
         """
         name += '_32x32'
         img = Image.open(StringIO(bin_content))
