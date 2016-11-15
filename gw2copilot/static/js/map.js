@@ -57,6 +57,8 @@ var m = {
         hearts: false,
         all: false
     },
+    heartAreas: {},
+    shownHeartAreas: [],
     POIlayers: ["waypoints", "POIs", "vistas", "heropoints", "hearts"]
 };
 
@@ -400,7 +402,14 @@ function addZoneMarkersToLayers(map_id) {
                     riseOnHover: true,
                     icon: ICONS.heart
                 }
-            )
+            ).on('click', handleHeartClick, {task_id: poi.task_id})
+            .on('mouseover', handleHeartMouseOver, {task_id: poi.task_id})
+            .on('mouseout', handleHeartMouseOut, {task_id: poi.task_id})
+        );
+        // heartAreas
+        bounds = poi.bounds.slice(0, poi.bounds.length - 1);
+        m.heartAreas[poi.task_id] = L.polygon(
+            bounds.map(function(e) { return gw2latlon(e); })
         );
     }
 
@@ -492,5 +501,54 @@ function showHideLayers() {
         for(var i =0; i < m.POIlayers.length; i++) {
             map.removeLayer(m.layerGroups[m.POIlayers[i]]);
         }
+    }
+}
+
+/**
+ * Handle a click on a heart.
+ *
+ * The handler's context (``this``) will be an object with one property,
+ * ``task_id``.
+ *
+ * @param {MouseEvent} e - Leaflet
+ *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
+ */
+function handleHeartClick(e) {
+    if ( m.shownHeartAreas.indexOf(this.task_id) > -1 ) {
+        map.removeLayer(m.heartAreas[this.task_id]);
+        m.shownHeartAreas.splice(m.shownHeartAreas.indexOf(this.task_id), 1);
+    } else {
+        map.addLayer(m.heartAreas[this.task_id]);
+        m.shownHeartAreas.push(this.task_id);
+    }
+}
+
+/**
+ * Handle mouse entering a heart.
+ *
+ * The handler's context (``this``) will be an object with one property,
+ * ``task_id``.
+ *
+ * @param {MouseEvent} e - Leaflet
+ *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
+ */
+function handleHeartMouseOver(e) {
+    if ( ! map.hasLayer(m.heartAreas[this.task_id]) ) {
+        map.addLayer(m.heartAreas[this.task_id]);
+    }
+}
+
+/**
+ * Handle mouse exiting a heart.
+ *
+ * The handler's context (``this``) will be an object with one property,
+ * ``task_id``.
+ *
+ * @param {MouseEvent} e - Leaflet
+ *   [MouseEvent](http://leafletjs.com/reference.html#mouse-event).
+ */
+function handleHeartMouseOut(e) {
+    if ( m.shownHeartAreas.indexOf(this.task_id) < 0 ) {
+        map.removeLayer(m.heartAreas[this.task_id]);
     }
 }
