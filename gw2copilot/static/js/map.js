@@ -48,7 +48,16 @@ var m = {
     zones: {},
     layerGroups: {}, // populated by addLayers()
     ZOOM_THRESH: 4, // cutoff between showing detailed data or not; >= this is detailed
-    lastShownZone: null
+    lastShownZone: null,
+    hidden: {
+        waypoints: false,
+        POIs: false,
+        vistas: false,
+        heropoints: false,
+        hearts: false,
+        all: false
+    },
+    POIlayers: ["waypoints", "POIs", "vistas", "heropoints", "hearts"]
 };
 
 var ICONS = {
@@ -143,22 +152,7 @@ function onMapClick(e) {
  * @param {Event} e - Leaflet event
  */
 function onZoomChange(e) {
-    z = map.getZoom();
-    if (z >= m.ZOOM_THRESH) {
-        // waypoints
-        map.addLayer(m.layerGroups.waypoints);
-        map.addLayer(m.layerGroups.POIs);
-        map.addLayer(m.layerGroups.vistas);
-        map.addLayer(m.layerGroups.heropoints);
-        map.addLayer(m.layerGroups.hearts);
-    } else {
-        // hide all POIs; let the mouseover handle them
-        map.removeLayer(m.layerGroups.waypoints);
-        map.removeLayer(m.layerGroups.POIs);
-        map.removeLayer(m.layerGroups.vistas);
-        map.removeLayer(m.layerGroups.heropoints);
-        map.removeLayer(m.layerGroups.hearts);
-    }
+    showHideLayers();
 }
 
 //
@@ -166,29 +160,33 @@ function onZoomChange(e) {
 //
 
 $("#btn_toggle_all").click(function() {
-    alert("TODO: btn_toggle_all not implemented");
+    m.hidden.all = ! m.hidden.all;
+    showHideLayers();
 });
 
 $("#btn_toggle_waypoints").click(function() {
-    if( map.hasLayer() ) {
-    } else {
-    }
+    m.hidden.waypoints = ! m.hidden.waypoints;
+    showHideLayers();
 });
 
 $("#btn_toggle_hearts").click(function() {
-    alert("TODO: btn_toggle_hearts not implemented");
+    m.hidden.hearts = ! m.hidden.hearts;
+    showHideLayers();
 });
 
 $("#btn_toggle_heropoints").click(function() {
-    alert("TODO: btn_toggle_herpoints not implemented");
+    m.hidden.heropoints = ! m.hidden.heropoints;
+    showHideLayers();
 });
 
 $("#btn_toggle_POIs").click(function() {
-    alert("TODO: btn_toggle_POIs not implemented");
+    m.hidden.POIs = ! m.hidden.POIs;
+    showHideLayers();
 });
 
 $("#btn_toggle_vistas").click(function() {
-    alert("TODO: btn_toggle_vistas not implemented");
+    m.hidden.vistas = ! m.hidden.vistas;
+    showHideLayers();
 });
 
 $("#btn_toggle_events").click(function() {
@@ -278,11 +276,9 @@ var initial_layer_style = {
  */
 function addLayers() {
     console.log("adding layers");
-    m.layerGroups.waypoints = L.layerGroup();
-    m.layerGroups.hearts = L.layerGroup();
-    m.layerGroups.heropoints = L.layerGroup();
-    m.layerGroups.POIs = L.layerGroup();
-    m.layerGroups.vistas = L.layerGroup();
+    for(var i =0; i < m.POIlayers.length; i++) {
+        m.layerGroups[m.POIlayers[i]] = L.layerGroup()
+    }
 
     for (map_id in WORLD_ZONES_IDtoNAME) {
         data = MAP_INFO[map_id];
@@ -307,11 +303,9 @@ function addLayers() {
         addZoneMarkersToLayers(map_id);
 
         // add layer groups to the global lists for toggling
-        m.layerGroups.waypoints.addLayer(m.zones[map_id].layers.waypoints);
-        m.layerGroups.hearts.addLayer(m.zones[map_id].layers.hearts);
-        m.layerGroups.heropoints.addLayer(m.zones[map_id].layers.heropoints);
-        m.layerGroups.POIs.addLayer(m.zones[map_id].layers.POIs);
-        m.layerGroups.vistas.addLayer(m.zones[map_id].layers.vistas);
+        for(var i =0; i < m.POIlayers.length; i++) {
+            m.layerGroups[m.POIlayers[i]].addLayer(m.zones[map_id].layers[m.POIlayers[i]]);
+        }
 
         // add the borders layer and set mouse handlers on it
         m.zones[map_id].layers.borders.on('mouseover', handleZoneMouseIn, { map_id: map_id });
@@ -467,4 +461,36 @@ function handleZoneMouseOut(e) {
 function handleZoneContextMenu(e) {
     console.log("Right-click on zone layer " + map_id);
     console.log(e);
+}
+
+/**
+ * Given the current ``m.hidden`` settings and the current map zoom level,
+ * show and hide marker layers as appropriate.
+ */
+function showHideLayers() {
+    if ( map.getZoom() >= m.ZOOM_THRESH ) {
+        // zoomed in enough, show all POIs based on our settings
+        if( m.hidden.all === true ){
+            for(var i =0; i < m.POIlayers.length; i++) {
+                map.removeLayer(m.layerGroups[m.POIlayers[i]]);
+            }
+            $("#btn_toggle_all").switchClass('btn-success', 'btn-danger');
+        } else {
+            $("#btn_toggle_all").switchClass('btn-danger', 'btn-success');
+            for(var i =0; i < m.POIlayers.length; i++) {
+                if ( m.hidden[m.POIlayers[i]] === true ) {
+                    map.removeLayer(m.layerGroups[m.POIlayers[i]]);
+                    $("#btn_toggle_" + m.POIlayers[i]).switchClass('btn-success', 'btn-danger');
+                } else {
+                    map.addLayer(m.layerGroups[m.POIlayers[i]]);
+                    $("#btn_toggle_" + m.POIlayers[i]).switchClass('btn-danger', 'btn-success');
+                }
+            }
+        }
+    } else {
+        // hide all POIs; let the mouseover handle them
+        for(var i =0; i < m.POIlayers.length; i++) {
+            map.removeLayer(m.layerGroups[m.POIlayers[i]]);
+        }
+    }
 }
