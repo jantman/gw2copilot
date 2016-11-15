@@ -43,6 +43,8 @@ from gw2copilot.version import VERSION, PROJECT_URL
 with open('README.rst') as file:
     long_description = file.read()
 
+# NOTE: when adding dependencies, be sure to add them to
+# requirements_docs.txt as well.
 requires = [
     'requests',
     'twisted>=16.0.0,<17.0.0',
