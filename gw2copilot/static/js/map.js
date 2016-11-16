@@ -217,9 +217,7 @@ $("#btn_follow_player").click(function() {
 
 // zoom the map to the player's current zone
 $("#btn_zoom_zone").click(function() {
-    sw_latlng = gw2latlon(MAP_INFO[P.map_id]['continent_rect'][0]);
-    ne_latlng = gw2latlon(MAP_INFO[P.map_id]['continent_rect'][1]);
-    map.fitBounds([sw_latlng, ne_latlng]);
+    zoomToZone(P.map_id);
 });
 
 // zoom the map to the player, full zoom
@@ -470,6 +468,17 @@ function handleZoneMouseOut(e) {
 function handleZoneContextMenu(e) {
     console.log("Right-click on zone layer " + map_id);
     console.log(e);
+}
+
+/**
+ * Zoom the map to show as much of the specified zone (map_id) as possible.
+ *
+ * @param {int} map_id - the map_id to zoom to
+ */
+function zoomToZone(map_id) {
+    sw_latlng = gw2latlon(MAP_INFO[map_id]['continent_rect'][0]);
+    ne_latlng = gw2latlon(MAP_INFO[map_id]['continent_rect'][1]);
+    map.fitBounds([sw_latlng, ne_latlng]);
 }
 
 /**
