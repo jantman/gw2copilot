@@ -42,6 +42,7 @@ import requests
 import os
 import json
 import urllib
+from base64 import b64encode
 from PIL import Image
 from StringIO import StringIO
 
@@ -277,7 +278,9 @@ class CachingAPIClient(object):
             for poi in f_info['points_of_interest']:
                 if poi['type'] not in result['points_of_interest']:
                     result['points_of_interest'][poi['type']] = []
-                result['points_of_interest'][poi['type']].append(poi)
+                result['points_of_interest'][poi['type']].append(
+                    self._add_chat_link_to_poi_dict(poi)
+                )
             result['skill_challenges'] = f_info.get('skill_challenges', [])
             result['tasks'] = f_info.get('tasks', [])
         except (TypeError, KeyError):
@@ -287,6 +290,29 @@ class CachingAPIClient(object):
                          result['default_floor'], result['region_id'])
         self._cache_set('mapdata', map_id, result)
         return result
+
+    def _add_chat_link_to_poi_dict(self, poi):
+        """
+        Given a POI dictionary such as the one returned by the floor_info API
+        (i.e. a dict containing a ``type`` key (string value) and a ``poi_id``
+        key (int value)), add a ``chat_link`` key to the dict containing the
+        appropriate 0x04 chat link for the POI.
+
+        The links are base64-encoded values enclosed in single square brackets
+        with a leading ampersand, i.e. ``[&BASE64]``.
+
+        POI/Waypoint links have a first byte of 0x04, followed by the ID as a
+        2-byte little endian integer, two null bytes.
+
+        :param poi: POI information
+        :type poi: dict
+        :return: dict with added ``chat_link`` key
+        :rtype: dict
+        """
+        b = b'\x04' + chr(poi['poi_id'] % 256) + chr(
+            int(poi['poi_id'] / 256)) + b'\x00\x00'
+        poi['chat_link'] = '[&' + b64encode(b).decode(encoding="UTF-8") + ']'
+        return poi
 
     def map_floor(self, continent_id, floor):
         """
