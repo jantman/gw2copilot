@@ -114,7 +114,9 @@ $(document).ready(function () {
     map = L.map("map", {
         minZoom: 1,
         maxZoom: 7,
-        crs: L.CRS.Simple
+        crs: L.CRS.Simple,
+        contextmenu: true,
+        contextmenuItems: []
     }).setView(m.WORLD_COORDS, m.WORLD_ZOOM);
 
     L.tileLayer("/api/tiles?continent=1&floor=1&zoom={z}&x={x}&y={y}", {
@@ -290,7 +292,28 @@ function addLayers() {
         m.zones[map_id] = {
             data: data,
             layers: {
-                borders: L.rectangle(layer_bounds).setStyle(initial_layer_style),
+                borders: L.rectangle(
+                    layer_bounds,
+                    {
+                        contextmenu: true,
+                        contextmenuItems: [
+                            {
+                                text: data.map_name + " (map " + map_id + ")",
+                                index: 0
+                            },
+                            {
+                                separator: true,
+                                index: 1
+                            },
+                            {
+                                text: "Zoom to Zone",
+                                index: 2,
+                                callback: function(e) { zoomToZone(this.map_id); },
+                                context: { map_id: map_id }
+                            }
+                        ]
+                    }
+                ).setStyle(initial_layer_style),
                 waypoints: L.layerGroup(),
                 hearts: L.layerGroup(),
                 heropoints: L.layerGroup(),
@@ -310,7 +333,6 @@ function addLayers() {
         // add the borders layer and set mouse handlers on it
         m.zones[map_id].layers.borders.on('mouseover', handleZoneMouseIn, { map_id: map_id });
         m.zones[map_id].layers.borders.on('mouseout', handleZoneMouseOut, { map_id: map_id });
-        m.zones[map_id].layers.borders.on('contextmenu', handleZoneContextMenu, { map_id: map_id });
         m.zones[map_id].layers.borders.addTo(map);
     }
     console.log("done adding layers.");
@@ -334,7 +356,14 @@ function addZoneMarkersToLayers(map_id) {
                     title: poi.name + " (" + poi.poi_id + ")",
                     alt: poi.name + " (" + poi.poi_id + ")",
                     riseOnHover: true,
-                    icon: ICONS.waypoint
+                    icon: ICONS.waypoint,
+                    contextmenu: true,
+                    contextmenuItems: [
+                        {
+                            text: poi.name + " (POI " + poi.poi_id + ")",
+                            index: 0
+                        }
+                    ]
                 }
             )
         );
@@ -350,7 +379,14 @@ function addZoneMarkersToLayers(map_id) {
                     title: poi.name + " (" + poi.poi_id + ")",
                     alt: poi.name + " (" + poi.poi_id + ")",
                     riseOnHover: true,
-                    icon: ICONS.poi
+                    icon: ICONS.poi,
+                    contextmenu: true,
+                    contextmenuItems: [
+                        {
+                            text: poi.name + " (POI " + poi.poi_id + ")",
+                            index: 0
+                        }
+                    ]
                 }
             )
         );
@@ -366,7 +402,14 @@ function addZoneMarkersToLayers(map_id) {
                     title: poi.name + " (" + poi.poi_id + ")",
                     alt: poi.name + " (" + poi.poi_id + ")",
                     riseOnHover: true,
-                    icon: ICONS.vista
+                    icon: ICONS.vista,
+                    contextmenu: true,
+                    contextmenuItems: [
+                        {
+                            text: poi.name + " (POI " + poi.poi_id + ")",
+                            index: 0
+                        }
+                    ]
                 }
             )
         );
@@ -395,8 +438,8 @@ function addZoneMarkersToLayers(map_id) {
             L.marker(
                 gw2latlon(poi["coord"]),
                 {
-                    title: poi.objective + " (" + poi.task_id + ")",
-                    alt: poi.objective + " (" + poi.task_id + ")",
+                    title: poi.objective + " (task_id " + poi.task_id + ")",
+                    alt: poi.objective + " (task_id " + poi.task_id + ")",
                     riseOnHover: true,
                     icon: ICONS.heart
                 }
