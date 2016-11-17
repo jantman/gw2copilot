@@ -425,6 +425,7 @@ class CachingAPIClient(object):
             'map_adventure',
             'map_adventure_complete',
             'map_adventure_locked',
+            'map_bank',
             'map_complete',
             'map_heart_empty',
             'map_heart_full',
@@ -433,15 +434,18 @@ class CachingAPIClient(object):
             'map_node_logging',
             'map_node_mining',
             'map_poi',
+            'map_repair',
             'map_special_event',
             'map_story',
+            'map_trading_post',
+            'map_vendor',
             'map_vista',
             'map_waypoint',
             'map_waypoint_contested',
             'map_waypoint_hover',
         ]
         logger.debug('Getting assets from GW2 files API')
-        r = self._get('/v1/files.json', auth=True)
+        r = self._get('/v1/files.json?ids=all', auth=True)
         files = r.json()
         for name in files_to_get:
             if os.path.exists(self._cache_path('assets', name, 'png')):
