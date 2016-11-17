@@ -408,6 +408,10 @@ function addZoneMarkersToLayers(map_id) {
                         {
                             text: poi.name + " (POI " + poi.poi_id + ")",
                             index: 0
+                        },
+                        {
+                            index: 1,
+                            text: '<input type="foo name="foo">'
                         }
                     ]
                 }
