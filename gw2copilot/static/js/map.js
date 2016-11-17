@@ -107,6 +107,9 @@ var ICONS = {
     })
 };
 
+// clipboardjs
+var clipboard = null;
+
 /* initialize map */
 $(document).ready(function () {
     "use strict";
@@ -130,6 +133,22 @@ $(document).ready(function () {
 
     map.on("click", onMapClick);
     map.on("zoomend", onZoomChange);
+
+    // setup clipboardjs
+    clipboard = new Clipboard('.clipboardlink');
+
+    clipboard.on('success', function(e) {
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+
+        e.clearSelection();
+    });
+
+    clipboard.on('error', function(e) {
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+    });
 });
 
 /******************************************************
@@ -411,7 +430,7 @@ function addZoneMarkersToLayers(map_id) {
                         },
                         {
                             index: 1,
-                            text: '<input type="foo name="foo">'
+                            text: '<button class="clipboardlink" data-clipboard-text="' + poi.chat_link + '">' + poi.chat_link + ' (Copy to clipboard)</button>'
                         }
                     ]
                 }
