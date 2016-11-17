@@ -112,6 +112,7 @@ gw2copilot is built on the shoulders of giants; it makes use of the following Fr
 * `bootleaf <https://github.com/bmcbride/bootleaf>`_ to integrate Bootstrap and Leaflet.
 * `jqueryui-bootstrap-adapter <https://github.com/arschmitz/jqueryui-bootstrap-adapter>`_ to make jQuery UI and Bootstrap play nicely together.
 * `jquery.appendGrid <https://appendgrid.apphb.com/>`_ for the editable Zone Reminders form.
+* `clipboardjs <https://clipboardjs.com/>`_ for copying chat links to the clipboard
 
 Reading the MumbleLink File
 +++++++++++++++++++++++++++
