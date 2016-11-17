@@ -362,6 +362,12 @@ function addZoneMarkersToLayers(map_id) {
                         {
                             text: poi.name + " (POI " + poi.poi_id + ")",
                             index: 0
+                        },
+                        {
+                            index: 1,
+                            text: poi.chat_link + ' (copy to clipboard)',
+                            callback: function(e) { copyTextToClipboard(this.chat_link); },
+                            context: { chat_link: poi.chat_link }
                         }
                     ]
                 }
@@ -385,6 +391,12 @@ function addZoneMarkersToLayers(map_id) {
                         {
                             text: poi.name + " (POI " + poi.poi_id + ")",
                             index: 0
+                        },
+                        {
+                            index: 1,
+                            text: poi.chat_link + ' (copy to clipboard)',
+                            callback: function(e) { copyTextToClipboard(this.chat_link); },
+                            context: { chat_link: poi.chat_link }
                         }
                     ]
                 }
@@ -411,7 +423,9 @@ function addZoneMarkersToLayers(map_id) {
                         },
                         {
                             index: 1,
-                            text: '<input type="foo name="foo">'
+                            text: poi.chat_link + ' (copy to clipboard)',
+                            callback: function(e) { copyTextToClipboard(this.chat_link); },
+                            context: { chat_link: poi.chat_link }
                         }
                     ]
                 }
