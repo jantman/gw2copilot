@@ -50,23 +50,22 @@ class PlayerInfo(object):
 
     professions = [
         '',  # 1-based indexing
-        'Guardian',
-        'Warrior',
-        'Engineer',
-        'Ranger',
-        'Thief',
-        'Elementalist',
-        'Mesmer',
-        'Necromancer',
-        'Revenant'
+        'Guardian',  # 1
+        'Warrior',  # 2
+        'Engineer',  # 3
+        'Ranger',  # 4
+        'Thief',  # 5
+        'Elementalist',  # 6
+        'Mesmer',  # 7
+        'Necromancer',  # 8
+        'Revenant'  # 9
     ]
     races = [
-        '',  # 1-based indexing
-        'Asura',
-        'Charr',
-        'Human',
-        'Norn',
-        'Sylvari'
+        'Asura',  # 0
+        'Charr',  # 1
+        'Human',  # 2
+        'Norn',  # 3
+        'Sylvari'  # 4
     ]
 
     def __init__(self, cache):
