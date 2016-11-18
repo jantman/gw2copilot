@@ -64,7 +64,7 @@ var m = {
 
 var ICONS = {
     player: L.icon({
-        iconUrl: '/static/img/crosshair_32x32.png',
+        iconUrl: '/static/img/blue_dot_32x32.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 0]
