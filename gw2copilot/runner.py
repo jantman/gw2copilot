@@ -42,6 +42,7 @@ import sys
 import os
 import argparse
 import logging
+import re
 
 from .version import VERSION, PROJECT_URL
 from .server import TwistedServer
@@ -113,6 +114,12 @@ class Runner(object):
                        help='API Key; exporting this as the GW2_API_KEY '
                             'environment variable is preferred over specifying '
                             'it on the command line')
+        lf = os.path.abspath(
+            os.path.expanduser('~/.gw2copilot/logs/')
+        )
+        p.add_argument('--logpath', dest='logpath', action='store', type=str,
+                       default=lf, help='directory to write log files in; '
+                       'set to "none" to disable writing log files')
         args = p.parse_args(argv)
         if args.api_key is None:
             k = os.environ.get('GW2_API_KEY', None)
@@ -130,6 +137,8 @@ class Runner(object):
             set_log_info()
         elif args.verbose > 1:
             set_log_debug()
+        if args.logpath != 'none':
+            set_log_file(args.logpath, args.verbose)
 
         s = TwistedServer(
             poll_interval=args.poll_interval,
@@ -140,6 +149,60 @@ class Runner(object):
             api_key=args.api_key
         )
         s.run()
+
+
+def set_log_file(logdir, verbosity):
+    """
+    Add a logging handler to write debug-level logs to a rotating file under
+    logdir.
+
+    :param logdir: directory to write log files under
+    :type logdir: str
+    :param verbosity: verbosity level: 0=WARNING, 1=INFO, 2=DEBUG
+    """
+    if not os.path.exists(logdir):
+        logger.debug("Creating log directory at: %s", logdir)
+        os.makedirs(logdir, 0700)
+    rotate_log_files(logdir)
+    fpath = os.path.join(logdir, 'gw2copilot.log')
+    logger.debug('Debug-level logs being written to: %s', fpath)
+    fh = logging.FileHandler(fpath)
+    if verbosity > 1:
+        fh.setLevel(logging.DEBUG)
+    elif verbosity > 0:
+        fh.setLevel(logging.INFO)
+    else:
+        fh.setLevel(logging.WARNING)
+    fmt = logging.Formatter("%(asctime)s [%(levelname)s %(filename)s:"
+                            "%(lineno)s - %(name)s.%(funcName)s() ] "
+                            "%(message)s")
+    fh.setFormatter(fmt)
+    logger.addHandler(fh)
+
+
+def rotate_log_files(logdir):
+    """
+    Rotate all log files in logdir.
+
+    :param logdir: logging directory
+    :type logdir: str
+    """
+    num_to_keep = 5
+    fpath = os.path.join(logdir, 'gw2copilot.log.%d' % num_to_keep)
+    if os.path.exists(fpath):
+        logger.debug('Removing oldest log file: %s', fpath)
+        os.unlink(fpath)
+    for i in range((num_to_keep - 1), 0, -1):
+        fpath = os.path.join(logdir, 'gw2copilot.log.%d' % i)
+        if os.path.exists(fpath):
+            newpath = os.path.join(logdir, 'gw2copilot.log.%d' % (i + 1))
+            logger.debug('Rotating log file %s -> %s', fpath, newpath)
+            os.rename(fpath, newpath)
+    fpath = os.path.join(logdir, 'gw2copilot.log')
+    if os.path.exists(fpath):
+        newpath = os.path.join(logdir, 'gw2copilot.log.%d' % 1)
+        logger.debug('Rotating log file %s -> %s', fpath, newpath)
+        os.rename(fpath, newpath)
 
 
 def set_log_info():
