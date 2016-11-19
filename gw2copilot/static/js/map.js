@@ -193,10 +193,6 @@ $("#btn_toggle_vistas").click(function() {
     showHideLayers();
 });
 
-$("#btn_toggle_events").click(function() {
-    alert("TODO: btn_toggle_events not implemented");
-});
-
 //
 // Map movement and zooming
 //
@@ -471,8 +467,6 @@ function addZoneMarkersToLayers(map_id) {
             bounds.map(function(e) { return gw2latlon(e); })
         );
     }
-
-    // @TODO: events
 }
 
 /**
