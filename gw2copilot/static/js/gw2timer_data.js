@@ -54,7 +54,8 @@ function gw2timer_add_resource_markers() {
     console.log("adding gw2timer resource layers");
     //ResourceLayers: ["Metal", "RichMetal", "Plant", "RichPlant", "Wood", "RichWood"]
     for(var i =0; i < m.ResourceLayers.length; i++) {
-        m.resourceGroups[m.ResourceLayers[i]] = L.layerGroup()
+        m.resourceGroups[m.ResourceLayers[i]] = L.layerGroup();
+        m.hidden[m.ResourceLayers[i]] = true;
     }
 
     for (res_name in GW2T_RESOURCE_DATA) {
@@ -84,11 +85,6 @@ function gw2timer_add_resource_markers() {
                 gw2timer_add_markers_for_resource(res_type, resource["Regular"], ("possible " + title), ICONS[res_type]);
             }
         }
-    }
-
-    console.log("DEBUG ONLY"); // while testing, always show them
-    for(var i =0; i < m.ResourceLayers.length; i++) {
-        map.addLayer(m.resourceGroups[m.ResourceLayers[i]]);
     }
 }
 
