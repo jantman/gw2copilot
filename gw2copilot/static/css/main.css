@@ -55,3 +55,8 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 #zoneRemindersTable thead tr td {
     font-weight: bold;
 }
+
+/* make the sidebar scrollable */
+.sidebar-wrapper {
+  overflow: scroll;
+}
