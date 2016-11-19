@@ -102,6 +102,7 @@ Dependencies and Thanks
 
 gw2copilot is built on the shoulders of giants; it makes use of the following Free or Open Source tools:
 
+* `drant's <http://forum.renaka.com/forum/368355/>`_ `gw2timer.com <http://gw2timer.com/>`_ (`github.com/Drant/GW2Timer <https://github.com/Drant/GW2Timer>`_) for data on resource node locations and some other items not accessible through the GW2 API.
 * `bootstrap <http://getbootstrap.com/>`_ and `html5boilerplate <https://html5boilerplate.com/>`_ for the UI, downloaded via `initizlizr <http://www.initializr.com/>`_, which themselves include `jquery <https://jquery.com/>`_ and `modernizr <https://modernizr.com/>`_.
 * The `twisted <https://twistedmatrix.com/>`_ event-based asynchronous framework at the heart of the app (reading the MumbleLink file, serving HTTP and websockets, and timer-based actions).
 * The `Klein <https://klein.readthedocs.io/en/latest/>`_ microframework for serving HTTP, with user-oriented pages templated using `Jinja2 <http://jinja.pocoo.org/>`_.

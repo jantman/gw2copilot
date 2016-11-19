@@ -121,7 +121,8 @@ $(document).ready(function () {
 
     L.tileLayer("/api/tiles?continent=1&floor=1&zoom={z}&x={x}&y={y}", {
         attribution: "Map Data and Imagery &copy; " +
-            "<a href=\"https://wiki.guildwars2.com/wiki/API:Main\">GuildWars2/ArenaNet</a>" +
+            "<a href=\"https://wiki.guildwars2.com/wiki/API:Main\">GuildWars2/ArenaNet</a>; " +
+            "some data from <a href=\"http://gw2timer.com/\">gw2timer.com</a>" +
             "; <a href=\"https://github.com/jantman/gw2copilot\">gw2copilot is AGPL Free Software</a>",
         continuousWorld: true
     }).addTo(map);
