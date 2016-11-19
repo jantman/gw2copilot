@@ -61,7 +61,7 @@ var m = {
     heartAreas: {},
     shownHeartAreas: [],
     POIlayers: ["waypoints", "POIs", "vistas", "heropoints", "hearts"],
-    ResourceLayers: ["Metal", "RichMetal", "PermanentMetal", "Plant", "RichPlant", "PermanentPlant", "Wood", "RichWood", "PermanentWood"]
+    ResourceLayers: ["Metal", "RichMetal", "Plant", "RichPlant", "Wood", "RichWood"]
 };
 
 var ICONS = {
