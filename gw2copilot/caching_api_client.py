@@ -127,7 +127,7 @@ class CachingAPIClient(object):
         )
 
     def _cache_get(self, cache_type, cache_key, binary=False, extension='json',
-                   ttl=None):
+                   ttl=None, raw=False):
         """
         Read the cache file from disk for the given cache type and cache key;
         return None if it does not exist. If it does exist, return the decoded
@@ -145,6 +145,8 @@ class CachingAPIClient(object):
           disk, it will only be returned (non-None result) if newer than this
           number of seconds
         :type ttl: int
+        :param raw: if True, return raw content without JSON decoding
+        :type raw: bool
         :returns: cache data or None
         :rtype: dict
         """
@@ -163,8 +165,10 @@ class CachingAPIClient(object):
                 r = fh.read()
             return r
         with open(p, 'r') as fh:
-            raw = fh.read()
-        j = json.loads(raw)
+            data = fh.read()
+        if raw:
+            return data
+        j = json.loads(data)
         return j
 
     def _cache_set(self, cache_type, cache_key, data, binary=False, raw=False,
@@ -546,7 +550,7 @@ class CachingAPIClient(object):
         url = 'https://raw.githubusercontent.com/Drant/GW2Timer/gh-pages/' \
               'data/resource.js'
         cached = self._cache_get('gw2timer', 'resource', extension='js',
-                                 ttl=TTL_1DAY)
+                                 ttl=TTL_1DAY, raw=True)
         if cached is not None:
             return
         r = requests.get(url)

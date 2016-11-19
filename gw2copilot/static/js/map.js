@@ -46,6 +46,7 @@ var m = {
     playerLatLng: null,
     followPlayer: false,
     zones: {},
+    resourceGroups: {},
     layerGroups: {}, // populated by addLayers()
     ZOOM_THRESH: 4, // cutoff between showing detailed data or not; >= this is detailed
     lastShownZone: null,
@@ -59,7 +60,8 @@ var m = {
     },
     heartAreas: {},
     shownHeartAreas: [],
-    POIlayers: ["waypoints", "POIs", "vistas", "heropoints", "hearts"]
+    POIlayers: ["waypoints", "POIs", "vistas", "heropoints", "hearts"],
+    ResourceLayers: ["Metal", "RichMetal", "PermanentMetal", "Plant", "RichPlant", "PermanentPlant", "Wood", "RichWood", "PermanentWood"]
 };
 
 var ICONS = {
@@ -101,6 +103,24 @@ var ICONS = {
     }),
     event: L.icon({
         iconUrl: '/cache/assets/map_special_event_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    Metal: L.icon({
+        iconUrl: '/cache/assets/map_node_mining_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    Plant: L.icon({
+        iconUrl: '/cache/assets/map_node_harvesting_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    Wood: L.icon({
+        iconUrl: '/cache/assets/map_node_logging_32x32.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 0]
@@ -332,6 +352,7 @@ function addLayers() {
         m.zones[map_id].layers.borders.on('mouseout', handleZoneMouseOut, { map_id: map_id });
         m.zones[map_id].layers.borders.addTo(map);
     }
+    gw2timer_add_resource_markers();
     console.log("done adding layers.");
 }
 
@@ -468,6 +489,8 @@ function addZoneMarkersToLayers(map_id) {
             bounds.map(function(e) { return gw2latlon(e); })
         );
     }
+
+
 }
 
 /**
