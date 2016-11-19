@@ -46,10 +46,16 @@ from base64 import b64encode
 from PIL import Image
 from StringIO import StringIO
 
-from .utils import dict2js
+from .utils import dict2js, file_age
 from .static_data import world_zones
 
 logger = logging.getLogger(__name__)
+
+#: Cache TTL - 1 day, in seconds
+TTL_1DAY = 86400
+
+#: Cache TTL - 1 hour, in seconds
+TTL_1HOUR = 3600
 
 
 class CachingAPIClient(object):
@@ -71,6 +77,7 @@ class CachingAPIClient(object):
         """
         self._cache_dir = cache_dir
         self._api_key = api_key
+        self._server = parent_server
         self._characters = {}  # these don't get cached to disk
         self._all_maps = None  # cache in memory as well
         self._zone_reminders = None  # cache in memory as well
@@ -116,7 +123,8 @@ class CachingAPIClient(object):
             self._cache_dir, cache_type, '%s.%s' % (cache_key, extn)
         )
 
-    def _cache_get(self, cache_type, cache_key, binary=False, extension='json'):
+    def _cache_get(self, cache_type, cache_key, binary=False, extension='json',
+                   ttl=None):
         """
         Read the cache file from disk for the given cache type and cache key;
         return None if it does not exist. If it does exist, return the decoded
@@ -130,6 +138,10 @@ class CachingAPIClient(object):
         :type binary: bool
         :param extension: file extension to save in cache with
         :type extension: str
+        :param ttl: cache TTL in seconds; if not None, and the file exists on
+          disk, it will only be returned (non-None result) if newer than this
+          number of seconds
+        :type ttl: int
         :returns: cache data or None
         :rtype: dict
         """
@@ -137,6 +149,11 @@ class CachingAPIClient(object):
         if not os.path.exists(p):
             logger.debug('cache MISS for type=%s key=%s (path: %s)',
                          cache_type, cache_key, p)
+            return None
+        age = file_age(p)
+        if ttl is not None and age >= ttl:
+            logger.debug('cache expired for type=%s key=%s (age=%s)',
+                         cache_type, cache_key, age)
             return None
         if binary:
             with open(p, 'rb') as fh:
@@ -220,8 +237,15 @@ class CachingAPIClient(object):
         if self._all_maps is not None:
             logger.debug('Already have all maps in cache')
             return self._all_maps
-        r = self._get('/v2/maps')
-        ids = r.json()
+        data = self._cache_get('mapdata', 'all_maps', ttl=TTL_1DAY)
+        if data is not None:
+            self._all_maps = data
+            return data
+        ids = self._cache_get('mapdata', 'ids', ttl=TTL_1DAY)
+        if ids is None:
+            r = self._get('/v2/maps')
+            ids = r.json()
+            self._cache_set('mapdata', 'ids', ids)
         logger.debug('Got list of all %d map IDs', len(ids))
         maps = {}
         logger.info("Starting to fill map data cache...")
@@ -439,8 +463,11 @@ class CachingAPIClient(object):
             'map_waypoint_hover',
         ]
         logger.debug('Getting assets from GW2 files API')
-        r = self._get('/v1/files.json?ids=all', auth=True)
-        files = r.json()
+        files = self._cache_get('api', 'files', ttl=TTL_1DAY)
+        if files is None:
+            r = self._get('/v1/files.json?ids=all', auth=True)
+            files = r.json()
+            self._cache_set('api', 'files', files)
         for name in files_to_get:
             if os.path.exists(self._cache_path('assets', name, 'png')):
                 logger.debug('Already have asset: %s', name)

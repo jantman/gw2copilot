@@ -42,6 +42,8 @@ from .version import VERSION
 import logging
 import inspect
 import json
+import time
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -115,3 +117,15 @@ def dict2js(varname, data):
     return "var %s = %s;\n" % (
         varname, json.dumps(data, sort_keys=True, indent=4)
     )
+
+
+def file_age(p):
+    """
+    Return the age of a file in seconds.
+
+    :param p: path to the file
+    :type p: str
+    :return: file age in seconds
+    :rtype: float
+    """
+    return time.time() - os.stat(p).st_mtime
