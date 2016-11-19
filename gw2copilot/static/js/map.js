@@ -57,6 +57,7 @@ var m = {
         heropoints: false,
         hearts: false,
         all: false
+        // the resource layer keys here are created by gw2timer_data:gw2timer_add_resource_markers()
     },
     heartAreas: {},
     shownHeartAreas: [],
@@ -184,35 +185,20 @@ function onZoomChange(e) {
 // Layer toggling
 //
 
+// handler for "ALL" POI layers
 $("#btn_toggle_all").click(function() {
     m.hidden.all = ! m.hidden.all;
     showHideLayers();
 });
 
-$("#btn_toggle_waypoints").click(function() {
-    m.hidden.waypoints = ! m.hidden.waypoints;
-    showHideLayers();
-});
-
-$("#btn_toggle_hearts").click(function() {
-    m.hidden.hearts = ! m.hidden.hearts;
-    showHideLayers();
-});
-
-$("#btn_toggle_heropoints").click(function() {
-    m.hidden.heropoints = ! m.hidden.heropoints;
-    showHideLayers();
-});
-
-$("#btn_toggle_POIs").click(function() {
-    m.hidden.POIs = ! m.hidden.POIs;
-    showHideLayers();
-});
-
-$("#btn_toggle_vistas").click(function() {
-    m.hidden.vistas = ! m.hidden.vistas;
-    showHideLayers();
-});
+// add handlers for POI layer clicks
+for(var i =0; i < m.POIlayers.length; i++) {
+    layername = m.POIlayers[i];
+    $("#btn_toggle_" + layername).click({layername: layername}, function(event) {
+        m.hidden[event.data.layername] = ! m.hidden[event.data.layername];
+        showHideLayers();
+    });
+}
 
 //
 // Map movement and zooming
