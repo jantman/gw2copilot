@@ -78,10 +78,10 @@ function gw2timer_add_resource_markers() {
                 gw2timer_add_markers_for_resource("Rich" + res_type, resource["Permanent"], ("Permanent " + title), ICONS[res_type]);
             }
             if (resource.hasOwnProperty("Hotspot") && resource["Hotspot"].length > 0) {
-                gw2timer_add_markers_for_resource(res_type, resource["Hotspot"], title, ICONS[res_type]);
+                gw2timer_add_markers_for_resource(res_type, resource["Hotspot"], ("probable " + title), ICONS[res_type]);
             }
             if (resource.hasOwnProperty("Regular") && resource["Regular"].length > 0) {
-                gw2timer_add_markers_for_resource(res_type, resource["Regular"], title, ICONS[res_type]);
+                gw2timer_add_markers_for_resource(res_type, resource["Regular"], ("possible " + title), ICONS[res_type]);
             }
         }
     }
