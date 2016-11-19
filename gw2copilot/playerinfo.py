@@ -247,14 +247,14 @@ class PlayerInfo(object):
         con_x, con_y = pos
         map_id, map_rect, con_rect = self._find_map_for_position(pos)
         x = (
-                (con_x - con_rect[0][0]) / \
-                (con_rect[1][0] - con_rect[0][0]) * \
+                (con_x - con_rect[0][0]) /
+                (con_rect[1][0] - con_rect[0][0]) *
                 (map_rect[1][0] - map_rect[0][0])
             ) + map_rect[0][0]
         y = (
                 (
-                    (con_y - con_rect[0][1]) / \
-                    (con_rect[1][1] - con_rect[0][1]) * \
+                    (con_y - con_rect[0][1]) /
+                    (con_rect[1][1] - con_rect[0][1]) *
                     (map_rect[1][1] - map_rect[0][1])
                 ) + map_rect[0][1]
         ) * -1
@@ -281,7 +281,6 @@ class PlayerInfo(object):
                 logger.debug('Found player in map %d', map_id)
                 return map_id, map['map_rect'], map['continent_rect']
         raise Exception('Error: could not find map for point %s', pos)
-
 
     def _handle_map_change(self, new_map_id):
         """

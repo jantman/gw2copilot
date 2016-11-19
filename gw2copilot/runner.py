@@ -42,7 +42,6 @@ import sys
 import os
 import argparse
 import logging
-import re
 
 from .version import VERSION, PROJECT_URL
 from .server import TwistedServer

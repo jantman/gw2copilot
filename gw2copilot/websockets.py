@@ -82,7 +82,7 @@ class BroadcastServerFactory(WebSocketServerFactory):
     def tick(self):
         self.tickcount += 1
         self.broadcast(
-            '{"type": "tick", "message": "tick %d from server"}' % \
+            '{"type": "tick", "message": "tick %d from server"}' %
             self.tickcount
         )
         self.reactor.callLater(1, self.tick)

@@ -391,13 +391,8 @@ class CachingAPIClient(object):
                 return None
             return cached
         url = 'https://tiles.guildwars2.com/{continent_id}/{floor}/' \
-              '{zoom}/{x}/{y}.jpg'.format(
-            continent_id=continent,
-            floor=floor,
-            zoom=zoom,
-            x=x,
-            y=y
-        )
+              '{zoom}/{x}/{y}.jpg'.format(continent_id=continent, floor=floor,
+                                          zoom=zoom, x=x, y=y)
         logger.debug('GET %s', url)
         r = requests.get(url)
         logger.debug('GET %s returned status %d, %d bytes', url,
@@ -407,7 +402,6 @@ class CachingAPIClient(object):
             return None
         if r.status_code == 403:
             logger.debug('403 - Tile does not exist')
-            content = ''
             self._cache_set('tiles', cache_key, r.content, binary=True,
                             extension='jpg')
             return None

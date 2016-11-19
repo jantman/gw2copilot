@@ -328,8 +328,9 @@ class GW2CopilotAPI(ClassRouteMixin):
     @classroute('tiles')
     def tiles(self, request):
         """
-        Provides local filesystem caching of GW2 map tiles. If the requested tile
-        is not already in the cache, it will be requested from the  GW2 Tiles API.
+        Provides local filesystem caching of GW2 map tiles. If the requested
+        tile is not already in the cache, it will be requested from the  GW2
+        Tiles API.
 
         This serves :http:get:`/api/tiles` endpoint.
 
@@ -435,7 +436,6 @@ class GW2CopilotAPI(ClassRouteMixin):
         msg = make_response('OK')
         request.setResponseCode(statuscode, message=msg)
         return make_response(json.dumps(data))
-
 
     @classroute('zone_reminders', methods=['PUT'])
     def set_zone_reminders(self, request):

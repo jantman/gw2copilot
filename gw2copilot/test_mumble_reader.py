@@ -161,8 +161,7 @@ class TestMumbleLinkReader(object):
         try:
             map_id, map_x, map_y = \
                 self.server.playerinfo._map_coords_from_position(
-                    (self.curr_x, self.curr_y)
-            )
+                    (self.curr_x, self.curr_y))
             # meters to inches
             map_x /= 39.3701
             map_y /= 39.3701
