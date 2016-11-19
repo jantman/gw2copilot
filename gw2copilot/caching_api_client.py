@@ -95,6 +95,7 @@ class CachingAPIClient(object):
         _ = self.all_maps
         self._make_map_data_js()
         self._get_gw2_api_files()
+        self._get_gw2timer_data()
 
     @property
     def cache_dir(self):
@@ -534,3 +535,22 @@ class CachingAPIClient(object):
         """
         self._zone_reminders = reminders
         self._cache_set('user_settings', 'zone_reminders', reminders)
+
+    def _get_gw2timer_data(self):
+        """
+        Retrive gw2timer.com data files from GitHub; cache locally.
+        """
+        logger.debug('Getting gw2timer.com data files')
+        url = 'https://raw.githubusercontent.com/Drant/GW2Timer/gh-pages/' \
+              'data/resource.js'
+        cached = self._cache_get('gw2timer', 'resource', extension='js',
+                                 ttl=TTL_1DAY)
+        if cached is not None:
+            return
+        r = requests.get(url)
+        if r.status_code != 200:
+            logger.error("Error: GET %s returned status code %s", url,
+                         r.status_code)
+            return
+        self._cache_set('gw2timer', 'resource', r.content, extension='js',
+                        raw=True)
