@@ -237,10 +237,6 @@ class CachingAPIClient(object):
         if self._all_maps is not None:
             logger.debug('Already have all maps in cache')
             return self._all_maps
-        data = self._cache_get('mapdata', 'all_maps', ttl=TTL_1DAY)
-        if data is not None:
-            self._all_maps = data
-            return data
         ids = self._cache_get('mapdata', 'ids', ttl=TTL_1DAY)
         if ids is None:
             r = self._get('/v2/maps')
