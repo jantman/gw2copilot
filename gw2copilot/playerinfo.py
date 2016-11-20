@@ -266,21 +266,15 @@ class PlayerInfo(object):
         py:meth:`~._continent_coords`), find the map_id, map_rect and
         continent_rect corresponding to that position.
 
+        Wrapper around
+        :py:meth:`~.CachingAPIClient.find_map_for_position`
+
         :param pos: continent coordinates position 2-tuple (x, y)
         :type pos: tuple
         :return: 3-tuple: (map_id, map_rect, continent_rect)
         :rtype: tuple
         """
-        x, y = pos
-        for map_id, map in self._cache.all_maps.items():
-            x1 = map['continent_rect'][0][0]
-            x2 = map['continent_rect'][1][0]
-            y1 = map['continent_rect'][0][1]
-            y2 = map['continent_rect'][1][1]
-            if x1 <= x <= x2 and y1 <= y <= y2:
-                logger.debug('Found player in map %d', map_id)
-                return map_id, map['map_rect'], map['continent_rect']
-        raise Exception('Error: could not find map for point %s', pos)
+        return self._cache.find_map_for_position(pos)
 
     def _handle_map_change(self, new_map_id):
         """

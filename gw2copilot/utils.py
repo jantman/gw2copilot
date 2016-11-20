@@ -44,6 +44,7 @@ import inspect
 import json
 import time
 import os
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -129,3 +130,29 @@ def file_age(p):
     :rtype: float
     """
     return time.time() - os.stat(p).st_mtime
+
+
+def extract_js_var(s, varname):
+    """
+    Given a string of javascript source code, extract the source of the given
+    variable name. Makes rather naive assumptions about correct formatting.
+
+    :param s: original JS source string
+    :type s: str
+    :param varname: the variable name to get
+    :type v: str
+    :return: source of specified variable
+    :rtype: str
+    """
+    vname_re = re.compile('^var %s\s+=\s+{.*$' % varname)
+    src = ''
+    in_var = False
+    for line in s.split("\n"):
+        if not in_var and vname_re.match(line):
+            in_var = True
+            src += line + "\n"
+        elif in_var:
+            src += line + "\n"
+            if '};' in line:
+                return src
+    raise Exception("Could not parse JS variable %s from source" % varname)
