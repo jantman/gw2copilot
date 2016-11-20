@@ -86,7 +86,6 @@ def read_js_object(code, use_unicode=False):
                         'Cannot + on anything other than two literals')
             else:
                 raise ValueError("Cannot do operator '%s'" % node.op)
-
         elif isinstance(node, ast.String):
             s = node.value.strip('"').strip("'")
             if use_unicode:
@@ -96,8 +95,23 @@ def read_js_object(code, use_unicode=False):
                 return s
         elif isinstance(node, ast.Array):
             return [visit(x) for x in node]
-        elif (isinstance(node, ast.Number) or isinstance(node, ast.Identifier)
-              or isinstance(node, ast.Boolean) or isinstance(node, ast.Null)):
+        elif isinstance(node, ast.Number):
+            try:
+                i = int(node.value)
+                if node.value == '%d' % i:
+                    return i
+            except Exception:
+                pass
+            return float(node.value)
+        elif isinstance(node, ast.Boolean):
+            # properly handle boolean
+            if node.value.lower().startswith('t'):
+                return True
+            return False
+        elif isinstance(node, ast.Null):
+            # properly handle null -> None
+            return None
+        elif isinstance(node, ast.Identifier):
             return node.value
         else:
             raise Exception("Unhandled node: %r" % node)
