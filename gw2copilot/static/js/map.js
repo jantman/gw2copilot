@@ -191,9 +191,18 @@ $("#btn_toggle_all").click(function() {
     showHideLayers();
 });
 
-// add handlers for POI layer clicks
+// add handlers for POI layer-hiding button clicks
 for(var i =0; i < m.POIlayers.length; i++) {
     layername = m.POIlayers[i];
+    $("#btn_toggle_" + layername).click({layername: layername}, function(event) {
+        m.hidden[event.data.layername] = ! m.hidden[event.data.layername];
+        showHideLayers();
+    });
+}
+
+// add handlers for resource layer-hiding button clicks
+for(var i =0; i < m.ResourceLayers.length; i++) {
+    layername = m.ResourceLayers[i];
     $("#btn_toggle_" + layername).click({layername: layername}, function(event) {
         m.hidden[event.data.layername] = ! m.hidden[event.data.layername];
         showHideLayers();
@@ -554,15 +563,21 @@ function showHideLayers() {
     if ( map.getZoom() >= m.ZOOM_THRESH ) {
         // zoomed in enough, show all POIs based on our settings
         if( m.hidden.all === true ){
+            // POI layers; "all" doesn't touch resource layers
             for(var i =0; i < m.POIlayers.length; i++) {
-                map.removeLayer(m.layerGroups[m.POIlayers[i]]);
+                if(map.hasLayer(m.layerGroups[m.POIlayers[i]])) {
+                    map.removeLayer(m.layerGroups[m.POIlayers[i]]);
+                }
             }
             $("#btn_toggle_all").switchClass('btn-success', 'btn-danger');
         } else {
             $("#btn_toggle_all").switchClass('btn-danger', 'btn-success');
+            // POI layers
             for(var i =0; i < m.POIlayers.length; i++) {
                 if ( m.hidden[m.POIlayers[i]] === true ) {
-                    map.removeLayer(m.layerGroups[m.POIlayers[i]]);
+                    if(map.hasLayer(m.layerGroups[m.POIlayers[i]])) {
+                        map.removeLayer(m.layerGroups[m.POIlayers[i]]);
+                    }
                     $("#btn_toggle_" + m.POIlayers[i]).switchClass('btn-success', 'btn-danger');
                 } else {
                     map.addLayer(m.layerGroups[m.POIlayers[i]]);
@@ -570,10 +585,30 @@ function showHideLayers() {
                 }
             }
         }
+        // resource layers
+        for(var i =0; i < m.ResourceLayers.length; i++) {
+            if ( m.hidden[m.ResourceLayers[i]] === true ) {
+                if(map.hasLayer(m.resourceGroups[m.ResourceLayers[i]])) {
+                    map.removeLayer(m.resourceGroups[m.ResourceLayers[i]]);
+                }
+                $("#btn_toggle_" + m.ResourceLayers[i]).switchClass('btn-success', 'btn-danger');
+            } else {
+                map.addLayer(m.resourceGroups[m.ResourceLayers[i]]);
+                $("#btn_toggle_" + m.ResourceLayers[i]).switchClass('btn-danger', 'btn-success');
+            }
+        }
     } else {
         // hide all POIs; let the mouseover handle them
         for(var i =0; i < m.POIlayers.length; i++) {
-            map.removeLayer(m.layerGroups[m.POIlayers[i]]);
+            if(map.hasLayer(m.layerGroups[m.POIlayers[i]])) {
+                map.removeLayer(m.layerGroups[m.POIlayers[i]]);
+            }
+        }
+        // hide all resource layers
+        for(var i =0; i < m.ResourceLayers.length; i++) {
+            if(map.hasLayer(m.resourceGroups[m.ResourceLayers[i]])) {
+                map.removeLayer(m.resourceGroups[m.ResourceLayers[i]]);
+            }
         }
     }
 }
