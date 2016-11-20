@@ -125,7 +125,25 @@ var ICONS = {
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 0]
-    })
+    }),
+    asura_gate: L.icon({
+        iconUrl: '/static/img/asura_gate.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    interborder: L.icon({
+        iconUrl: '/static/img/interborder.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    skritt_tunnel: L.icon({
+        iconUrl: '/static/img/skritt_tunnel.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
 };
 
 /* initialize map */
