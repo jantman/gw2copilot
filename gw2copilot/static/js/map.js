@@ -144,6 +144,18 @@ var ICONS = {
         iconAnchor: [16, 16],
         popupAnchor: [0, 0]
     }),
+    launchpad: L.icon({
+        iconUrl: '/static/img/launchpad.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    launchpad_target: L.icon({
+        iconUrl: '/static/img/launchpad_target.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
 };
 
 /* initialize map */
