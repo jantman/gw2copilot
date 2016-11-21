@@ -48,6 +48,48 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 */
 
 /**
+ * Add markers for travel points from travel.js
+ */
+function gw2timer_add_travel() {
+    console.log("adding gw2timer travel layer");
+    m.travelLayer = L.layerGroup();
+
+    // interborders - zone portals
+    for(var i =0; i < GW2T_TRAVEL_PATHS["interborders"].length; i++) {
+        data = GW2T_TRAVEL_PATHS["interborders"][i];
+        markerA = L.marker(
+            gw2latlon(data["end_a"]["coord"]),
+            {
+                title: data["end_a"]["title"],
+                alt: data["end_a"]["title"],
+                riseOnHover: true,
+                icon: ICONS[data["end_a"]["icon"]],
+                opacity: 0.75
+            }
+        );
+        markerB = L.marker(
+            gw2latlon(data["end_b"]["coord"]),
+            {
+                title: data["end_b"]["title"],
+                alt: data["end_b"]["title"],
+                riseOnHover: true,
+                icon: ICONS[data["end_b"]["icon"]],
+                opacity: 0.75
+            }
+        );
+        markerA.on('mouseover', function(e) { console.log("markerA mouseover"); this.otherMarker.setOpacity(1.0); }, { otherMarker: markerB } );
+        markerA.on('mouseout', function(e) { console.log("markerA mouseout"); this.otherMarker.setOpacity(0.75); }, { otherMarker: markerB } );
+        m.travelLayer.addLayer(markerA);
+        m.travelLayer.addLayer(markerB);
+    }
+
+    // FINALLY, in map.js, hide/show layer (and add a button for it in live-sidebar.html)
+    // @TODO: DEBUG
+    map.addLayer(m.travelLayer);
+    // @TODO: END DEBUG
+}
+
+/**
  * Add markers for resource locations from gw2timer resource.js
  */
 function gw2timer_add_resource_markers() {

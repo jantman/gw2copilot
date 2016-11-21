@@ -59,6 +59,7 @@ var m = {
         all: false
         // the resource layer keys here are created by gw2timer_data:gw2timer_add_resource_markers()
     },
+    travelLayer: null, // populated by gw2timer_add_travel(), called from addLayers()
     heartAreas: {},
     shownHeartAreas: [],
     POIlayers: ["waypoints", "POIs", "vistas", "heropoints", "hearts"],
@@ -378,6 +379,7 @@ function addLayers() {
         m.zones[map_id].layers.borders.addTo(map);
     }
     gw2timer_add_resource_markers();
+    gw2timer_add_travel();
     console.log("done adding layers.");
 }
 
