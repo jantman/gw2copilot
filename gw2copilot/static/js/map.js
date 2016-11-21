@@ -140,7 +140,7 @@ var ICONS = {
         popupAnchor: [0, 0]
     }),
     skritt_tunnel: L.icon({
-        iconUrl: '/static/img/skritt_tunnel.png',
+        iconUrl: '/static/img/skritt_tunnel_32x32.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 0]
@@ -153,6 +153,36 @@ var ICONS = {
     }),
     launchpad_target: L.icon({
         iconUrl: '/static/img/launchpad_target.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    asura_gate_highlighted: L.icon({
+        iconUrl: '/static/img/asura_gate_highlighted.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    interborder_highlighted: L.icon({
+        iconUrl: '/static/img/interborder_highlighted.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    skritt_tunnel_highlighted: L.icon({
+        iconUrl: '/static/img/skritt_tunnel_highlighted_32x32.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    launchpad_highlighted: L.icon({
+        iconUrl: '/static/img/launchpad_highlighted.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, 0]
+    }),
+    launchpad_target_highlighted: L.icon({
+        iconUrl: '/static/img/launchpad_target_highlighted.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 0]
