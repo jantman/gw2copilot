@@ -56,7 +56,8 @@ var m = {
         vistas: false,
         heropoints: false,
         hearts: false,
-        all: false
+        all: false,
+        travel: false
         // the resource layer keys here are created by gw2timer_data:gw2timer_add_resource_markers()
     },
     travelLayer: null, // populated by gw2timer_add_travel(), called from addLayers()
@@ -249,6 +250,11 @@ function onZoomChange(e) {
 // handler for "ALL" POI layers
 $("#btn_toggle_all").click(function() {
     m.hidden.all = ! m.hidden.all;
+    showHideLayers();
+});
+
+$("#btn_toggle_travel").click(function() {
+    m.hidden.travel = ! m.hidden.travel;
     showHideLayers();
 });
 
@@ -631,6 +637,10 @@ function showHideLayers() {
                     map.removeLayer(m.layerGroups[m.POIlayers[i]]);
                 }
             }
+            // travel layer
+            if(map.hasLayer(m.travelLayer)) {
+                map.removeLayer(m.travelLayer);
+            }
             $("#btn_toggle_all").switchClass('btn-success', 'btn-danger');
         } else {
             $("#btn_toggle_all").switchClass('btn-danger', 'btn-success');
@@ -645,6 +655,16 @@ function showHideLayers() {
                     map.addLayer(m.layerGroups[m.POIlayers[i]]);
                     $("#btn_toggle_" + m.POIlayers[i]).switchClass('btn-danger', 'btn-success');
                 }
+            }
+            // handle travel layer
+            if( m.hidden["travel"] === true ) {
+                if(map.hasLayer(m.travelLayer)) {
+                    map.removeLayer(m.travelLayer);
+                }
+                $("#btn_toggle_travel").switchClass('btn-success', 'btn-danger');
+            } else {
+                map.addLayer(m.travelLayer);
+                $("#btn_toggle_travel").switchClass('btn-danger', 'btn-success');
             }
         }
         // resource layers
@@ -671,6 +691,10 @@ function showHideLayers() {
             if(map.hasLayer(m.resourceGroups[m.ResourceLayers[i]])) {
                 map.removeLayer(m.resourceGroups[m.ResourceLayers[i]]);
             }
+        }
+        // hide travel layer
+        if(map.hasLayer(m.travelLayer)) {
+            map.removeLayer(m.travelLayer);
         }
     }
 }

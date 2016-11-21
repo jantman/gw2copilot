@@ -94,11 +94,6 @@ function gw2timer_add_travel() {
         m.travelLayer.addLayer(markerA);
         m.travelLayer.addLayer(markerB);
     }
-
-    // FINALLY, in map.js, hide/show layer (and add a button for it in live-sidebar.html)
-    // @TODO: DEBUG
-    map.addLayer(m.travelLayer);
-    // @TODO: END DEBUG
 }
 
 /**
