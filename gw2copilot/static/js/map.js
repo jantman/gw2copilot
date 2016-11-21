@@ -164,7 +164,7 @@ var ICONS = {
         popupAnchor: [0, 0]
     }),
     interborder_highlighted: L.icon({
-        iconUrl: '/static/img/interborder_highlighted.png',
+        iconUrl: '/static/img/interborder_highligted.png',
         iconSize: [32, 32],
         iconAnchor: [16, 16],
         popupAnchor: [0, 0]

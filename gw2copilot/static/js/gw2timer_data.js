@@ -63,8 +63,7 @@ function gw2timer_add_travel() {
                 title: data["end_a"]["title"],
                 alt: data["end_a"]["title"],
                 riseOnHover: true,
-                icon: ICONS[data["end_a"]["icon"]],
-                opacity: 0.75
+                icon: ICONS[data["end_a"]["icon"]]
             }
         );
         markerB = L.marker(
@@ -73,12 +72,25 @@ function gw2timer_add_travel() {
                 title: data["end_b"]["title"],
                 alt: data["end_b"]["title"],
                 riseOnHover: true,
-                icon: ICONS[data["end_b"]["icon"]],
-                opacity: 0.75
+                icon: ICONS[data["end_b"]["icon"]]
             }
         );
-        markerA.on('mouseover', function(e) { console.log("markerA mouseover"); this.otherMarker.setOpacity(1.0); }, { otherMarker: markerB } );
-        markerA.on('mouseout', function(e) { console.log("markerA mouseout"); this.otherMarker.setOpacity(0.75); }, { otherMarker: markerB } );
+        markerA.on('mouseover', function(e) {
+            this.otherMarker.setIcon(ICONS.interborder_highlighted);
+            this.otherMarker.bounce();
+        }, { otherMarker: markerB } );
+        markerA.on('mouseout', function(e) {
+            this.otherMarker.stopBouncing();
+            this.otherMarker.setIcon(ICONS.interborder);
+        }, { otherMarker: markerB } );
+        markerB.on('mouseover', function(e) {
+            this.otherMarker.setIcon(ICONS.interborder_highlighted);
+            this.otherMarker.bounce();
+        }, { otherMarker: markerA } );
+        markerB.on('mouseout', function(e) {
+            this.otherMarker.stopBouncing();
+            this.otherMarker.setIcon(ICONS.interborder);
+        }, { otherMarker: markerA } );
         m.travelLayer.addLayer(markerA);
         m.travelLayer.addLayer(markerB);
     }
