@@ -76,24 +76,28 @@ function gw2timer_add_travel() {
             }
         );
         markerA.on('mouseover', function(e) {
-            this.otherMarker.setIcon(ICONS.interborder_highlighted);
+            this.otherMarker.setIcon(ICONS[this.icon_name + "_highlighted"]);
             this.otherMarker.bounce();
-        }, { otherMarker: markerB } );
+        }, { otherMarker: markerB, icon_name: data["end_a"]["icon"] } );
         markerA.on('mouseout', function(e) {
             this.otherMarker.stopBouncing();
-            this.otherMarker.setIcon(ICONS.interborder);
-        }, { otherMarker: markerB } );
+            this.otherMarker.setIcon(ICONS[this.icon_name]);
+        }, { otherMarker: markerB, icon_name: data["end_a"]["icon"] } );
         markerB.on('mouseover', function(e) {
-            this.otherMarker.setIcon(ICONS.interborder_highlighted);
+            this.otherMarker.setIcon(ICONS[this.icon_name + "_highlighted"]);
             this.otherMarker.bounce();
-        }, { otherMarker: markerA } );
+        }, { otherMarker: markerA, icon_name: data["end_b"]["icon"] } );
         markerB.on('mouseout', function(e) {
             this.otherMarker.stopBouncing();
-            this.otherMarker.setIcon(ICONS.interborder);
-        }, { otherMarker: markerA } );
+            this.otherMarker.setIcon(ICONS[this.icon_name]);
+        }, { otherMarker: markerA, icon_name: data["end_b"]["icon"] } );
         m.travelLayer.addLayer(markerA);
         m.travelLayer.addLayer(markerB);
     }
+
+    // interzones - Asura Gates
+    // intrazones - tunnels
+    // launchpads
 }
 
 /**
