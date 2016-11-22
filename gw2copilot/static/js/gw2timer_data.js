@@ -57,13 +57,54 @@ function gw2timer_add_travel() {
     // interborders - zone portals
     for(var i =0; i < GW2T_TRAVEL_PATHS["interborders"].length; i++) {
         data = GW2T_TRAVEL_PATHS["interborders"][i];
-        // @TODO - call gw2timer_add_travel_marker_pair() with args that
-        // are reusable for all of these...
+        gw2timer_add_travel_marker_pair(
+            data["end_a"]["coord"],
+            data["end_a"]["title"],
+            data["end_a"]["icon"],
+            data["end_b"]["coord"],
+            data["end_b"]["title"],
+            data["end_b"]["icon"]
+        );
     }
 
     // interzones - Asura Gates
+    for(var i =0; i < GW2T_TRAVEL_PATHS["interzones"].length; i++) {
+        data = GW2T_TRAVEL_PATHS["interzones"][i];
+        gw2timer_add_travel_marker_pair(
+            data["end_a"]["coord"],
+            data["end_a"]["title"],
+            data["end_a"]["icon"],
+            data["end_b"]["coord"],
+            data["end_b"]["title"],
+            data["end_b"]["icon"]
+        );
+    }
+
     // intrazones - tunnels
+    for(var i =0; i < GW2T_TRAVEL_PATHS["intrazones"].length; i++) {
+        data = GW2T_TRAVEL_PATHS["intrazones"][i];
+        gw2timer_add_travel_marker_pair(
+            data["end_a"]["coord"],
+            data["end_a"]["title"],
+            data["end_a"]["icon"],
+            data["end_b"]["coord"],
+            data["end_b"]["title"],
+            data["end_b"]["icon"]
+        );
+    }
+
     // launchpads
+    for(var i =0; i < GW2T_TRAVEL_PATHS["launchpads"].length; i++) {
+        data = GW2T_TRAVEL_PATHS["launchpads"][i];
+        gw2timer_add_travel_marker_pair(
+            data["end_a"]["coord"],
+            data["end_a"]["title"],
+            data["end_a"]["icon"],
+            data["end_b"]["coord"],
+            data["end_b"]["title"],
+            data["end_b"]["icon"]
+        );
+    }
 }
 
 /**
@@ -72,41 +113,42 @@ function gw2timer_add_travel() {
  *
  * @param {String} foo - bar
  */
-function gw2timer_add_travel_marker_pair() {
+function gw2timer_add_travel_marker_pair(a_coord, a_title, a_icon,
+                                         b_coord, b_title, b_icon) {
     markerA = L.marker(
-        gw2latlon(data["end_a"]["coord"]),
+        gw2latlon(a_coord),
         {
-            title: data["end_a"]["title"],
-            alt: data["end_a"]["title"],
+            title: a_title,
+            alt: a_title,
             riseOnHover: true,
-            icon: ICONS[data["end_a"]["icon"]]
+            icon: ICONS[a_icon]
         }
     );
     markerB = L.marker(
-        gw2latlon(data["end_b"]["coord"]),
+        gw2latlon(b_coord),
         {
-            title: data["end_b"]["title"],
-            alt: data["end_b"]["title"],
+            title: b_title,
+            alt: b_title,
             riseOnHover: true,
-            icon: ICONS[data["end_b"]["icon"]]
+            icon: ICONS[b_icon]
         }
     );
     markerA.on('mouseover', function(e) {
         this.otherMarker.setIcon(ICONS[this.icon_name + "_highlighted"]);
         this.otherMarker.bounce();
-    }, { otherMarker: markerB, icon_name: data["end_a"]["icon"] } );
+    }, { otherMarker: markerB, icon_name: a_icon } );
     markerA.on('mouseout', function(e) {
         this.otherMarker.stopBouncing();
         this.otherMarker.setIcon(ICONS[this.icon_name]);
-    }, { otherMarker: markerB, icon_name: data["end_a"]["icon"] } );
+    }, { otherMarker: markerB, icon_name: a_icon } );
     markerB.on('mouseover', function(e) {
         this.otherMarker.setIcon(ICONS[this.icon_name + "_highlighted"]);
         this.otherMarker.bounce();
-    }, { otherMarker: markerA, icon_name: data["end_b"]["icon"] } );
+    }, { otherMarker: markerA, icon_name: b_icon } );
     markerB.on('mouseout', function(e) {
         this.otherMarker.stopBouncing();
         this.otherMarker.setIcon(ICONS[this.icon_name]);
-    }, { otherMarker: markerA, icon_name: data["end_b"]["icon"] } );
+    }, { otherMarker: markerA, icon_name: b_icon } );
     m.travelLayer.addLayer(markerA);
     m.travelLayer.addLayer(markerB);
 }
