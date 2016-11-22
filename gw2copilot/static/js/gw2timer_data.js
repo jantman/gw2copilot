@@ -57,47 +57,58 @@ function gw2timer_add_travel() {
     // interborders - zone portals
     for(var i =0; i < GW2T_TRAVEL_PATHS["interborders"].length; i++) {
         data = GW2T_TRAVEL_PATHS["interborders"][i];
-        markerA = L.marker(
-            gw2latlon(data["end_a"]["coord"]),
-            {
-                title: data["end_a"]["title"],
-                alt: data["end_a"]["title"],
-                riseOnHover: true,
-                icon: ICONS[data["end_a"]["icon"]]
-            }
-        );
-        markerB = L.marker(
-            gw2latlon(data["end_b"]["coord"]),
-            {
-                title: data["end_b"]["title"],
-                alt: data["end_b"]["title"],
-                riseOnHover: true,
-                icon: ICONS[data["end_b"]["icon"]]
-            }
-        );
-        markerA.on('mouseover', function(e) {
-            this.otherMarker.setIcon(ICONS[this.icon_name + "_highlighted"]);
-            this.otherMarker.bounce();
-        }, { otherMarker: markerB, icon_name: data["end_a"]["icon"] } );
-        markerA.on('mouseout', function(e) {
-            this.otherMarker.stopBouncing();
-            this.otherMarker.setIcon(ICONS[this.icon_name]);
-        }, { otherMarker: markerB, icon_name: data["end_a"]["icon"] } );
-        markerB.on('mouseover', function(e) {
-            this.otherMarker.setIcon(ICONS[this.icon_name + "_highlighted"]);
-            this.otherMarker.bounce();
-        }, { otherMarker: markerA, icon_name: data["end_b"]["icon"] } );
-        markerB.on('mouseout', function(e) {
-            this.otherMarker.stopBouncing();
-            this.otherMarker.setIcon(ICONS[this.icon_name]);
-        }, { otherMarker: markerA, icon_name: data["end_b"]["icon"] } );
-        m.travelLayer.addLayer(markerA);
-        m.travelLayer.addLayer(markerB);
+        // @TODO - call gw2timer_add_travel_marker_pair() with args that
+        // are reusable for all of these...
     }
 
     // interzones - Asura Gates
     // intrazones - tunnels
     // launchpads
+}
+
+/**
+ * Add a specific set of markers for a pair of travel path points from
+ * gw2timer_add_travel(); this should only ever be called from that function!
+ *
+ * @param {String} foo - bar
+ */
+function gw2timer_add_travel_marker_pair() {
+    markerA = L.marker(
+        gw2latlon(data["end_a"]["coord"]),
+        {
+            title: data["end_a"]["title"],
+            alt: data["end_a"]["title"],
+            riseOnHover: true,
+            icon: ICONS[data["end_a"]["icon"]]
+        }
+    );
+    markerB = L.marker(
+        gw2latlon(data["end_b"]["coord"]),
+        {
+            title: data["end_b"]["title"],
+            alt: data["end_b"]["title"],
+            riseOnHover: true,
+            icon: ICONS[data["end_b"]["icon"]]
+        }
+    );
+    markerA.on('mouseover', function(e) {
+        this.otherMarker.setIcon(ICONS[this.icon_name + "_highlighted"]);
+        this.otherMarker.bounce();
+    }, { otherMarker: markerB, icon_name: data["end_a"]["icon"] } );
+    markerA.on('mouseout', function(e) {
+        this.otherMarker.stopBouncing();
+        this.otherMarker.setIcon(ICONS[this.icon_name]);
+    }, { otherMarker: markerB, icon_name: data["end_a"]["icon"] } );
+    markerB.on('mouseover', function(e) {
+        this.otherMarker.setIcon(ICONS[this.icon_name + "_highlighted"]);
+        this.otherMarker.bounce();
+    }, { otherMarker: markerA, icon_name: data["end_b"]["icon"] } );
+    markerB.on('mouseout', function(e) {
+        this.otherMarker.stopBouncing();
+        this.otherMarker.setIcon(ICONS[this.icon_name]);
+    }, { otherMarker: markerA, icon_name: data["end_b"]["icon"] } );
+    m.travelLayer.addLayer(markerA);
+    m.travelLayer.addLayer(markerB);
 }
 
 /**
