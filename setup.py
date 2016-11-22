@@ -52,7 +52,8 @@ requires = [
     'klein>=15.0.0,<16.0.0',
     'Jinja2>=2.8.0, <2.9.0',
     'autobahn>=0.16.0,<0.17.0',
-    'pillow>=3.4.0,<4.0.0'
+    'pillow>=3.4.0,<4.0.0',
+    'slimit>=0.8.0,<0.9.0'
 ]
 
 classifiers = [
