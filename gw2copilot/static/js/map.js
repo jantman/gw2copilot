@@ -451,13 +451,13 @@ function addZoneMarkersToLayers(map_id) {
                             context: { chat_link: poi.chat_link }
                         },
                         {
-                            text: '<a href="#">wiki.guildwars2.com</a>',
+                            text: '<a href="#">search on wiki.guildwars2.com</a>',
                             index: 2,
                             context: { link: "http://wiki.guildwars2.com/index.php?title=Special%3ASearch&search=" + encodeURIComponent(poi.chat_link) + "&go=Go" },
                             callback: function(e) { window.open(this.link); }
                         },
                         {
-                            text: '<a href="#">gw2.mmorpg-life.com</a>',
+                            text: '<a href="#">search on gw2.mmorpg-life.com</a>',
                             index: 3,
                             context: { link : "http://gw2.mmorpg-life.com/mojsearch.php?s=" + encodeURIComponent(poi.name) + "&submit=Search" },
                             callback: function(e) { window.open(this.link); }
@@ -490,6 +490,18 @@ function addZoneMarkersToLayers(map_id) {
                             text: poi.chat_link + ' (copy to clipboard)',
                             callback: function(e) { copyTextToClipboard(this.chat_link); },
                             context: { chat_link: poi.chat_link }
+                        },
+                        {
+                            text: '<a href="#">search on wiki.guildwars2.com</a>',
+                            index: 2,
+                            context: { link: "http://wiki.guildwars2.com/index.php?title=Special%3ASearch&search=" + encodeURIComponent(poi.chat_link) + "&go=Go" },
+                            callback: function(e) { window.open(this.link); }
+                        },
+                        {
+                            text: '<a href="#">search on gw2.mmorpg-life.com</a>',
+                            index: 3,
+                            context: { link : "http://gw2.mmorpg-life.com/mojsearch.php?s=" + encodeURIComponent(poi.name) + "&submit=Search" },
+                            callback: function(e) { window.open(this.link); }
                         }
                     ]
                 }
@@ -519,6 +531,18 @@ function addZoneMarkersToLayers(map_id) {
                             text: poi.chat_link + ' (copy to clipboard)',
                             callback: function(e) { copyTextToClipboard(this.chat_link); },
                             context: { chat_link: poi.chat_link }
+                        },
+                        {
+                            text: '<a href="#">search on wiki.guildwars2.com</a>',
+                            index: 2,
+                            context: { link: "http://wiki.guildwars2.com/index.php?title=Special%3ASearch&search=" + encodeURIComponent(poi.chat_link) + "&go=Go" },
+                            callback: function(e) { window.open(this.link); }
+                        },
+                        {
+                            text: '<a href="#">search on gw2.mmorpg-life.com</a>',
+                            index: 3,
+                            context: { link : "http://gw2.mmorpg-life.com/mojsearch.php?s=" + encodeURIComponent(poi.name) + "&submit=Search" },
+                            callback: function(e) { window.open(this.link); }
                         }
                     ]
                 }
@@ -552,7 +576,26 @@ function addZoneMarkersToLayers(map_id) {
                     title: poi.objective + " (task_id " + poi.task_id + ")",
                     alt: poi.objective + " (task_id " + poi.task_id + ")",
                     riseOnHover: true,
-                    icon: ICONS.heart
+                    icon: ICONS.heart,
+                    contextmenu: true,
+                    contextmenuItems: [
+                        {
+                            text: poi.objective + " (task " + poi.task_id + ")",
+                            index: 0
+                        },
+                        {
+                            text: '<a href="#">search on wiki.guildwars2.com</a>',
+                            index: 2,
+                            context: { link: "http://wiki.guildwars2.com/index.php?title=Special%3ASearch&search=" + encodeURIComponent(poi.objective) + "&go=Go" },
+                            callback: function(e) { window.open(this.link); }
+                        },
+                        {
+                            text: '<a href="#">search on gw2.mmorpg-life.com</a>',
+                            index: 3,
+                            context: { link : "http://gw2.mmorpg-life.com/mojsearch.php?s=" + encodeURIComponent(poi.objective) + "&submit=Search" },
+                            callback: function(e) { window.open(this.link); }
+                        }
+                    ]
                 }
             ).on('click', handleHeartClick, {task_id: poi.task_id})
             .on('mouseover', handleHeartMouseOver, {task_id: poi.task_id})
