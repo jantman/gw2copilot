@@ -91,10 +91,16 @@ class WineMumbleLinkReader(object):
         self._wine_protocol = WineProcessProtocol(self.server)
         logger.debug("Finding process executable, args and environ")
         executable, args, env = self._gw2_wine_spawn_info
+        # this seems to cause problems
+        if 'WINESERVERSOCKET' in env:
+            del env['WINESERVERSOCKET']
         logger.debug(
             "Creating spawned process; executable=%s args=%s len(env)=%d",
             executable, args, len(env)
         )
+        logger.debug("Process environment:")
+        for k in sorted(env.keys()):
+            logger.debug('%s=%s' % (k, env[k]))
         self._wine_process = self.server.reactor.spawnProcess(
             self._wine_protocol, executable, args, env)
 
