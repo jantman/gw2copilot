@@ -121,7 +121,20 @@ function gw2timer_add_travel_marker_pair(a_coord, a_title, a_icon,
             title: a_title,
             alt: a_title,
             riseOnHover: true,
-            icon: ICONS[a_icon]
+            icon: ICONS[a_icon],
+            contextmenu: true,
+            contextmenuItems: [
+                {
+                    text: a_title,
+                    index: 0
+                },
+                {
+                    index: 1,
+                    text: 'Pan to Other End',
+                    callback: function(e) { map.panTo(this.pos); },
+                    context: { pos: gw2latlon(b_coord) }
+                }
+            ]
         }
     );
     markerB = L.marker(
@@ -130,7 +143,20 @@ function gw2timer_add_travel_marker_pair(a_coord, a_title, a_icon,
             title: b_title,
             alt: b_title,
             riseOnHover: true,
-            icon: ICONS[b_icon]
+            icon: ICONS[b_icon],
+            contextmenu: true,
+            contextmenuItems: [
+                {
+                    text: b_title,
+                    index: 0
+                },
+                {
+                    index: 1,
+                    text: 'Pan to Other End',
+                    callback: function(e) { map.panTo(this.pos); },
+                    context: { pos: gw2latlon(a_coord) }
+                }
+            ]
         }
     );
     markerA.on('mouseover', function(e) {
