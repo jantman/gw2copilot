@@ -102,7 +102,7 @@ class TwistedServer(object):
             logger.debug('Defaulting cache directory to: %s', cd)
             cache_dir = cd
         self._cache_dir = cache_dir
-        self.cache = CachingAPIClient(self, cache_dir, api_key=api_key)
+        self.cache = CachingAPIClient(cache_dir, api_key=api_key)
         self.cache.fill_persistent_cache()
         # saved state:
         self._mumble_link_data = None

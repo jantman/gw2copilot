@@ -69,12 +69,10 @@ class CachingAPIClient(object):
     locally on disk.
     """
 
-    def __init__(self, parent_server, cache_dir, api_key=None):
+    def __init__(self, cache_dir, api_key=None):
         """
         Initialize the cache class.
 
-        :param parent_server: the TwistedServer instance that started this
-        :type parent_server: :py:class:`~.TwistedServer`
         :param cache_dir: cache directory on filesystem
         :type cache_dir: str
         :param api_key: GW2 API Key
@@ -82,7 +80,6 @@ class CachingAPIClient(object):
         """
         self._cache_dir = cache_dir
         self._api_key = api_key
-        self._server = parent_server
         self._characters = {}  # these don't get cached to disk
         self._all_maps = None  # cache in memory as well
         self._zone_reminders = None  # cache in memory as well
