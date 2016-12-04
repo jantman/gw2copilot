@@ -342,7 +342,7 @@ function latlon2gw(latlon) {
  * @param {array} latlng - (x, y) map Lat/Long position
  */
 function addPlayerMarker(latlng) {
-    m.playerMarker = L.marker(latlng, {icon: ICONS.player})
+    m.playerMarker = L.marker(latlng, {icon: ICONS.player, zIndexOffset: 1000})
         .bindPopup("Player position.")
         .addTo(map);
 }
