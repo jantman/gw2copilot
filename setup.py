@@ -53,7 +53,8 @@ requires = [
     'Jinja2>=2.8.0, <2.9.0',
     'autobahn>=0.16.0,<0.17.0',
     'pillow>=3.4.0,<4.0.0',
-    'slimit>=0.8.0,<0.9.0'
+    'slimit>=0.8.0,<0.9.0',
+    'versionfinder>=0.1.0,<0.2.0'
 ]
 
 classifiers = [

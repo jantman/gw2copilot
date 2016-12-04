@@ -47,6 +47,7 @@ from twisted.web.server import Site
 from twisted.internet import reactor
 from twisted.python import log
 from autobahn.twisted.websocket import listenWS
+from versionfinder import find_version
 
 import gw2copilot.site
 import gw2copilot.api
@@ -60,6 +61,12 @@ from .websockets import BroadcastServerFactory, BroadcastServerProtocol
 logger = logging.getLogger(__name__)
 observer = log.PythonLoggingObserver(loggerName='twisted')
 observer.start()
+
+# suppress versionfinder logging
+for lname in ['versionfinder', 'pip', 'git']:
+    l = logging.getLogger(lname)
+    l.setLevel(logging.CRITICAL)
+    l.propagate = True
 
 
 class TwistedServer(object):
@@ -88,6 +95,8 @@ class TwistedServer(object):
         :param api_key: GW2 API Key
         :type api_key: str
         """
+        self.ver_info = find_version('gw2copilot')
+        logger.info('Installed version: %s', self.ver_info.long_str)
         self._poll_interval = poll_interval
         self._bind_port = bind_port
         self._api_key = api_key

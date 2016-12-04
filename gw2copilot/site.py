@@ -95,6 +95,24 @@ class GW2CopilotSite(ClassRouteMixin):
             self._resource = self.app.resource()
         return self._resource
 
+    @property
+    def version_html(self):
+        """
+        Return a HTML string describing the current running version.
+
+        :return: HTML version string
+        :rtype: str
+        """
+        s = '<a href="%s">gw2copilot</a> %s' % (
+            self.parent_server.ver_info.url,
+            self.parent_server.ver_info.version
+        )
+        gs = self.parent_server.ver_info.git_str
+        if gs is not None and gs != '':
+            s += ' (' + gs + ')'
+        return s
+
+
     def _render_template(self, tmpl_name, request, **kwargs):
         """
         Render a Jinja2 template of the given name (passed as argument to
@@ -111,8 +129,9 @@ class GW2CopilotSite(ClassRouteMixin):
         :rtype: str
         """
         tmpl = self._tmpl_env.get_template(tmpl_name)
-        kwargs['VERSION'] = VERSION
-        kwargs['PROJECT_URL'] = PROJECT_URL
+        kwargs['VER_HTML'] = self.version_html
+        kwargs['VER_STR'] = self.parent_server.ver_info.long_str
+        kwargs['PROJECT_URL'] = self.parent_server.ver_info.url
         kwargs['ws_port'] = self.parent_server.ws_port
         rendered = tmpl.render(**kwargs)
         return rendered
