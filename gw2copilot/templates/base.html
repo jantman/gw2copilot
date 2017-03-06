@@ -61,6 +61,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
     </head>
     <body>
 {% include 'nav.html' %}
+{% include 'bug-report-modal.html' %}
 {% block body %}{% endblock %}
 
     <div class="container">
@@ -74,6 +75,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
     <script src="/static/js/vendor/jqueryui-bootstrap-adapter.min.js"></script>
     <script src="/static/js/plugins.js"></script>
     <script src="/static/js/main.js"></script>
+    <script src="/static/js/bug_report.js"></script>
     {% block extra_foot_script %}{% endblock %}
     </body>
 </html>

@@ -60,3 +60,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 .sidebar-wrapper {
   overflow: scroll;
 }
+
+#bug_report_link {
+  color: #AD0606 !important;
+}

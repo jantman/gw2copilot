@@ -1,5 +1,5 @@
 {#
-gw2copilot/templates/live-edit-modal.html
+gw2copilot/templates/bug-report-modal.html
 
 The latest version of this package is available at:
 <https://github.com/jantman/gw2copilot>
@@ -36,22 +36,22 @@ AUTHORS:
 Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 ################################################################################
 #}
-<!-- BEGIN live-edit-modal.html -->
-    <div class="modal fade" id="remindersModal" tabindex="-1" role="dialog">
+<!-- BEGIN bug-report-modal.html -->
+    <div class="modal fade" id="bugReportModal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">Edit Per-Zone Reminders</h4>
+            <h4 class="modal-title">Report A Bug</h4>
           </div>
           <div class="modal-body">
-              <table class="table table-striped" id="zoneRemindersTable"></table>
+              <p>Hello!</p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" id="saveZoneRemindersTable">Save</button>
+            <button type="button" class="btn btn-default" id="bugReportSave">Save</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-<!-- END live-edit-modal.html -->
+<!-- END bug-report-modal.html -->
