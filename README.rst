@@ -21,14 +21,16 @@ gw2copilot
    :target: https://readthedocs.org/projects/gw2copilot/?badge=latest
    :alt: sphinx documentation for latest release
 
-.. image:: http://www.repostatus.org/badges/latest/wip.svg
-   :alt: Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
-   :target: http://www.repostatus.org/#wip
+.. image:: http://www.repostatus.org/badges/latest/unsupported.svg
+   :alt: Project Status: Unsupported – The project has reached a stable, usable state but the author(s) have ceased all work on it. A new maintainer may be desired.
+   :target: http://www.repostatus.org/#unsupported
 
 A Python-based GuildWars2 helper tool.
 
 Overview
 --------
+
+**This project is unsupported.** It is/was mostly functional and usable, and I think it provided quite a bit of help. However I'm no longer playing GW2, so I don't expect to do much, if any, work on this project. If anyone wants to take over development or maintenance of it, please open an issue...
 
 gw2copilot is a browser-based "helper" for Guild Wars 2, to automate manual
 tasks that players currently perform out of the game.
